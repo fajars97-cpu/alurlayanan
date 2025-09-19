@@ -8,7 +8,7 @@ const IMG_DIR = "/infografis";
 const FLOW_IMG_DIR = "/alur";
 const FLOW_MAP = {
   0: null,                           // blank
-  1: "1-menuju-loket.jpg",           // menuju loket
+  1: "1-menuju-loket.jpg.png",           // menuju loket
   2: "2-menuju-kasir.jpg",           // menuju kasir
   3: "3-menuju-poli-gigi.jpg",       // menuju poli gigi (contoh awal)
   4: "4-menuju-farmasi.jpg",         // turun ke lantai 1 → farmasi
