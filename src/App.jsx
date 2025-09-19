@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 // Semua infografis disimpan di satu folder: public/infografis/
 const IMG_DIR = "/infografis";
 // Alur layanan (gambar bersama): simpan di public/alur/
-const FLOW_IMG_DIR = "/alur";
+const FLOW_IMG_DIR = `${import.meta.env.BASE_URL}alur`;
 const FLOW_MAP = {
   0: null,                           // blank
-  1: "1-menuju-loket.jpg.png",           // menuju loket
+  1: "1-menuju-loket.jpg",           // menuju loket
   2: "2-menuju-kasir.jpg",           // menuju kasir
   3: "3-menuju-poli-gigi.jpg",       // menuju poli gigi (contoh awal)
   4: "4-menuju-farmasi.jpg",         // turun ke lantai 1 → farmasi
