@@ -1,9 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ======================= Mockup Jadwal (v2, fixed) ==========================
+// ======================= Mockup Jadwal (v3, fixed) ==========================
 // Semua infografis disimpan di satu folder: public/infografis/
 const IMG_DIR = "/infografis";
+// Alur layanan (gambar bersama): simpan di public/alur/
+const FLOW_IMG_DIR = "/alur";
+const FLOW_MAP = {
+  0: null,                           // blank
+  1: "1-menuju-loket.jpg",           // menuju loket
+  2: "2-menuju-kasir.jpg",           // menuju kasir
+  3: "3-menuju-poli-gigi.jpg",       // menuju poli gigi (contoh awal)
+  4: "4-menuju-farmasi.jpg",         // turun ke lantai 1 → farmasi
+  5: "5-selesai.jpg",                // alur layanan selesai
+};
+const resolveFlowImg = (code) => {
+  const f = FLOW_MAP[code];
+  return f ? `${FLOW_IMG_DIR}/${f}` : null;
+};
+
 
 // Data contoh (ganti dengan data nyata)
 const SERVICES = [
@@ -30,10 +45,10 @@ const SERVICES = [
     ],
     img: "poli-umum.jpg.png", // ← file ada di public/infografis/poli-umum.jpg
     layanan: [
-    { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, ket: "Konsultasi dokter umum" },
-    { nama: "Kontrol Berkala",   ikon: "📅", tarif: 0 },
-    { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000 },
-    { nama: "Konseling",         ikon: "💬", tarif: 0 },
+    { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0,  ket: "Konsultasi dokter umum", alur: [1,5,0,0,0,0,0,0,0] },
+    { nama: "Kontrol Berkala",   ikon: "📅", tarif: 0,  alur: [1,5,0,0,0,0,0,0,0] },
+    { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000, alur: [1,2,5,0,0,0,0,0,0] },
+    { nama: "Konseling",         ikon: "💬", tarif: 0,  alur: [1,5,0,0,0,0,0,0,0] },
   ],
   },
   {
@@ -60,10 +75,10 @@ const SERVICES = [
     ],
     img: "poli-gigi.jpg",
      layanan: [
-    { nama: "Cabut Gigi",        ikon: "🦷", tarif: 30000 },
-    { nama: "Scaling (Pembersihan Karang)", ikon: "🪥", tarif: 40000 },
-    { nama: "Penambalan Gigi",   ikon: "🧱", tarif: 30000 },
-    { nama: "Konsultasi Gigi",   ikon: "💬", tarif: 0 },
+       { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1,2,3,4,5,0,0,0,0] },
+    { nama: "Scaling (Pembersihan Karang)", ikon: "🪥", tarif: 40000, alur: [1,3,4,5,0,0,0,0,0] },
+    { nama: "Penambalan Gigi", ikon: "🧱", tarif: 30000, alur: [1,3,2,4,5,0,0,0,0] },
+    { nama: "Konsultasi Gigi", ikon: "💬", tarif: 0, alur: [1,3,5,0,0,0,0,0,0] },
   ],
   },
   {
@@ -742,9 +757,12 @@ function ServiceCard({ s, onPick }) {
 }
 
 // Kartu layanan tambahan ------------------------------------------------------
-function SubServiceCard({ item }) {
+function SubServiceCard({ item, onPick }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden">
+    <button
+      onClick={() => onPick(item)}
+      className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
+    >
       <div className="p-4">
         <div className="flex items-center gap-3">
           <div className="text-xl">{item.ikon ?? "🧩"}</div>
@@ -753,21 +771,36 @@ function SubServiceCard({ item }) {
         </div>
         {item.ket && <div className="text-sm text-white/60 mt-1">{item.ket}</div>}
       </div>
+    </button>
+  );
+}
+
+function FlowCard({ code, index }) {
+  const src = resolveFlowImg(code);
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+      <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
+      <div className="p-3 flex items-center justify-center">
+        {src ? (
+          <img src={src} alt={`Langkah ${index + 1}`} className="max-w-full h-auto object-contain" />
+        ) : (
+          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>
+        )}
+      </div>
     </div>
   );
 }
 
 // Panel kanan ----------------------------------------------------------------
 function RightPanel({ selected, setSelected, filtered }) {
-  const title = !selected ? "Pilih poli untuk melihat jenis layanannya." :
-                             `Jenis Layanan — ${selected.nama}`;
+  const [sub, setSub] = useState(null);
+  useEffect(() => setSub(null), [selected]); // reset saat ganti poli
 
-  const list = selected ? (selected.layanan ?? []) : filtered;
-
-  return (
-    <div className="min-h-[calc(100svh-64px)] p-4 md:p-6">
-      <AnimatePresence mode="wait">
-        {!selected ? (
+  // 1) Belum pilih poli → tampilkan grid poli
+  if (!selected) {
+    return (
+      <div className="min-h-[calc(100svh-64px)] p-4 md:p-6">
+        <AnimatePresence mode="wait">
           <motion.div
             key="grid-poli"
             initial={{ opacity: 0, x: -20 }}
@@ -775,52 +808,67 @@ function RightPanel({ selected, setSelected, filtered }) {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25 }}
           >
-            <div className="mb-3 text-white/70">{title}</div>
+            <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {list.map((s) => (
+              {filtered.map((s) => (
                 <ServiceCard key={s.id} s={s} onPick={setSelected} />
               ))}
             </div>
           </motion.div>
-        ) : (
-          <motion.div
-            key={`grid-layanan-${selected.id}`}
-            initial={{ opacity: 0, x: 80 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -80 }}
-            transition={{ duration: 0.35 }}
-            className="space-y-4"
-          >
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setSelected(null)}
-                className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
-              >
-                ← Kembali
-              </button>
-              <div className="text-2xl">{selected.ikon}</div>
-              <h2 className="text-xl md:text-2xl font-semibold">{selected.nama}</h2>
-              <div className="ml-auto flex gap-2">
-                <Chip>{selected.klaster}</Chip>
-                {selected.telemed && <Chip>Telemed</Chip>}
-              </div>
-            </div>
+        </AnimatePresence>
+      </div>
+    );
+  }
 
-            <div className="mb-3 text-white/70">{title}</div>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {list.length > 0 ? (
-                list.map((it, i) => <SubServiceCard key={i} item={it} />)
-              ) : (
-                <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  // 2) Sudah pilih poli, belum pilih layanan → tampilkan daftar layanan
+  if (!sub) {
+    const list = selected.layanan ?? [];
+    return (
+      <div className="min-h-[calc(100svh-64px)] p-4 md:p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setSelected(null)} className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+          <div className="text-2xl">{selected.ikon}</div>
+          <h2 className="text-xl md:text-2xl font-semibold">{selected.nama}</h2>
+          <div className="ml-auto flex gap-2">
+            <Chip>{selected.klaster}</Chip>
+            {selected.telemed && <Chip>Telemed</Chip>}
+          </div>
+        </div>
+
+        <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {list.length > 0 ? (
+            list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />)
+          ) : (
+            <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 3) Sudah pilih layanan → tampilkan 9 langkah alur
+  const steps = Array.from({ length: 9 }, (_, i) => sub.alur?.[i] ?? 0);
+
+  return (
+    <div className="min-h-[calc(100svh-64px)] p-4 md:p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <button onClick={() => setSub(null)} className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+        <div className="text-2xl">{selected.ikon}</div>
+        <h2 className="text-xl md:text-2xl font-semibold">{selected.nama} — {sub.nama}</h2>
+        <div className="ml-auto flex gap-2">
+          <Chip>{selected.klaster}</Chip>
+          {selected.telemed && <Chip>Telemed</Chip>}
+        </div>
+      </div>
+
+      <div className="text-white/70">Alur layanan untuk: <span className="font-medium">{sub.nama}</span></div>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {steps.map((code, i) => <FlowCard key={i} code={code} index={i} />)}
+      </div>
     </div>
   );
 }
-
 
 // App ------------------------------------------------------------------------
 export default function App() {
