@@ -234,7 +234,7 @@ const StatusPill = ({ open }) => (
 );
 
 // ===== Sidebar =====
-function Sidebar({ query, setQuery, services, onPick, selected }){
+function Sidebar({ query, setQuery, services, onPick, selected, matchedIds }) {
   const [expandedId, setExpandedId] = useState(null);
   const toggle = (s) => { onPick(s); setExpandedId(id => id===s.id? null : s.id); };
 
@@ -256,7 +256,7 @@ function Sidebar({ query, setQuery, services, onPick, selected }){
           const active = expandedId === s.id;
           return (
             <div key={s.id} className="space-y-2">
-              <button onClick={()=>toggle(s)} className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${selected?.id===s.id?"border-emerald-500/60 bg-emerald-500/10":"border-white/10"}`}>
+              <button onClick={() => toggle(s)}className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${selected?.id === s.id? "border-emerald-500/60 bg-emerald-500/10": (matchedIds?.has?.(s.id) && query? "border-emerald-400/60 bg-emerald-400/10": "border-white/10")}`}>
                 <div className="flex items-center gap-3">
                   <div className="text-lg">{s.ikon}</div>
                   <div className="min-w-0">
@@ -358,16 +358,33 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
       <div className="min-h-[calc(100svh-64px)] p-4 md:p-6">
         <AnimatePresence mode="wait">
           <motion.div key="grid-poli" initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:20 }} transition={{ duration:.25 }}>
-            {searchQuery && subMatches?.length>0 && (
-              <section className="mb-6">
-                <div className="mb-2 text-white/70">Hasil Pelayanan</div>
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {subMatches.map(({ poli, item, index }) => (
-                    <SubServiceCard key={poli.id+'#'+index} item={{ ...item, nama: `${item.nama} — ${poli.nama}` }} onPick={()=>onPickSub(poli.id, index)} />
-                  ))}
-                </div>
-              </section>
-            )}
+            {searchQuery && subMatches?.length > 0 && (
+  <section className="mb-6">
+    <div className="mb-2 text-white/70">Hasil Pelayanan</div>
+    <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {subMatches.map(({ poli, item, index }) => (
+        <SubServiceCard
+          key={poli.id + "#" + index}
+          item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
+          onPick={() => onPickSub(poli.id, index)}
+        />
+      ))}
+    </div>
+  </section>
+)}
+
+{!(searchQuery && subMatches?.length > 0) && (
+  <>
+    <div className="mb-3 text-white/70">
+      Pilih poli untuk melihat jenis layanannya.
+    </div>
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {filtered.map((s) => (
+        <ServiceCard key={s.id} s={s} onPick={setSelected} />
+      ))}
+    </div>
+  </>
+)}
 
             <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -456,6 +473,12 @@ export default function App(){
     return rows;
   }, [query]);
 
+  // set poli yang relevan dengan hasil pencarian pelayanan
+const matchPoliIds = useMemo(
+  () => new Set(subResults.map((r) => r.poli.id)),
+  [subResults]
+);
+
   // loncat otomatis ke sub-layanan (dipakai RightPanel)
   const [jump, setJump] = useState(null);
   function handlePickSub(poliId, idx){
@@ -482,7 +505,7 @@ export default function App(){
       </header>
 
       <div className="max-w-7xl mx-auto md:px-4 grid md:grid-cols-[24rem_1fr]">
-        <Sidebar query={query} setQuery={setQuery} services={filtered} onPick={(s)=>setSelected(s)} selected={selected} />
+        <Sidebar query={query}setQuery={setQuery}services={sidebarList}onPick={(s) => setSelected(s)}selected={selected}matchedIds={matchPoliIds}/>
         <RightPanel selected={selected} setSelected={setSelected} filtered={filtered} subMatches={subResults} onPickSub={handlePickSub} jump={jump} setJump={setJump} searchQuery={query} />
       </div>
 
