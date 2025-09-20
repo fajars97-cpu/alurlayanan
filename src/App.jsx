@@ -112,7 +112,7 @@ const SERVICES = [
     ikon: "🌙",
     lokasi: "Lantai 1 — Layanan 24 Jam",
     telemed: false,
-    img: "pelayanan-24-jam.jpg",
+    img: "igd.jpg",
     layanan: [{ nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] }],
   },
 ];
