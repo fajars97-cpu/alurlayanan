@@ -1,6 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// === Engine graf (baru) ===
+import { evalFlow, linearFromArray } from "./flowEngine";
+import { FLOWS } from "./flows";
+
 // === Path helper ===
 const BASE = import.meta.env.BASE_URL ?? "/";
 const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
@@ -21,7 +25,7 @@ const onInfoError = (e) => {
   e.currentTarget.src = INFO_FALLBACK;
 };
 
-// === Flow helper ===
+// === Flow helper (peta file gambar per kode angka) ===
 const FLOW_MAP = {
   0: null,
   1: "1-menuju-loket.jpg",
@@ -29,6 +33,11 @@ const FLOW_MAP = {
   3: "3-menuju-poli-gigi.jpg",
   4: "4-menuju-farmasi.jpg",
   5: "5-selesai.jpg",
+  // langkah tambahan (digunakan oleh subflow lab & decision)
+  6: "menuju-laboratorium.jpg",
+  7: "menunggu-hasil-lab.jpg",
+  8: "kembali-ke-poli-umum-baca-hasil.jpg",
+  9: "menuju-ke-poli-umum.jpg",
 };
 const resolveFlowImg = (code) => {
   const f = FLOW_MAP[code] ?? null;
@@ -92,7 +101,8 @@ function rangesForToday(j, ref = new Date()) {
   const push = (r, label) => {
     const [a, b] = r.split("-").map((s) => s.trim());
     if (!a || !b) return;
-    const A = toMin(a), B = toMin(b);
+    const A = toMin(a),
+      B = toMin(b);
     if (B >= A) out.push({ from: A, to: B });
     else {
       if (label === "yesterday") out.push({ from: 0, to: B });
@@ -121,7 +131,7 @@ const FACILITIES = [
   { id: "pustu-tanjung-barat", name: "Pustu Tanjung Barat" },
 ];
 
-// Dataset layanan untuk Puskesmas Jagakarsa (lengkap seperti sebelumnya)
+// Dataset layanan untuk Puskesmas Jagakarsa (lengkap, termasuk IGD & 24 jam)
 const SERVICES_JAGAKARSA = [
   {
     id: "poli-umum",
@@ -132,8 +142,15 @@ const SERVICES_JAGAKARSA = [
     telemed: true,
     img: "poli-umum.jpg.png",
     layanan: [
-      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, ket: "Konsultasi dokter umum", alur: [1, 5] },
-      { nama: "Kontrol Berkala", ikon: "📅", tarif: 0, alur: [1, 5] },
+      // alur array tetap ada agar backward-compatible; graf akan override via FLOWS
+      {
+        nama: "Pemeriksaan Umum",
+        ikon: "🩺",
+        tarif: 0,
+        ket: "Konsultasi dokter umum",
+        alur: [1, 9, 4, 5], // fallback linear bila graf tidak ditemukan
+      },
+      { nama: "Kontrol Berkala", ikon: "📅", tarif: 0, alur: [1, 4, 5] },
       { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000, alur: [1, 2, 5] },
     ],
   },
@@ -158,7 +175,7 @@ const SERVICES_JAGAKARSA = [
     lokasi: "Lantai Dasar — IGD",
     telemed: false,
     img: "igd.jpg",
-    layanan: [ { nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, alur: [1, 5] } ],
+    layanan: [{ nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, alur: [1, 5] }],
   },
   {
     id: "pelayanan-24-jam",
@@ -167,8 +184,8 @@ const SERVICES_JAGAKARSA = [
     ikon: "🌙",
     lokasi: "Lantai 1 — Layanan 24 Jam",
     telemed: false,
-    img: "igd.jpg",
-    layanan: [ { nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] } ],
+    img: "pelayanan-24-jam.jpg",
+    layanan: [{ nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] }],
   },
 ];
 
@@ -182,9 +199,7 @@ const makePustuServices = (label) => [
     lokasi: "Ruang Poli Umum",
     telemed: false,
     img: "poli-umum.jpg.png",
-    layanan: [
-      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, alur: [1, 5] },
-    ],
+    layanan: [{ nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, alur: [1, 5] }],
   },
   {
     id: `${label}-gigi`,
@@ -226,26 +241,51 @@ function Rupiah({ n }) {
       <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">Gratis</span>
     );
   return (
-    <span className="px-2 rounded bg-sky-600/20 text-sky-300">Rp {n.toLocaleString("id-ID")}</span>
+    <span className="px-2 rounded bg-sky-600/20 text-sky-300">
+      Rp {n.toLocaleString("id-ID")}
+    </span>
   );
 }
 const StatusPill = ({ open }) => (
-  <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${open?"bg-emerald-500/10 border-emerald-400/30 text-emerald-300":"bg-rose-500/10 border-rose-400/30 text-rose-300"}`}>{open?"Buka":"Tutup"}</span>
+  <span
+    className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
+      open
+        ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300"
+        : "bg-rose-500/10 border-rose-400/30 text-rose-300"
+    }`}
+  >
+    {open ? "Buka" : "Tutup"}
+  </span>
 );
 
 // === Sidebar ===
-function Sidebar({ facilityName, query, setQuery, services, onPick, selected, highlightIds = [] }) {
+function Sidebar({
+  facilityName,
+  query,
+  setQuery,
+  services,
+  onPick,
+  selected,
+  highlightIds = [],
+}) {
   const [expandedId, setExpandedId] = useState(null);
-  const toggle = (s) => { onPick(s); setExpandedId((id) => (id === s.id ? null : s.id)); };
+  const toggle = (s) => {
+    onPick(s);
+    setExpandedId((id) => (id === s.id ? null : s.id));
+  };
 
   return (
     <aside className="w-full md:w-80 shrink-0 bg-slate-950/70 backdrop-blur border-r border-white/10 flex flex-col">
       <div className="p-4 flex items-center gap-2 border-b border-white/10">
-        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
+        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">
+          🏥
+        </div>
         <div className="font-semibold truncate">Jadwal & Tarif</div>
       </div>
 
-      <div className="px-4 pt-3 text-xs text-white/60">Fasilitas: <span className="text-white/90 font-medium">{facilityName}</span></div>
+      <div className="px-4 pt-3 text-xs text-white/60">
+        Fasilitas: <span className="text-white/90 font-medium">{facilityName}</span>
+      </div>
 
       <div className="p-4 space-y-3">
         <label className="text-xs uppercase text-white/50">Pencarian</label>
@@ -308,9 +348,17 @@ function Sidebar({ facilityName, query, setQuery, services, onPick, selected, hi
 // === Cards ===
 function ServiceCard({ s, onPick }) {
   return (
-    <button onClick={() => onPick(s)} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left">
+    <button
+      onClick={() => onPick(s)}
+      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left"
+    >
       <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden">
-        <img src={resolveInfografis(s)} onError={onInfoError} alt={s.nama} className="w-full h-full object-cover" />
+        <img
+          src={resolveInfografis(s)}
+          onError={onInfoError}
+          alt={s.nama}
+          className="w-full h-full object-cover"
+        />
       </div>
       <div className="p-3">
         <div className="flex items-center gap-2">
@@ -324,28 +372,42 @@ function ServiceCard({ s, onPick }) {
 }
 function SubServiceCard({ item, onPick }) {
   return (
-    <button onClick={() => onPick(item)} className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden">
+    <button
+      onClick={() => onPick(item)}
+      className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
+    >
       <div className="p-3 sm:p-4">
         <div className="flex items-center gap-3">
           <div className="text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
           <div className="font-semibold text-sm sm:text-base">{item.nama}</div>
-          <div className="ml-auto">{typeof item.tarif === "number" ? <Rupiah n={item.tarif} /> : null}</div>
+          <div className="ml-auto">
+            {typeof item.tarif === "number" ? <Rupiah n={item.tarif} /> : null}
+          </div>
         </div>
-        {item.ket && <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>}
+        {item.ket && (
+          <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>
+        )}
       </div>
     </button>
   );
 }
-function FlowCard({ code, index }) {
+function FlowStepCard({ code, index }) {
   const src = resolveFlowImg(code);
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
       <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
       <div className="p-2 sm:p-3 flex items-center justify-center">
         {src ? (
-          <img src={src} onError={onFlowError} alt={`Langkah ${index + 1}`} className="max-w-full h-auto object-contain" />
+          <img
+            src={src}
+            onError={onFlowError}
+            alt={`Langkah ${index + 1}`}
+            className="max-w-full h-auto object-contain"
+          />
         ) : (
-          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>
+          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">
+            —
+          </div>
         )}
       </div>
     </div>
@@ -353,7 +415,16 @@ function FlowCard({ code, index }) {
 }
 
 // === RightPanel ===
-function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, jump, setJump, searchQuery }) {
+function RightPanel({
+  selected,
+  setSelected,
+  filtered,
+  subMatches,
+  onPickSub,
+  jump,
+  setJump,
+  searchQuery,
+}) {
   const [sub, setSub] = useState(null);
   useEffect(() => setSub(null), [selected]);
   useEffect(() => {
@@ -368,13 +439,23 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
         <AnimatePresence mode="wait">
-          <motion.div key="grid-poli" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.25 }}>
+          <motion.div
+            key="grid-poli"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.25 }}
+          >
             {hasServiceResults && (
               <section className="mb-6">
                 <div className="mb-2 text-white/70">Hasil Pelayanan</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
-                    <SubServiceCard key={poli.id + "#" + index} item={{ ...item, nama: `${item.nama} — ${poli.nama}` }} onPick={() => onPickSub(poli.id, index)} />
+                    <SubServiceCard
+                      key={poli.id + "#" + index}
+                      item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
+                      onPick={() => onPickSub(poli.id, index)}
+                    />
                   ))}
                 </div>
               </section>
@@ -382,9 +463,13 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
 
             {!hasServiceResults && (
               <>
-                <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
+                <div className="mb-3 text-white/70">
+                  Pilih poli untuk melihat jenis layanannya.
+                </div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {filtered.map((s) => (<ServiceCard key={s.id} s={s} onPick={setSelected} />))}
+                  {filtered.map((s) => (
+                    <ServiceCard key={s.id} s={s} onPick={setSelected} />
+                  ))}
                 </div>
               </>
             )}
@@ -399,12 +484,19 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <button onClick={() => setSelected(null)} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+          <button
+            onClick={() => setSelected(null)}
+            className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
+          >
+            ← Kembali
+          </button>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-2xl">{selected.ikon}</div>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama}</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+            {selected.nama}
+          </h2>
           <div className="ml-auto flex gap-2">
             <Chip>{selected.klaster}</Chip>
             {selected.telemed && <Chip>Telemed</Chip>}
@@ -413,7 +505,9 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
 
         <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
         <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {list.length > 0 ? list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />) : (
+          {list.length > 0 ? (
+            list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />)
+          ) : (
             <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
           )}
         </div>
@@ -421,28 +515,100 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
     );
   }
 
-  const steps = Array.from({ length: 9 }, (_, i) => sub.alur?.[i] ?? 0);
-  const visibleSteps = steps.filter((code) => code && code !== 0);
+  // === Alur berbasis graf (MINIMAL CHANGE) ===
+  // 1) state jawaban decision per layanan
+  const [decisions, setDecisions] = useState({});
+  useEffect(() => setDecisions({}), [sub]);
+
+  // 2) kunci layanan: "<id-poli>/<slug-layanan>"
+  const serviceKey = `${selected.id}/${(sub.nama || "")
+    .toLowerCase()
+    .replace(/\s+/g, "-")}`;
+
+  // 3) pilih graf; fallback ke array 'alur' bila belum ada
+  const graph =
+    FLOWS[serviceKey] ||
+    linearFromArray(Array.isArray(sub.alur) ? sub.alur : []);
+
+  // 4) evaluasi graf sampai decision berikutnya
+  const path = useMemo(
+    () => evalFlow(graph, graph.start, { decisions }),
+    [graph, decisions]
+  );
+
+  function answerDecision(key, val) {
+    setDecisions((d) => ({ ...d, [key]: val }));
+  }
 
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <button onClick={() => setSub(null)} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+        <button
+          onClick={() => setSub(null)}
+          className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
+        >
+          ← Kembali
+        </button>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="text-2xl">{selected.ikon}</div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama} — {sub.nama}</h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+          {selected.nama} — {sub.nama}
+        </h2>
         <div className="ml-auto flex gap-2">
           <Chip>{selected.klaster}</Chip>
           {selected.telemed && <Chip>Telemed</Chip>}
         </div>
       </div>
 
-      <div className="text-white/70">Alur layanan untuk: <span className="font-medium">{sub.nama}</span></div>
+      <div className="text-white/70">
+        Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
+      </div>
 
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {visibleSteps.map((code, i) => (<FlowCard key={i} code={code} index={i} />))}
+        {path.map((node, i) => {
+          if (node.type === "step") {
+            return <FlowStepCard key={node.id} code={node.data.img} index={i} />;
+          }
+          if (node.type === "decision") {
+            const key = node.data.key;
+            const current = decisions[key];
+            return (
+              <div
+                key={node.id}
+                className="rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4"
+              >
+                <div className="text-sm font-semibold mb-2">{node.data.label}</div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => answerDecision(key, "ya")}
+                    aria-pressed={current === "ya"}
+                    className={`px-3 py-2 rounded-lg border ${
+                      current === "ya"
+                        ? "bg-emerald-600/30 border-emerald-500/60"
+                        : "bg-white/10 border-white/20 hover:bg-white/20"
+                    }`}
+                  >
+                    Ya
+                  </button>
+                  <button
+                    onClick={() => answerDecision(key, "tidak")}
+                    aria-pressed={current === "tidak"}
+                    className={`px-3 py-2 rounded-lg border ${
+                      current === "tidak"
+                        ? "bg-rose-600/30 border-rose-500/60"
+                        : "bg-white/10 border-white/20 hover:bg-white/20"
+                    }`}
+                  >
+                    Tidak
+                  </button>
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })}
       </div>
     </div>
   );
@@ -461,7 +627,10 @@ export default function App() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return SERVICES_CURRENT.filter(
-      (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
+      (s) =>
+        !q ||
+        s.nama.toLowerCase().includes(q) ||
+        s.klaster.toLowerCase().includes(q)
     );
   }, [query, SERVICES_CURRENT]);
 
@@ -470,19 +639,25 @@ export default function App() {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     const rows = [];
-    SERVICES_CURRENT.forEach((p) => (p.layanan || []).forEach((item, idx) => {
-      const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
-      if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
-    }));
+    SERVICES_CURRENT.forEach((p) =>
+      (p.layanan || []).forEach((item, idx) => {
+        const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
+        if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
+      })
+    );
     return rows;
   }, [query, SERVICES_CURRENT]);
 
   // poli relevan → highlight
-  const matchPoliIds = useMemo(() => Array.from(new Set(subResults.map((r) => r.poli.id))), [subResults]);
+  const matchPoliIds = useMemo(
+    () => Array.from(new Set(subResults.map((r) => r.poli.id))),
+    [subResults]
+  );
 
   // daftar untuk sidebar: kalau filter poli kosong tapi ada hasil pelayanan → tampilkan semua poli
   const sidebarList = useMemo(() => {
-    if (filtered.length === 0 && query && subResults.length > 0) return SERVICES_CURRENT;
+    if (filtered.length === 0 && query && subResults.length > 0)
+      return SERVICES_CURRENT;
     return filtered;
   }, [filtered, query, subResults, SERVICES_CURRENT]);
 
@@ -496,14 +671,19 @@ export default function App() {
   }
 
   // reset pilihan saat ganti fasilitas
-  useEffect(() => { setSelected(null); setQuery(""); }, [facility]);
+  useEffect(() => {
+    setSelected(null);
+    setQuery("");
+  }, [facility]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
       <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
+            <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">
+              🏥
+            </div>
             <div className="font-semibold">Penampil Jadwal & Tarif Layanan</div>
           </div>
 
@@ -516,7 +696,9 @@ export default function App() {
               className="h-9 rounded-lg bg-white/5 border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
             >
               {FACILITIES.map((f) => (
-                <option key={f.id} value={f.id}>{f.name}</option>
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
               ))}
             </select>
           </div>
@@ -545,7 +727,9 @@ export default function App() {
         />
       </div>
 
-      <footer className="py-6 text-center text-white/50 text-sm">© {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.</footer>
+      <footer className="py-6 text-center text-white/50 text-sm">
+        © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
+      </footer>
     </div>
   );
 }
