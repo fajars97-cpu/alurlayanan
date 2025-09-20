@@ -274,11 +274,11 @@ function Sidebar({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cari 'umum', 'gigi', 'cabut gigi' ..."
-          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500"
-        />
+          className="w-full h-11 px-3 rounded-xl bg-white/5 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
+       />
       </div>
 
-      <div className="px-4 pb-2 max-h-[calc(100svh-200px)] overflow-auto space-y-2">
+      <div className="px-4 pb-2 max-h-[calc(100svh-180px)] overflow-auto space-y-2">
         <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
 
         {services.map((s) => {
@@ -338,7 +338,7 @@ function ServiceCard({ s, onPick }) {
       onClick={() => onPick(s)}
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left"
     >
-      <div className="aspect-[16/9] w-full overflow-hidden">
+      <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden">
         <img
           src={resolveInfografis(s)}
           onError={onInfoError}
@@ -428,7 +428,7 @@ function RightPanel({
   if (!selected) {
     const hasServiceResults = searchQuery && subMatches?.length > 0;
     return (
-      <div className="min-h-[calc(100svh-64px)] p-4 md:p-6">
+      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
         <AnimatePresence mode="wait">
           <motion.div
             key="grid-poli"
@@ -457,7 +457,7 @@ function RightPanel({
                 <div className="mb-3 text-white/70">
                   Pilih poli untuk melihat jenis layanannya.
                 </div>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filtered.map((s) => (
                     <ServiceCard key={s.id} s={s} onPick={setSelected} />
                   ))}
@@ -478,7 +478,7 @@ function RightPanel({
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSelected(null)}
-            className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
+            className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
           >
             ← Kembali
           </button>
@@ -486,7 +486,7 @@ function RightPanel({
 
         <div className="flex items-center gap-3">
           <div className="text-2xl">{selected.ikon}</div>
-          <h2 className="text-xl md:text-2xl font-semibold">{selected.nama}</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama}</h2>
           <div className="ml-auto flex gap-2">
             <Chip>{selected.klaster}</Chip>
             {selected.telemed && <Chip>Telemed</Chip>}
@@ -600,7 +600,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
       <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-3">
+         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
             <div className="font-semibold">Penampil Jadwal & Tarif Layanan</div>
@@ -613,7 +613,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto md:px-4 grid md:grid-cols-[24rem_1fr]">
+      <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
         <Sidebar
           query={query}
           setQuery={setQuery}
