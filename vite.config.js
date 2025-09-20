@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/alurlayanan/',     // ← ganti sesuai nama repo (HARUS ada slash awal & akhir)
+  base: '/alurlayanan/',   // ← HARUS: nama repo kamu, ada slash awal & akhir
 })
