@@ -2,7 +2,14 @@ import React, { useMemo, useState, useEffect } from "react";
 import { evalFlow, linearFromArray } from "./flowEngine";
 import { FLOWS } from "./flows";
 
-// === util slugify untuk konsistensi key ===
+/* =========================
+   Util & path helpers
+   ========================= */
+const BASE = import.meta.env.BASE_URL ?? "/";
+const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
+const DIR_INFO = `${BASE}infografis`;
+const DIR_FLOW = `${BASE}alur`;
+
 const slugify = (s) =>
   String(s || "")
     .normalize("NFKD")
@@ -12,16 +19,139 @@ const slugify = (s) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-// === Dummy data poli & layanan (cukup untuk test) ===
+/* =============== Infografis (kartu poli) =============== */
+const resolveInfografis = (service) => {
+  const file = (service?.img ?? `${service?.id ?? "missing"}.jpg`).toString();
+  if (/^https?:\/\//.test(file)) return file;
+  if (file.startsWith("/")) return asset(file);
+  return `${DIR_INFO}/${file}`;
+};
+const INFO_FALLBACK =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="22" text-anchor="middle" dominant-baseline="middle">Infografis tidak ditemukan</text></svg>';
+
+/* =============== Gambar alur (kartu langkah) =============== */
+const FLOW_FILE = {
+  1: "1-menuju-loket.jpg",
+  2: "2-menuju-kasir.jpg",
+  3: "3-menuju-poli-gigi.jpg",
+  4: "4-menuju-farmasi.jpg",
+  5: "5-selesai.jpg",
+  6: "menuju-laboratorium.jpg",
+  7: "menunggu-hasil-lab.jpg",
+  8: "kembali-ke-poli-umum-baca-hasil.jpg",
+  9: "menuju-ke-poli-umum.jpg",
+};
+const resolveFlowImg = (code) => {
+  const f = FLOW_FILE[code] ?? null;
+  return f ? `${DIR_FLOW}/${f}` : null;
+};
+const FLOW_FALLBACK =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
+
+/* =========================
+   Jadwal & status buka/tutup
+   ========================= */
+const DAY_NAMES_ID = [
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
+const DEFAULT_RULE = {
+  Senin: "08:00–16:00",
+  Selasa: "08:00–16:00",
+  Rabu: "08:00–16:00",
+  Kamis: "08:00–16:00",
+  Jumat: "08:00–16:00",
+  Sabtu: "Tutup",
+  Minggu: "Tutup",
+};
+function buildRuleJadwal(service) {
+  const id = (service?.id || "").toLowerCase();
+  if (id === "igd")
+    return Object.fromEntries(DAY_NAMES_ID.map((d) => [d, "00:00–24:00"]));
+  if (id.includes("pelayanan-24"))
+    return Object.fromEntries(
+      DAY_NAMES_ID.map((d) => [d, "16:00–24:00, 00:00–06:00"])
+    );
+  return { ...DEFAULT_RULE };
+}
+function getEffectiveJadwal(s) {
+  return s?.jadwal && Object.keys(s.jadwal).length ? s.jadwal : buildRuleJadwal(s);
+}
+const toMin = (s) => {
+  const [h, m] = String(s).split(":").map((n) => parseInt(n, 10) || 0);
+  return h * 60 + m;
+};
+function parseRanges(v) {
+  const t = String(v || "");
+  if (t.toLowerCase().includes("tutup")) return [];
+  return t.split(",").map((r) => r.trim().replace(/–|—/g, "-"));
+}
+function rangesForToday(j, ref = new Date()) {
+  const d = ref.getDay();
+  const day = DAY_NAMES_ID[d];
+  const prev = DAY_NAMES_ID[(d + 6) % 7];
+  const today = parseRanges(j[day]);
+  const yesterday = parseRanges(j[prev]);
+  const out = [];
+  const push = (r, label) => {
+    const [a, b] = r.split("-").map((s) => s.trim());
+    if (!a || !b) return;
+    const A = toMin(a), B = toMin(b);
+    if (B >= A) out.push({ from: A, to: B });
+    else {
+      if (label === "yesterday") out.push({ from: 0, to: B });
+      else out.push({ from: A, to: 1440 });
+    }
+  };
+  yesterday.forEach((r) => push(r, "yesterday"));
+  today.forEach((r) => push(r, "today"));
+  return out;
+}
+function isOpenNow(s, ref = new Date()) {
+  const j = getEffectiveJadwal(s);
+  const now = ref.getHours() * 60 + ref.getMinutes();
+  return rangesForToday(j, ref).some((R) => now >= R.from && now <= R.to);
+}
+
+/* =========================
+   Data fasilitas & layanan
+   ========================= */
+const FACILITIES = [
+  { id: "pkm-jagakarsa", name: "Puskesmas Jagakarsa" },
+  { id: "pustu-jagakarsa-1", name: "Pustu Jagakarsa 1" },
+  { id: "pustu-jagakarsa-2", name: "Pustu Jagakarsa 2" },
+  { id: "pustu-ciganjur", name: "Pustu Ciganjur" },
+  { id: "pustu-srensawah", name: "Pustu Srengseng Sawah" },
+  { id: "pustu-lenteng-1", name: "Pustu Lenteng Agung 1" },
+  { id: "pustu-lenteng-2", name: "Pustu Lenteng Agung 2" },
+  { id: "pustu-tanjung-barat", name: "Pustu Tanjung Barat" },
+];
+
 const SERVICES_JAGAKARSA = [
   {
     id: "poli-umum",
     nama: "Poli Umum",
     klaster: "Pelayanan Medik",
     ikon: "🩺",
+    lokasi: "Lantai 1 — Ruang 101",
+    telemed: true,
+    img: "poli-umum.jpg.png",
     layanan: [
-      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0 },
-      { nama: "Kontrol Berkala", ikon: "📅", tarif: 0 },
+      {
+        nama: "Pemeriksaan Umum",
+        ikon: "🩺",
+        tarif: 0,
+        ket: "Konsultasi dokter umum",
+        // fallback linear jika graf tidak ditemukan
+        alur: [1, 9, 4, 5],
+      },
+      { nama: "Kontrol Berkala", ikon: "📅", tarif: 0, alur: [1, 4, 5] },
+      { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000, alur: [1, 2, 5] },
     ],
   },
   {
@@ -29,70 +159,234 @@ const SERVICES_JAGAKARSA = [
     nama: "Poli Gigi",
     klaster: "Pelayanan Medik",
     ikon: "🦷",
+    lokasi: "Lantai 1 — Ruang 103",
+    telemed: false,
+    img: "poli-gigi.jpg",
     layanan: [
-      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000 },
-      { nama: "Scaling", ikon: "🪥", tarif: 40000 },
+      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1, 2, 3, 4, 5] },
+      { nama: "Scaling (Pembersihan Karang)", ikon: "🪥", tarif: 40000, alur: [1, 3, 4, 5] },
+    ],
+  },
+  {
+    id: "igd",
+    nama: "IGD",
+    klaster: "Gawat Darurat",
+    ikon: "🚑",
+    lokasi: "Lantai Dasar — IGD",
+    telemed: false,
+    img: "igd.jpg",
+    layanan: [{ nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, alur: [1, 5] }],
+  },
+  {
+    id: "pelayanan-24-jam",
+    nama: "Pelayanan 24 Jam",
+    klaster: "Layanan Malam",
+    ikon: "🌙",
+    lokasi: "Lantai 1 — Layanan 24 Jam",
+    telemed: false,
+    img: "pelayanan-24-jam.jpg",
+    layanan: [{ nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] }],
+  },
+];
+const makePustuServices = (label) => [
+  {
+    id: `${label}-umum`,
+    nama: "Poli Umum",
+    klaster: "Pelayanan Medik",
+    ikon: "🩺",
+    lokasi: "Ruang Poli Umum",
+    telemed: false,
+    img: "poli-umum.jpg.png",
+    layanan: [{ nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, alur: [1, 5] }],
+  },
+  {
+    id: `${label}-gigi`,
+    nama: "Poli Gigi",
+    klaster: "Pelayanan Medik",
+    ikon: "🦷",
+    lokasi: "Ruang Poli Gigi",
+    telemed: false,
+    img: "poli-gigi.jpg",
+    layanan: [
+      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1, 2, 3, 4, 5] },
+      { nama: "Scaling", ikon: "🪥", tarif: 40000, alur: [1, 3, 4, 5] },
     ],
   },
 ];
+const SERVICES_BY_FACILITY = {
+  "pkm-jagakarsa": SERVICES_JAGAKARSA,
+  "pustu-jagakarsa-1": makePustuServices("pustu-jag1"),
+  "pustu-jagakarsa-2": makePustuServices("pustu-jag2"),
+  "pustu-ciganjur": makePustuServices("pustu-ciganjur"),
+  "pustu-srensawah": makePustuServices("pustu-srensawah"),
+  "pustu-lenteng-1": makePustuServices("pustu-lenteng1"),
+  "pustu-lenteng-2": makePustuServices("pustu-lenteng2"),
+  "pustu-tanjung-barat": makePustuServices("pustu-tjbrt"),
+};
 
-function ServiceCard({ s, onPick }) {
+/* =========================
+   UI kecil
+   ========================= */
+const Chip = ({ children }) => (
+  <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 whitespace-nowrap">
+    {children}
+  </span>
+);
+function Rupiah({ n }) {
+  if (typeof n !== "number") return null;
+  if (n === 0) return <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">Gratis</span>;
+  return <span className="px-2 rounded bg-sky-600/20 text-sky-300">Rp {n.toLocaleString("id-ID")}</span>;
+}
+const StatusPill = ({ open }) => (
+  <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${open ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300" : "bg-rose-500/10 border-rose-400/30 text-rose-300"}`}>{open ? "Buka" : "Tutup"}</span>
+);
+
+/* =========================
+   Sidebar
+   ========================= */
+function Sidebar({ facilityName, query, setQuery, services, onPick, selected, highlightIds = [] }) {
+  const [expandedId, setExpandedId] = useState(null);
+  const toggle = (s) => { onPick(s); setExpandedId((id) => (id === s.id ? null : s.id)); };
   return (
-    <button
-      onClick={() => onPick(s)}
-      className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left w-full"
-    >
-      <div className="text-lg">{s.ikon}</div>
-      <div className="font-semibold">{s.nama}</div>
-      <div className="text-xs text-white/60">{s.klaster}</div>
-    </button>
+    <aside className="w-full md:w-80 shrink-0 bg-slate-950/70 backdrop-blur border-r border-white/10 flex flex-col">
+      <div className="p-4 flex items-center gap-2 border-b border-white/10">
+        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
+        <div className="font-semibold truncate">Jadwal & Tarif</div>
+      </div>
+
+      <div className="px-4 pt-3 text-xs text-white/60">Fasilitas: <span className="text-white/90 font-medium">{facilityName}</span></div>
+
+      <div className="p-4 space-y-3">
+        <label className="text-xs uppercase text-white/50">Pencarian</label>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Cari 'umum', 'gigi', 'cabut gigi' ..."
+          className="w-full h-11 px-3 rounded-xl bg-white/5 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
+        />
+      </div>
+
+      <div className="px-4 pb-2 flex-1 overflow-y-auto space-y-2">
+        <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
+        {services.map((s) => {
+          const active = expandedId === s.id;
+          const hl = highlightIds.includes(s.id);
+          return (
+            <div key={s.id} className="space-y-2">
+              <button
+                onClick={() => toggle(s)}
+                className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${
+                  selected?.id === s.id
+                    ? "border-emerald-500/60 bg-emerald-500/10"
+                    : hl
+                    ? "border-emerald-400 bg-emerald-400/10"
+                    : "border-white/10"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-lg">{s.ikon}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{s.nama}</div>
+                    <div className="text-xs text-white/60 truncate">{s.klaster}</div>
+                  </div>
+                  <StatusPill open={isOpenNow(s)} />
+                </div>
+              </button>
+
+              {active && (
+                <div className="mx-2 mb-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
+                  <div className="text-white/60 mb-1">Jadwal</div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
+                    {DAY_NAMES_ID.map((d) => (
+                      <React.Fragment key={d}>
+                        <span className="text-white/50">{d}</span>
+                        <span>{getEffectiveJadwal(s)[d] || "Tutup"}</span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 
-function SubServiceCard({ item, onPick }) {
+/* =========================
+   Cards
+   ========================= */
+function ServiceCard({ s, onPick }) {
   return (
-    <button
-      onClick={() => onPick(item)}
-      className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left w-full"
-    >
-      <div className="flex items-center gap-2">
-        <div>{item.ikon}</div>
-        <div className="font-semibold">{item.nama}</div>
+    <button onClick={() => onPick(s)} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left">
+      <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden">
+        <img src={resolveInfografis(s)} onError={(e) => (e.currentTarget.src = INFO_FALLBACK)} alt={s.nama} className="w-full h-full object-cover" />
+      </div>
+      <div className="p-3">
+        <div className="flex items-center gap-2">
+          <div className="text-xl">{s.ikon}</div>
+          <div className="font-semibold truncate">{s.nama}</div>
+        </div>
+        <div className="text-xs text-white/60 mt-1 truncate">{s.klaster}</div>
       </div>
     </button>
   );
 }
-
-function FlowStepCard({ node, idx }) {
+function SubServiceCard({ item, onPick }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-      <div className="text-xs text-white/50 mb-2">Langkah {idx + 1}</div>
-      <div className="font-semibold">{node.data?.label || node.id}</div>
+    <button onClick={() => onPick(item)} className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden">
+      <div className="p-3 sm:p-4">
+        <div className="flex items-center gap-3">
+          <div className="text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
+          <div className="font-semibold text-sm sm:text-base">{item.nama}</div>
+          <div className="ml-auto">{typeof item.tarif === "number" ? <Rupiah n={item.tarif} /> : null}</div>
+        </div>
+        {item.ket && <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>}
+      </div>
+    </button>
+  );
+}
+function FlowStepCard({ node, idx }) {
+  const src = resolveFlowImg(node.data?.img);
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+      <div className="px-3 pt-2 text-[11px] text-white/60">Langkah {idx + 1}</div>
+      <div className="p-2 sm:p-3 flex items-center justify-center">
+        {src ? (
+          <img
+            src={src}
+            alt={node.data?.label || node.id}
+            className="max-w-full h-auto object-contain"
+            onError={(e) => (e.currentTarget.src = FLOW_FALLBACK)}
+          />
+        ) : (
+          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">
+            {node.data?.label || node.id}
+          </div>
+        )}
+      </div>
+      <div className="px-3 pb-3 text-sm font-medium">{node.data?.label || node.id}</div>
     </div>
   );
 }
-
 function FlowDecisionCard({ node, current, onAnswer }) {
   return (
-    <div className="rounded-xl border border-amber-400/40 bg-amber-400/10 p-4">
-      <div className="font-semibold mb-2">{node.data?.label}</div>
+    <div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4">
+      <div className="text-sm font-semibold mb-2">{node.data?.label}</div>
       <div className="flex gap-2">
         <button
           onClick={() => onAnswer("ya")}
-          className={`px-3 py-1 rounded-lg border ${
-            current === "ya"
-              ? "bg-emerald-600/30 border-emerald-500/60"
-              : "bg-white/10 border-white/20"
+          className={`px-3 py-2 rounded-lg border transition ${
+            current === "ya" ? "bg-emerald-600/30 border-emerald-500/60" : "bg-white/10 border-white/20 hover:bg-white/20"
           }`}
         >
           Ya
         </button>
         <button
           onClick={() => onAnswer("tidak")}
-          className={`px-3 py-1 rounded-lg border ${
-            current === "tidak"
-              ? "bg-rose-600/30 border-rose-500/60"
-              : "bg-white/10 border-white/20"
+          className={`px-3 py-2 rounded-lg border transition ${
+            current === "tidak" ? "bg-rose-600/30 border-rose-500/60" : "bg-white/10 border-white/20 hover:bg-white/20"
           }`}
         >
           Tidak
@@ -102,74 +396,129 @@ function FlowDecisionCard({ node, current, onAnswer }) {
   );
 }
 
-// === Right Panel untuk render alur ===
-function RightPanel({ selected, sub, onBackSub, onBack }) {
-  const [decisions, setDecisions] = useState({});
+/* =========================
+   Right Panel (detail & alur)
+   ========================= */
+function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, jump, setJump, searchQuery }) {
+  const [sub, setSub] = useState(null);
 
-  const serviceKey = selected && sub ? `${selected.id}/${slugify(sub.nama)}` : null;
-  const graph = (serviceKey && FLOWS[serviceKey]) || linearFromArray(sub?.alur || []);
-
-  // DEBUG LOG
+  useEffect(() => setSub(null), [selected]);
   useEffect(() => {
-    if (serviceKey) {
-      console.log("[flow] serviceKey:", serviceKey);
-      console.log("[flow] has graph:", !!FLOWS[serviceKey]);
-      if (FLOWS[serviceKey]) {
-        console.log("[flow] graph.start:", FLOWS[serviceKey].start);
-        console.log("[flow] graph.nodes:", FLOWS[serviceKey].nodes.map((n) => n.id));
-      }
+    if (jump && selected && selected.id === jump.poliId) {
+      setSub(selected.layanan?.[jump.idx] ?? null);
+      setJump(null);
     }
-  }, [serviceKey]);
-
-  const path = useMemo(
-    () => (graph ? evalFlow(graph, graph.start, { decisions }) : []),
-    [graph, decisions]
-  );
-
-  // DEBUG path hasil evaluasi
-  useEffect(() => {
-    if (path.length) {
-      console.log(
-        "[flow] rendered path:",
-        path.map((n) => `${n.type}:${n.data?.label || n.id}`)
-      );
-    }
-  }, [path]);
+  }, [jump, selected, setJump]);
 
   if (!selected) {
-    return <div className="p-6 text-white/60">Pilih poli di sebelah kiri.</div>;
+    const hasServiceResults = searchQuery && subMatches?.length > 0;
+    return (
+      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
+        {hasServiceResults ? (
+          <section className="mb-6">
+            <div className="mb-2 text-white/70">Hasil Pelayanan</div>
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {subMatches.map(({ poli, item, index }) => (
+                <SubServiceCard key={poli.id + "#" + index} item={{ ...item, nama: `${item.nama} — ${poli.nama}` }} onPick={() => onPickSub(poli.id, index)} />
+              ))}
+            </div>
+          </section>
+        ) : (
+          <>
+            <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filtered.map((s) => (<ServiceCard key={s.id} s={s} onPick={setSelected} />))}
+            </div>
+          </>
+        )}
+      </div>
+    );
   }
 
   if (!sub) {
+    const list = selected.layanan ?? [];
     return (
-      <div className="p-6 space-y-3">
-        <button onClick={onBack} className="px-3 py-2 rounded bg-white/10">
-          ← Kembali
-        </button>
-        <h2 className="font-semibold text-lg">{selected.nama}</h2>
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-          {selected.layanan.map((it, i) => (
-            <SubServiceCard key={i} item={it} onPick={() => onBackSub(it)} />
-          ))}
+      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setSelected(null)} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="text-2xl">{selected.ikon}</div>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama}</h2>
+          <div className="ml-auto flex gap-2">
+            <Chip>{selected.klaster}</Chip>
+            {selected.telemed && <Chip>Telemed</Chip>}
+          </div>
+        </div>
+
+        <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {list.length > 0 ? list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />) : (
+            <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
+          )}
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="p-6 space-y-3">
-      <button onClick={() => onBackSub(null)} className="px-3 py-2 rounded bg-white/10">
-        ← Kembali
-      </button>
-      <h2 className="font-semibold text-lg">
-        {selected.nama} — {sub.nama}
-      </h2>
+  /* === Alur berbasis graf dengan deep-link keputusan === */
+  const [decisions, setDecisions] = useState({});
 
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+  // baca keputusan dari URL saat pertama tampil
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const key = "cekLab";
+    const v = url.searchParams.get(key);
+    if (v === "ya" || v === "tidak") setDecisions((d) => ({ ...d, [key]: v }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const serviceKey = `${selected.id}/${slugify(sub.nama)}`;
+  const graph = FLOWS[serviceKey] || linearFromArray(Array.isArray(sub.alur) ? sub.alur : []);
+  const path = useMemo(() => evalFlow(graph, graph.start, { decisions }), [graph, decisions]);
+
+  function setDecisionAndUpdateUrl(key, val) {
+    setDecisions((d) => {
+      const next = { ...d, [key]: val };
+      const url = new URL(window.location.href);
+      url.searchParams.set(key, val);
+      window.history.replaceState({}, "", url.toString());
+      return next;
+    });
+  }
+
+  const stepsCount = path.filter((n) => n.type === "step").length;
+  const waitingDecision = path.some((n) => n.type === "decision");
+
+  return (
+    <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <button onClick={() => setSub(null)} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="text-2xl">{selected.ikon}</div>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama} — {sub.nama}</h2>
+        <div className="ml-auto flex gap-2">
+          <Chip>{selected.klaster}</Chip>
+          {selected.telemed && <Chip>Telemed</Chip>}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 text-white/70">
+        <span>Langkah terhitung:</span>
+        <span className="px-2 py-1 rounded-full bg-white/10 border border-white/10 text-white/90">{stepsCount} langkah</span>
+        {waitingDecision && (
+          <span className="px-2 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-200">
+            Menunggu keputusan
+          </span>
+        )}
+      </div>
+
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {path.map((node, i) => {
-          if (node.type === "step") {
-            return <FlowStepCard key={node.id} node={node} idx={i} />;
-          }
+          if (node.type === "step") return <FlowStepCard key={node.id} node={node} idx={i} />;
           if (node.type === "decision") {
             const key = node.data.key;
             return (
@@ -177,7 +526,7 @@ function RightPanel({ selected, sub, onBackSub, onBack }) {
                 key={node.id}
                 node={node}
                 current={decisions[key]}
-                onAnswer={(val) => setDecisions((d) => ({ ...d, [key]: val }))}
+                onAnswer={(val) => setDecisionAndUpdateUrl(key, val)}
               />
             );
           }
@@ -188,29 +537,107 @@ function RightPanel({ selected, sub, onBackSub, onBack }) {
   );
 }
 
-// === Root App ===
+/* =========================
+   App Root
+   ========================= */
 export default function App() {
+  const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
-  const [sub, setSub] = useState(null);
+  const [facility, setFacility] = useState("pkm-jagakarsa");
+
+  const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
+  const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
+
+  // filter poli berdasar nama/klaster
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return SERVICES_CURRENT.filter(
+      (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
+    );
+  }, [query, SERVICES_CURRENT]);
+
+  // hasil pencarian untuk sub-layanan
+  const subResults = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    const rows = [];
+    SERVICES_CURRENT.forEach((p) =>
+      (p.layanan || []).forEach((item, idx) => {
+        const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
+        if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
+      })
+    );
+    return rows;
+  }, [query, SERVICES_CURRENT]);
+
+  // poli relevan → highlight
+  const matchPoliIds = useMemo(() => Array.from(new Set(subResults.map((r) => r.poli.id))), [subResults]);
+
+  // daftar untuk sidebar: jika filter poli kosong tapi ada hasil pelayanan → tampilkan semua poli
+  const sidebarList = useMemo(() => {
+    if (filtered.length === 0 && query && subResults.length > 0) return SERVICES_CURRENT;
+    return filtered;
+  }, [filtered, query, subResults, SERVICES_CURRENT]);
+
+  // loncat otomatis ke sub-layanan
+  const [jump, setJump] = useState(null);
+  function handlePickSub(poliId, idx) {
+    const p = SERVICES_CURRENT.find((x) => x.id === poliId);
+    if (!p) return;
+    setSelected(p);
+    setJump({ poliId, idx });
+  }
+
+  // reset saat ganti fasilitas
+  useEffect(() => { setSelected(null); setQuery(""); }, [facility]);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
-      <header className="p-4 font-semibold border-b border-white/10">
-        Penampil Jadwal & Alur — Experimental Flow
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
+      <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
+            <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
+            <div className="font-semibold">Penampil Jadwal & Alur — Experimental Flow</div>
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <label className="text-xs text-white/60 hidden sm:block">Fasilitas</label>
+            <select
+              value={facility}
+              onChange={(e) => setFacility(e.target.value)}
+              className="h-9 rounded-lg bg-white/5 border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              {FACILITIES.map((f) => (<option key={f.id} value={f.id}>{f.name}</option>))}
+            </select>
+          </div>
+        </div>
       </header>
-      <div className="grid md:grid-cols-[20rem_1fr]">
-        <aside className="p-4 border-r border-white/10 space-y-3">
-          {SERVICES_JAGAKARSA.map((s) => (
-            <ServiceCard key={s.id} s={s} onPick={(ss) => { setSelected(ss); setSub(null); }} />
-          ))}
-        </aside>
+
+      <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
+        <Sidebar
+          facilityName={facilityName}
+          query={query}
+          setQuery={setQuery}
+          services={sidebarList}
+          onPick={(s) => setSelected(s)}
+          selected={selected}
+          highlightIds={matchPoliIds}
+        />
         <RightPanel
           selected={selected}
-          sub={sub}
-          onBack={() => setSelected(null)}
-          onBackSub={(x) => setSub(x)}
+          setSelected={setSelected}
+          filtered={filtered}
+          subMatches={subResults}
+          onPickSub={handlePickSub}
+          jump={jump}
+          setJump={setJump}
+          searchQuery={query}
         />
       </div>
+
+      <footer className="py-6 text-center text-white/50 text-sm">
+        © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
+      </footer>
     </div>
   );
 }
