@@ -1,15 +1,13 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/* ============================================================================
-   Path & Asset Helpers (aman untuk GitHub Pages)
-============================================================================ */
+// === Path helper ===
 const BASE = import.meta.env.BASE_URL ?? "/";
 const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
-
 const DIR_INFO = `${BASE}infografis`;
 const DIR_FLOW = `${BASE}alur`;
 
+// === Infografis helper ===
 const resolveInfografis = (service) => {
   const file = (service?.img ?? `${service?.id ?? "missing"}.jpg`).toString();
   if (/^https?:\/\//.test(file)) return file;
@@ -23,6 +21,7 @@ const onInfoError = (e) => {
   e.currentTarget.src = INFO_FALLBACK;
 };
 
+// === Flow helper ===
 const FLOW_MAP = {
   0: null,
   1: "1-menuju-loket.jpg",
@@ -42,10 +41,88 @@ const onFlowError = (e) => {
   e.currentTarget.src = FLOW_FALLBACK;
 };
 
-/* ============================================================================
-   Data Contoh (silakan ganti/extend sesuai kebutuhan)
-============================================================================ */
-const SERVICES = [
+// === Jadwal helper ===
+const DAY_NAMES_ID = [
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
+const RULE_DEFAULT = {
+  Senin: "08:00–16:00",
+  Selasa: "08:00–16:00",
+  Rabu: "08:00–16:00",
+  Kamis: "08:00–16:00",
+  Jumat: "08:00–16:00",
+  Sabtu: "Tutup",
+  Minggu: "Tutup",
+};
+function buildRuleJadwal(service) {
+  const id = (service?.id || "").toLowerCase();
+  if (id === "igd")
+    return Object.fromEntries(DAY_NAMES_ID.map((d) => [d, "00:00–24:00"]));
+  if (id.includes("pelayanan-24"))
+    return Object.fromEntries(
+      DAY_NAMES_ID.map((d) => [d, "16:00–24:00, 00:00–06:00"])
+    );
+  return { ...RULE_DEFAULT };
+}
+function getEffectiveJadwal(s) {
+  return s?.jadwal && Object.keys(s.jadwal).length ? s.jadwal : buildRuleJadwal(s);
+}
+const toMin = (s) => {
+  const [h, m] = String(s).split(":").map((n) => parseInt(n, 10) || 0);
+  return h * 60 + m;
+};
+function parseRanges(v) {
+  const t = String(v || "");
+  if (t.toLowerCase().includes("tutup")) return [];
+  return t.split(",").map((r) => r.trim().replace(/–|—/g, "-"));
+}
+function rangesForToday(j, ref = new Date()) {
+  const d = ref.getDay();
+  const day = DAY_NAMES_ID[d];
+  const prev = DAY_NAMES_ID[(d + 6) % 7];
+  const today = parseRanges(j[day]);
+  const yesterday = parseRanges(j[prev]);
+  const out = [];
+  const push = (r, label) => {
+    const [a, b] = r.split("-").map((s) => s.trim());
+    if (!a || !b) return;
+    const A = toMin(a), B = toMin(b);
+    if (B >= A) out.push({ from: A, to: B });
+    else {
+      if (label === "yesterday") out.push({ from: 0, to: B });
+      else out.push({ from: A, to: 1440 });
+    }
+  };
+  yesterday.forEach((r) => push(r, "yesterday"));
+  today.forEach((r) => push(r, "today"));
+  return out;
+}
+function isOpenNow(s, ref = new Date()) {
+  const j = getEffectiveJadwal(s);
+  const now = ref.getHours() * 60 + ref.getMinutes();
+  return rangesForToday(j, ref).some((R) => now >= R.from && now <= R.to);
+}
+
+// === Data per fasilitas (Jagakarsa + Pustu) ===
+const FACILITIES = [
+  { id: "pkm-jagakarsa", name: "Puskesmas Jagakarsa" },
+  { id: "pustu-jagakarsa-1", name: "Pustu Jagakarsa 1" },
+  { id: "pustu-jagakarsa-2", name: "Pustu Jagakarsa 2" },
+  { id: "pustu-ciganjur", name: "Pustu Ciganjur" },
+  { id: "pustu-srensawah", name: "Pustu Srengseng Sawah" },
+  { id: "pustu-lenteng-1", name: "Pustu Lenteng Agung 1" },
+  { id: "pustu-lenteng-2", name: "Pustu Lenteng Agung 2" },
+  { id: "pustu-tanjung-barat", name: "Pustu Tanjung Barat" },
+];
+
+// Dataset layanan untuk Puskesmas Jagakarsa (lengkap seperti sebelumnya)
+const SERVICES_JAGAKARSA = [
   {
     id: "poli-umum",
     nama: "Poli Umum",
@@ -55,20 +132,9 @@ const SERVICES = [
     telemed: true,
     img: "poli-umum.jpg.png",
     layanan: [
-      {
-        nama: "Pemeriksaan Umum",
-        ikon: "🩺",
-        tarif: 0,
-        ket: "Konsultasi dokter umum",
-        alur: [1, 5],
-      },
+      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, ket: "Konsultasi dokter umum", alur: [1, 5] },
       { nama: "Kontrol Berkala", ikon: "📅", tarif: 0, alur: [1, 5] },
-      {
-        nama: "Surat Keterangan Sehat",
-        ikon: "📝",
-        tarif: 15000,
-        alur: [1, 2, 5],
-      },
+      { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000, alur: [1, 2, 5] },
     ],
   },
   {
@@ -81,18 +147,7 @@ const SERVICES = [
     img: "poli-gigi.jpg",
     layanan: [
       { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1, 2, 3, 4, 5] },
-      {
-        nama: "Scaling (Pembersihan Karang)",
-        ikon: "🪥",
-        tarif: 40000,
-        alur: [1, 3, 4, 5],
-      },
-      {
-        nama: "Penambalan Gigi",
-        ikon: "🧱",
-        tarif: 30000,
-        alur: [1, 3, 2, 4, 5],
-      },
+      { nama: "Scaling (Pembersihan Karang)", ikon: "🪥", tarif: 40000, alur: [1, 3, 4, 5] },
     ],
   },
   {
@@ -103,7 +158,7 @@ const SERVICES = [
     lokasi: "Lantai Dasar — IGD",
     telemed: false,
     img: "igd.jpg",
-    layanan: [{ nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, alur: [1, 5] }],
+    layanan: [ { nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, alur: [1, 5] } ],
   },
   {
     id: "pelayanan-24-jam",
@@ -113,160 +168,84 @@ const SERVICES = [
     lokasi: "Lantai 1 — Layanan 24 Jam",
     telemed: false,
     img: "igd.jpg",
-    layanan: [{ nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] }],
+    layanan: [ { nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] } ],
   },
 ];
 
-/* ============================================================================
-   Jadwal & Status Buka
-   - IGD → 00:00–24:00 (semua hari)
-   - Pelayanan 24 Jam → 16:00–24:00 dan 00:00–06:00 (lintas hari)
-   - Lainnya → Sen–Jum 08:00–16:00; Sab–Min Tutup
-============================================================================ */
-const DAY_NAMES_ID = [
-  "Minggu",
-  "Senin",
-  "Selasa",
-  "Rabu",
-  "Kamis",
-  "Jumat",
-  "Sabtu",
+// Template 2 poli (Umum & Gigi) untuk Pustu (dummy)
+const makePustuServices = (label) => [
+  {
+    id: `${label}-umum`,
+    nama: "Poli Umum",
+    klaster: "Pelayanan Medik",
+    ikon: "🩺",
+    lokasi: "Ruang Poli Umum",
+    telemed: false,
+    img: "poli-umum.jpg.png",
+    layanan: [
+      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, alur: [1, 5] },
+    ],
+  },
+  {
+    id: `${label}-gigi`,
+    nama: "Poli Gigi",
+    klaster: "Pelayanan Medik",
+    ikon: "🦷",
+    lokasi: "Ruang Poli Gigi",
+    telemed: false,
+    img: "poli-gigi.jpg",
+    layanan: [
+      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1, 2, 3, 4, 5] },
+      { nama: "Scaling", ikon: "🪥", tarif: 40000, alur: [1, 3, 4, 5] },
+    ],
+  },
 ];
 
-const RULE_DEFAULT = {
-  Senin: "08:00–16:00",
-  Selasa: "08:00–16:00",
-  Rabu: "08:00–16:00",
-  Kamis: "08:00–16:00",
-  Jumat: "08:00–16:00",
-  Sabtu: "Tutup",
-  Minggu: "Tutup",
+// Pemetaan services per fasilitas
+const SERVICES_BY_FACILITY = {
+  "pkm-jagakarsa": SERVICES_JAGAKARSA,
+  "pustu-jagakarsa-1": makePustuServices("pustu-jag1"),
+  "pustu-jagakarsa-2": makePustuServices("pustu-jag2"),
+  "pustu-ciganjur": makePustuServices("pustu-ciganjur"),
+  "pustu-srensawah": makePustuServices("pustu-srensawah"),
+  "pustu-lenteng-1": makePustuServices("pustu-lenteng1"),
+  "pustu-lenteng-2": makePustuServices("pustu-lenteng2"),
+  "pustu-tanjung-barat": makePustuServices("pustu-tjbrt"),
 };
 
-function buildRuleJadwal(service) {
-  const id = (service?.id || "").toLowerCase();
-  const name = (service?.nama || "").toLowerCase();
-  if (id === "igd" || name.includes("igd")) {
-    return Object.fromEntries(DAY_NAMES_ID.map((d) => [d, "00:00–24:00"])); // 24/7
-  }
-  if (id.includes("pelayanan-24") || name.includes("pelayanan 24 jam")) {
-    return Object.fromEntries(
-      DAY_NAMES_ID.map((d) => [d, "16:00–24:00, 00:00–06:00"])
-    );
-  }
-  return { ...RULE_DEFAULT };
-}
-
-function getEffectiveJadwal(s) {
-  return s?.jadwal && Object.keys(s.jadwal).length ? s.jadwal : buildRuleJadwal(s);
-}
-
-const toMin = (s) => {
-  const [h, m] = String(s).split(":").map((n) => parseInt(n, 10) || 0);
-  return h * 60 + m;
-};
-
-function parseRanges(v) {
-  const t = String(v || "");
-  if (t.toLowerCase().includes("tutup")) return [];
-  return t.split(",").map((r) => r.trim().replace(/–|—/g, "-"));
-}
-
-function rangesForToday(j, ref = new Date()) {
-  const d = ref.getDay();
-  const day = DAY_NAMES_ID[d];
-  const prev = DAY_NAMES_ID[(d + 6) % 7];
-
-  const today = parseRanges(j[day]);
-  const yesterday = parseRanges(j[prev]);
-
-  const out = [];
-  const push = (r, label) => {
-    const [a, b] = r.split("-").map((s) => s.trim());
-    if (!a || !b) return;
-    const A = toMin(a),
-      B = toMin(b);
-    if (B >= A) {
-      out.push({ from: A, to: B });
-    } else {
-      // overnight
-      if (label === "yesterday") out.push({ from: 0, to: B }); // carry ke hari ini
-      else out.push({ from: A, to: 1440 }); // hingga 24:00
-    }
-  };
-
-  yesterday.forEach((r) => push(r, "yesterday"));
-  today.forEach((r) => push(r, "today"));
-  return out;
-}
-
-function isOpenNow(s, ref = new Date()) {
-  const j = getEffectiveJadwal(s);
-  const now = ref.getHours() * 60 + ref.getMinutes();
-  return rangesForToday(j, ref).some((R) => now >= R.from && now <= R.to);
-}
-
-/* ============================================================================
-   UI Atoms
-============================================================================ */
+// === UI kecil ===
 const Chip = ({ children }) => (
   <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 whitespace-nowrap">
     {children}
   </span>
 );
-
 function Rupiah({ n }) {
   if (typeof n !== "number") return null;
   if (n === 0)
     return (
-      <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">
-        Gratis
-      </span>
+      <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">Gratis</span>
     );
   return (
-    <span className="px-2 rounded bg-sky-600/20 text-sky-300">
-      Rp {n.toLocaleString("id-ID")}
-    </span>
+    <span className="px-2 rounded bg-sky-600/20 text-sky-300">Rp {n.toLocaleString("id-ID")}</span>
   );
 }
-
 const StatusPill = ({ open }) => (
-  <span
-    className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
-      open
-        ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300"
-        : "bg-rose-500/10 border-rose-400/30 text-rose-300"
-    }`}
-  >
-    {open ? "Buka" : "Tutup"}
-  </span>
+  <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${open?"bg-emerald-500/10 border-emerald-400/30 text-emerald-300":"bg-rose-500/10 border-rose-400/30 text-rose-300"}`}>{open?"Buka":"Tutup"}</span>
 );
 
-/* ============================================================================
-   Sidebar
-============================================================================ */
-function Sidebar({
-  query,
-  setQuery,
-  services,
-  onPick,
-  selected,
-  highlightIds = [],
-}) {
+// === Sidebar ===
+function Sidebar({ facilityName, query, setQuery, services, onPick, selected, highlightIds = [] }) {
   const [expandedId, setExpandedId] = useState(null);
-  const toggle = (s) => {
-    onPick(s);
-    setExpandedId((id) => (id === s.id ? null : s.id));
-  };
+  const toggle = (s) => { onPick(s); setExpandedId((id) => (id === s.id ? null : s.id)); };
 
   return (
-    <aside className="w-full md:w-[23rem] shrink-0 bg-slate-950/70 backdrop-blur border-r border-white/10">
+    <aside className="w-full md:w-80 shrink-0 bg-slate-950/70 backdrop-blur border-r border-white/10 flex flex-col">
       <div className="p-4 flex items-center gap-2 border-b border-white/10">
-        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">
-          🏥
-        </div>
-        <div className="font-semibold">Jadwal & Tarif</div>
+        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
+        <div className="font-semibold truncate">Jadwal & Tarif</div>
       </div>
+
+      <div className="px-4 pt-3 text-xs text-white/60">Fasilitas: <span className="text-white/90 font-medium">{facilityName}</span></div>
 
       <div className="p-4 space-y-3">
         <label className="text-xs uppercase text-white/50">Pencarian</label>
@@ -275,12 +254,11 @@ function Sidebar({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cari 'umum', 'gigi', 'cabut gigi' ..."
           className="w-full h-11 px-3 rounded-xl bg-white/5 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
-       />
+        />
       </div>
 
-      <div className="px-4 pb-2 max-h-[calc(100svh-180px)] overflow-auto space-y-2">
+      <div className="px-4 pb-2 flex-1 overflow-y-auto space-y-2">
         <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
-
         {services.map((s) => {
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
@@ -298,11 +276,9 @@ function Sidebar({
               >
                 <div className="flex items-center gap-3">
                   <div className="text-lg">{s.ikon}</div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="font-medium truncate">{s.nama}</div>
-                    <div className="text-xs text-white/60 truncate">
-                      {s.klaster}
-                    </div>
+                    <div className="text-xs text-white/60 truncate">{s.klaster}</div>
                   </div>
                   <StatusPill open={isOpenNow(s)} />
                 </div>
@@ -329,22 +305,12 @@ function Sidebar({
   );
 }
 
-/* ============================================================================
-   Cards
-============================================================================ */
+// === Cards ===
 function ServiceCard({ s, onPick }) {
   return (
-    <button
-      onClick={() => onPick(s)}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left"
-    >
+    <button onClick={() => onPick(s)} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left">
       <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden">
-        <img
-          src={resolveInfografis(s)}
-          onError={onInfoError}
-          alt={s.nama}
-          className="w-full h-full object-cover"
-        />
+        <img src={resolveInfografis(s)} onError={onInfoError} alt={s.nama} className="w-full h-full object-cover" />
       </div>
       <div className="p-3">
         <div className="flex items-center gap-2">
@@ -356,67 +322,40 @@ function ServiceCard({ s, onPick }) {
     </button>
   );
 }
-
 function SubServiceCard({ item, onPick }) {
   return (
-    <button
-      onClick={() => onPick(item)}
-      className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
-    >
-      <div className="p-4">
+    <button onClick={() => onPick(item)} className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden">
+      <div className="p-3 sm:p-4">
         <div className="flex items-center gap-3">
-          <div className="text-xl">{item.ikon ?? "🧩"}</div>
-          <div className="font-semibold">{item.nama}</div>
-          <div className="ml-auto">
-            {typeof item.tarif === "number" ? <Rupiah n={item.tarif} /> : null}
-          </div>
+          <div className="text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
+          <div className="font-semibold text-sm sm:text-base">{item.nama}</div>
+          <div className="ml-auto">{typeof item.tarif === "number" ? <Rupiah n={item.tarif} /> : null}</div>
         </div>
-        {item.ket && <div className="text-sm text-white/60 mt-1">{item.ket}</div>}
+        {item.ket && <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>}
       </div>
     </button>
   );
 }
-
 function FlowCard({ code, index }) {
   const src = resolveFlowImg(code);
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
       <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
-      <div className="p-3 flex items-center justify-center">
+      <div className="p-2 sm:p-3 flex items-center justify-center">
         {src ? (
-          <img
-            src={src}
-            onError={onFlowError}
-            alt={`Langkah ${index + 1}`}
-            className="max-w-full h-auto object-contain"
-          />
+          <img src={src} onError={onFlowError} alt={`Langkah ${index + 1}`} className="max-w-full h-auto object-contain" />
         ) : (
-          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">
-            —
-          </div>
+          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>
         )}
       </div>
     </div>
   );
 }
 
-/* ============================================================================
-   Right Panel
-============================================================================ */
-function RightPanel({
-  selected,
-  setSelected,
-  filtered,
-  subMatches,
-  onPickSub,
-  jump,
-  setJump,
-  searchQuery,
-}) {
+// === RightPanel ===
+function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, jump, setJump, searchQuery }) {
   const [sub, setSub] = useState(null);
   useEffect(() => setSub(null), [selected]);
-
-  // auto-buka sub-layanan ketika datang dari hasil pencarian
   useEffect(() => {
     if (jump && selected && selected.id === jump.poliId) {
       setSub(selected.layanan?.[jump.idx] ?? null);
@@ -424,29 +363,18 @@ function RightPanel({
     }
   }, [jump, selected, setJump]);
 
-  // 1) awal: jika ada hasil pelayanan, tampilkan itu dan sembunyikan grid poli
   if (!selected) {
     const hasServiceResults = searchQuery && subMatches?.length > 0;
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
         <AnimatePresence mode="wait">
-          <motion.div
-            key="grid-poli"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.25 }}
-          >
+          <motion.div key="grid-poli" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.25 }}>
             {hasServiceResults && (
               <section className="mb-6">
                 <div className="mb-2 text-white/70">Hasil Pelayanan</div>
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
-                    <SubServiceCard
-                      key={poli.id + "#" + index}
-                      item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
-                      onPick={() => onPickSub(poli.id, index)}
-                    />
+                    <SubServiceCard key={poli.id + "#" + index} item={{ ...item, nama: `${item.nama} — ${poli.nama}` }} onPick={() => onPickSub(poli.id, index)} />
                   ))}
                 </div>
               </section>
@@ -454,13 +382,9 @@ function RightPanel({
 
             {!hasServiceResults && (
               <>
-                <div className="mb-3 text-white/70">
-                  Pilih poli untuk melihat jenis layanannya.
-                </div>
+                <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {filtered.map((s) => (
-                    <ServiceCard key={s.id} s={s} onPick={setSelected} />
-                  ))}
+                  {filtered.map((s) => (<ServiceCard key={s.id} s={s} onPick={setSelected} />))}
                 </div>
               </>
             )}
@@ -470,18 +394,12 @@ function RightPanel({
     );
   }
 
-  // 2) sudah pilih poli → daftar layanan
   if (!sub) {
     const list = selected.layanan ?? [];
     return (
-      <div className="min-h-[calc(100svh-64px)] p-4 md:p-6 space-y-4">
+      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setSelected(null)}
-            className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
-          >
-            ← Kembali
-          </button>
+          <button onClick={() => setSelected(null)} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
         </div>
 
         <div className="flex items-center gap-3">
@@ -494,10 +412,8 @@ function RightPanel({
         </div>
 
         <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {list.length > 0 ? (
-            list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />)
-          ) : (
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {list.length > 0 ? list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />) : (
             <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
           )}
         </div>
@@ -505,116 +421,111 @@ function RightPanel({
     );
   }
 
-  // 3) sudah pilih layanan → alur
   const steps = Array.from({ length: 9 }, (_, i) => sub.alur?.[i] ?? 0);
   const visibleSteps = steps.filter((code) => code && code !== 0);
 
   return (
-    <div className="min-h-[calc(100svh-64px)] p-4 md:p-6 space-y-4">
+    <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <button
-          onClick={() => setSub(null)}
-          className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
-        >
-          ← Kembali
-        </button>
+        <button onClick={() => setSub(null)} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="text-2xl">{selected.ikon}</div>
-        <h2 className="text-xl md:text-2xl font-semibold">
-          {selected.nama} — {sub.nama}
-        </h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama} — {sub.nama}</h2>
         <div className="ml-auto flex gap-2">
           <Chip>{selected.klaster}</Chip>
           {selected.telemed && <Chip>Telemed</Chip>}
         </div>
       </div>
 
-      <div className="text-white/70">
-        Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
-      </div>
+      <div className="text-white/70">Alur layanan untuk: <span className="font-medium">{sub.nama}</span></div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {visibleSteps.map((code, i) => (
-          <FlowCard key={i} code={code} index={i} />
-        ))}
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {visibleSteps.map((code, i) => (<FlowCard key={i} code={code} index={i} />))}
       </div>
     </div>
   );
 }
 
-/* ============================================================================
-   App Root
-============================================================================ */
+// === App Root ===
 export default function App() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
+  const [facility, setFacility] = useState("pkm-jagakarsa"); // default: Puskesmas Jagakarsa
+
+  const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
+  const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
 
   // filter poli berdasar nama/klaster
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SERVICES.filter(
-      (s) =>
-        !q ||
-        s.nama.toLowerCase().includes(q) ||
-        s.klaster.toLowerCase().includes(q)
+    return SERVICES_CURRENT.filter(
+      (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, SERVICES_CURRENT]);
 
   // hasil pencarian untuk sub-layanan (pelayanan)
   const subResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     const rows = [];
-    SERVICES.forEach((p) =>
-      (p.layanan || []).forEach((item, idx) => {
-        const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
-        if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
-      })
-    );
+    SERVICES_CURRENT.forEach((p) => (p.layanan || []).forEach((item, idx) => {
+      const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
+      if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
+    }));
     return rows;
-  }, [query]);
+  }, [query, SERVICES_CURRENT]);
 
-  // poli yang relevan → highlight
-  const matchPoliIds = useMemo(
-    () => Array.from(new Set(subResults.map((r) => r.poli.id))),
-    [subResults]
-  );
+  // poli relevan → highlight
+  const matchPoliIds = useMemo(() => Array.from(new Set(subResults.map((r) => r.poli.id))), [subResults]);
 
   // daftar untuk sidebar: kalau filter poli kosong tapi ada hasil pelayanan → tampilkan semua poli
   const sidebarList = useMemo(() => {
-    if (filtered.length === 0 && query && subResults.length > 0) return SERVICES;
+    if (filtered.length === 0 && query && subResults.length > 0) return SERVICES_CURRENT;
     return filtered;
-  }, [filtered, query, subResults]);
+  }, [filtered, query, subResults, SERVICES_CURRENT]);
 
   // loncat otomatis ke sub-layanan
   const [jump, setJump] = useState(null);
   function handlePickSub(poliId, idx) {
-    const p = SERVICES.find((x) => x.id === poliId);
+    const p = SERVICES_CURRENT.find((x) => x.id === poliId);
     if (!p) return;
     setSelected(p);
     setJump({ poliId, idx });
   }
 
+  // reset pilihan saat ganti fasilitas
+  useEffect(() => { setSelected(null); setQuery(""); }, [facility]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
       <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
-         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
             <div className="font-semibold">Penampil Jadwal & Tarif Layanan</div>
           </div>
-          <div className="ml-auto hidden md:flex text-sm gap-2 text-white/70">
-            <Chip>Mobile-first</Chip>
-            <Chip>Infografis</Chip>
-            <Chip>Animated</Chip>
+
+          {/* Dropdown fasilitas */}
+          <div className="ml-auto flex items-center gap-2">
+            <label className="text-xs text-white/60 hidden sm:block">Fasilitas</label>
+            <select
+              value={facility}
+              onChange={(e) => setFacility(e.target.value)}
+              className="h-9 rounded-lg bg-white/5 border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              {FACILITIES.map((f) => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </select>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
         <Sidebar
+          facilityName={facilityName}
           query={query}
           setQuery={setQuery}
           services={sidebarList}
@@ -634,9 +545,7 @@ export default function App() {
         />
       </div>
 
-      <footer className="py-6 text-center text-white/50 text-sm">
-        © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
-      </footer>
+      <footer className="py-6 text-center text-white/50 text-sm">© {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.</footer>
     </div>
   );
 }
