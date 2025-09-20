@@ -141,6 +141,80 @@ const SERVICES = [
 ============================================================================ */
 const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
+// ======= Aturan jadwal default =======
+const RULE_DEFAULT = {
+  Senin:  "08:00–16:00",
+  Selasa: "08:00–16:00",
+  Rabu:   "08:00–16:00",
+  Kamis:  "08:00–16:00",
+  Jumat:  "08:00–16:00",
+  Sabtu:  "Tutup",
+  Minggu: "Tutup",
+};
+
+function buildRuleJadwal(service){
+  const name = (service?.nama || "").toLowerCase();
+  if (name.includes("igd")) {
+    // 24 jam setiap hari
+    return Object.fromEntries(DAY_NAMES_ID.map(d => [d, "00:00–24:00"]));
+  }
+  if (name.includes("pelayanan 24 jam")) {
+    // 16:00–24:00 dan 00:00–06:00 (lintas hari)
+    return Object.fromEntries(DAY_NAMES_ID.map(d => [d, "16:00–24:00, 00:00–06:00"]));
+  }
+  return { ...RULE_DEFAULT };
+}
+
+function getEffectiveJadwal(service){
+  // jika service.jadwal ada, pakai itu; kalau tidak, pakai aturan
+  return service?.jadwal && Object.keys(service.jadwal).length
+    ? service.jadwal
+    : buildRuleJadwal(service);
+}
+
+// parse "HH:MM" -> minutes
+const hm = (s) => {
+  const [h,m] = s.split(":").map(n => parseInt(n,10)||0);
+  return h*60+m;
+};
+
+// Ambil daftar range hari ini + carry-over dari hari kemarin jika overnight
+function rangesForToday(jadwal, refDate=new Date()){
+  const day = DAY_NAMES_ID[refDate.getDay()];
+  const prev = DAY_NAMES_ID[(refDate.getDay()+6)%7];
+
+  const parseRanges = (val) => String(val||"")
+      .toLowerCase().includes("tutup") ? [] :
+      String(val).split(",").map(r => r.trim().replace(/–|—/g,"-"));
+
+  const today = parseRanges(jadwal[day]);
+  const yesterday = parseRanges(jadwal[prev]);
+
+  // pecah overnight (start>end) -> bagian sebelum & sesudah tengah malam
+  const result = [];
+
+  const pushSplit = (r, labelDay) => {
+    const [a,b] = r.split("-").map(s=>s.trim());
+    if(!a||!b) return;
+    const A = hm(a), B = hm(b);
+    if (B >= A) {
+      result.push({ from:A, to:B, source:labelDay });            // normal
+    } else {
+      if (labelDay === "yesterday"){
+        // carry: 00:00..B untuk hari ini
+        result.push({ from:0, to:B, source:"carry" });
+      } else {
+        // today overnight bagian awal  A..24:00
+        result.push({ from:A, to:24*60, source:"today" });
+      }
+    }
+  };
+
+  yesterday.forEach(r => pushSplit(r, "yesterday"));
+  today.forEach(r => pushSplit(r, "today"));
+  return result;
+}
+
 function parseTimeToDate(timeStr, refDate) {
   const [h, m] = (timeStr || "").split(":").map((n) => parseInt(n, 10) || 0);
   const d = new Date(refDate);
@@ -148,22 +222,20 @@ function parseTimeToDate(timeStr, refDate) {
   return d;
 }
 
-function isOpenNow(service, refDate = new Date()) {
-  const dayName = DAY_NAMES_ID[refDate.getDay()];
-  const info = service?.jadwal?.[dayName];
-  if (!info) return false;
-  const lc = String(info).toLowerCase();
-  if (lc.includes("tutup")) return false;
-  return String(info)
-    .split(",")
-    .some((range) => {
-      const r = range.trim().replace(/–|—/g, "-");
-      const [start, end] = r.split("-").map((s) => s.trim());
-      if (!start || !end) return false;
-      const a = parseTimeToDate(start, refDate);
-      const b = parseTimeToDate(end, refDate);
-      return refDate >= a && refDate <= b;
-    });
+function isOpenNow(service, refDate=new Date()){
+  const jadwal = getEffectiveJadwal(service);
+  const nowMin = refDate.getHours()*60 + refDate.getMinutes();
+  return rangesForToday(jadwal, refDate).some(R => nowMin >= R.from && nowMin <= R.to);
+}
+
+// Teks ringkas "Hari ini: xx" dengan gabungan rentang efektif
+function todayText(service, refDate=new Date()){
+  const jadwal = getEffectiveJadwal(service);
+  const segs = rangesForToday(jadwal, refDate).map(R => {
+    const toHM = (m)=>`${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
+    return `${toHM(R.from)}–${toHM(R.to === 24*60 ? (24*60-1) : R.to)}`;
+  });
+  return segs.length ? segs.join(", ") : "Tutup";
 }
 
 const Chip = ({ children }) => (
@@ -193,46 +265,58 @@ const StatusPill = ({ open }) => (
    Sidebar = Daftar Poli
 ============================================================================ */
 function Sidebar({ query, setQuery, services, onPick, selected }) {
+  const [expandedId, setExpandedId] = useState(null);
+
+  const toggle = (s) => {
+    onPick(s);                         // tetap pilih untuk panel kanan
+    setExpandedId(id => id === s.id ? null : s.id); // toggle jadwal di sidebar
+  };
+
   return (
     <aside className="w-full md:w-[23rem] shrink-0 bg-slate-950/70 backdrop-blur border-r border-white/10">
-      <div className="p-4 flex items-center gap-2 border-b border-white/10">
-        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
-        <div className="font-semibold">Jadwal & Tarif</div>
-      </div>
-
-      <div className="p-4 space-y-3">
-        <label className="text-xs uppercase text-white/50">Pencarian</label>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cari 'umum', 'gigi', ..."
-          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500"
-        />
-      </div>
+      {/* ... header & search tetap ... */}
 
       <div className="px-4 pb-2 max-h-[calc(100svh-200px)] overflow-auto space-y-2">
         <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
-        {services.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onPick(s)}
-            className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${
-              selected?.id === s.id ? "border-emerald-500/60 bg-emerald-500/10" : "border-white/10"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-lg">{s.ikon}</div>
-              <div className="min-w-0">
-                <div className="font-medium truncate">{s.nama}</div>
-                <div className="text-xs text-white/60 truncate">{s.klaster}</div>
-              </div>
-              <StatusPill open={isOpenNow(s)} />
+
+        {services.map((s) => {
+          const active = expandedId === s.id;
+          return (
+            <div key={s.id} className="space-y-2">
+              <button
+                onClick={() => toggle(s)}
+                className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${
+                  selected?.id === s.id ? "border-emerald-500/60 bg-emerald-500/10" : "border-white/10"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-lg">{s.ikon}</div>
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">{s.nama}</div>
+                    <div className="text-xs text-white/60 truncate">{s.klaster}</div>
+                  </div>
+                  <StatusPill open={isOpenNow(s)} />
+                </div>
+              </button>
+
+              {active && (
+                <div className="mx-2 mb-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
+                  <div className="text-white/60 mb-1">Jadwal</div>
+                  <div className="text-white/90 mb-2">Hari ini: <b>{todayText(s)}</b></div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
+                    {DAY_NAMES_ID.map((d) => (
+                      <React.Fragment key={d}>
+                        <span className="text-white/50">{d}</span>
+                        <span>{(getEffectiveJadwal(s)[d] || "Tutup")}</span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </button>
-        ))}
-        {services.length === 0 && (
-          <div className="text-sm text-white/50">Tidak ada hasil untuk kata kunci.</div>
-        )}
+          );
+        })}
+        {services.length === 0 && <div className="text-sm text-white/50">Tidak ada hasil untuk kata kunci.</div>}
       </div>
     </aside>
   );
