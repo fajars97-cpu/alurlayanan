@@ -2,8 +2,7 @@ name: Deploy Vite to GitHub Pages
 
 on:
   push:
-    branches:
-      - experimental-flow   # deploy setiap push ke cabang ini
+    branches: [ experimental-flow ]
 
 permissions:
   contents: read
@@ -18,31 +17,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-
-      - name: Install
-        run: npm ci
-
+          cache: npm
+      - run: npm ci
       - name: Build
+        run: npm run build
         env:
-          # penting untuk Vite di subpath Pages
-          VITE_BASE: /alurlayanan/
-        run: |
-          # pastikan vite.config.js sudah set base: '/alurlayanan/'
-          npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+          # pastikan vite.config.js sudah base: '/alurlayanan/'
+          NODE_ENV: production
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -50,6 +38,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v4
