@@ -3,22 +3,27 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // ======================= Mockup Jadwal (v3, fixed) ==========================
 // Semua infografis disimpan di satu folder: public/infografis/
-const IMG_DIR = "/infografis";
+const IMG_DIR = `${BASE}infografis`;
 // Alur layanan (gambar bersama): simpan di public/alur/
-const FLOW_IMG_DIR = `${import.meta.env.BASE_URL}alur`;
+const FLOW_IMG_DIR = `${BASE}alur`;
 const FLOW_MAP = {
-  0: null,                           // blank
-  1: "1-menuju-loket.jpg",           // menuju loket
-  2: "2-menuju-kasir.jpg",           // menuju kasir
-  3: "3-menuju-poli-gigi.jpg",       // menuju poli gigi (contoh awal)
-  4: "4-menuju-farmasi.jpg",         // turun ke lantai 1 → farmasi
-  5: "5-selesai.jpg",                // alur layanan selesai
+  0: null,
+  1: "1-menuju-loket.jpg",
+  2: "2-menuju-kasir.jpg",
+  3: "3-menuju-poli-gigi.jpg",
+  4: "4-menuju-farmasi.jpg",
+  5: "5-selesai.jpg",
 };
 const resolveFlowImg = (code) => {
-  const f = FLOW_MAP[code];
+  const f = FLOW_MAP[code] ?? null;
   return f ? `${FLOW_IMG_DIR}/${f}` : null;
 };
+const FLOW_FALLBACK =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
+const onFlowImgError = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = FLOW_FALLBACK; };
 
+// --- Path helper (aman untuk GitHub Pages) ---
+const BASE = import.meta.env.BASE_URL ?? "/";
 
 // Data contoh (ganti dengan data nyata)
 const SERVICES = [
@@ -572,12 +577,15 @@ const SERVICES = [
 
 const DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
 
-// Helpers --------------------------------------------------------------------
 const resolveImg = (s) => {
-  const p = s.img || `${s.id}.jpg`;
-  if (p.startsWith("http") || p.startsWith("/")) return p;
-  return `${IMG_DIR}/${p}`;
+  const p = (s?.img ?? `${s?.id ?? "missing"}.jpg`).toString();
+  if (p.startsWith("http://") || p.startsWith("https://")) return p;         // URL penuh
+  if (p.startsWith("/")) return `${BASE}${p.slice(1)}`;                       // absolut → relatif base
+  return `${IMG_DIR}/${p}`;                                                   // nama file di /infografis
 };
+const INFO_FALLBACK =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="22" text-anchor="middle" dominant-baseline="middle">Infografis tidak ditemukan</text></svg>';
+const onInfoImgError = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = INFO_FALLBACK; };
 
 // ---- OPEN/CLOSED BADGE (pakai waktu sekarang) ------------------------------
 const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
