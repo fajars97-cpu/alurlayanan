@@ -284,24 +284,47 @@ function ServiceCard({ s, onPick }) {
 }
 function SubServiceCard({ item, onPick }) {
   return (
-    <button onClick={() => onPick(item)} className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden">
+    <button
+      onClick={() => onPick(item)}
+      className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
+    >
       <div className="p-3 sm:p-4">
         <div className="flex items-center gap-3">
           <div className="text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
-          <div className="font-semibold text-sm sm:text-base flex-1">{item.nama}</div>
+
+          <div className="font-semibold text-sm sm:text-base flex-1">
+            {item.nama}
+          </div>
+
           <div className="ml-auto flex items-center gap-2">
-            {item.bpjs ? (
-              <img src={`${import.meta.env.BASE_URL}icons/bpjs.png`} alt="Ditanggung BPJS" className="h-5 w-auto" />
-            ) : (
-              <span className="text-sky-300 text-sm font-medium">Rp {item.tarif?.toLocaleString("id-ID")}</span>
+            {item.bpjs && (
+              <img
+                src={`${import.meta.env.BASE_URL}icons/bpjs.svg`}
+                alt="Ditanggung BPJS"
+                className="h-5 w-auto"
+                loading="lazy"
+              />
             )}
+            <span
+              className={`text-sm font-medium ${
+                item.tarif === 0 ? "text-emerald-300" : "text-sky-300"
+              }`}
+              aria-label={`Tarif layanan untuk pasien tanpa BPJS: Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`}
+              title="Tarif untuk pasien tanpa BPJS"
+            >
+              {item.tarif === 0 ? "Gratis" : `Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`}
+            </span>
           </div>
         </div>
-        {item.ket && <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>}
+
+        {item.ket && (
+          <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>
+        )}
       </div>
     </button>
   );
 }
+
 function FlowCard({ code, index }) {
   const src = resolveFlowImg(code);
   const NARRATION_MAP = { 1:"alur-loket.mp3" /*, 2:"alur-kasir.mp3", 3:"alur-poli-gigi.mp3", 4:"alur-farmasi.mp3", 5:"alur-selesai.mp3"*/ };
