@@ -210,6 +210,31 @@ const makePustuServices = (label) => [
   },
 ];
 
+// === Doctors map per poli ===
+const DOCTORS_BY_POLI = {
+  "poli-umum": "dr. Natasha Adjani",
+  "poli-gigi": "drg. Liza Noah Febriana Marpaung",
+  "pelayanan-24-jam": "dr. Alfred Alberta Josua Ritonga",
+  "igd": "dr. Ranu Brata Kusuma",
+};
+
+const EXTRA_INFO = {
+  "Pemeriksaan Umum":
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim, nisi at tincidunt cursus, urna nibh dictum risus.",
+  "Kontrol Berkala":
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, laboriosam. Catatan pra-kunjungan dan riwayat obat disarankan.",
+  "Surat Keterangan Sehat":
+    "Lorem ipsum dolor sit amet. Bawa identitas asli dan persyaratan administrasi sesuai ketentuan.",
+  "Cabut Gigi":
+    "Lorem ipsum dolor sit amet, consectetur. Harap informasikan riwayat alergi dan obat pengencer darah bila ada.",
+  "Scaling (Pembersihan Karang)":
+    "Lorem ipsum dolor sit amet. Anjuran kontrol kebersihan gigi dan mulut setelah tindakan.",
+  "Tindakan Darurat":
+    "Lorem ipsum dolor sit amet. Prioritas keselamatan pasien; ikuti instruksi petugas IGD.",
+  "Pelayanan Malam":
+    "Lorem ipsum dolor sit amet. Layanan tersedia pada jam malam; ikuti arahan petugas jaga.",
+};
+
 // Pemetaan services per fasilitas
 const SERVICES_BY_FACILITY = {
   "pkm-jagakarsa": SERVICES_JAGAKARSA,
@@ -415,6 +440,17 @@ function FlowCard({ code, index }) {
   );
 }
 
+function InfoCard({ title, children }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+      <div className="text-sm uppercase tracking-wide text-white/60 mb-2">{title}</div>
+      <div className="prose prose-invert max-w-none text-sm leading-relaxed">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function stopFlowAudio() {
   const a = getFlowAudio();
   try { a.pause(); a.currentTime = 0; } catch {}
@@ -509,9 +545,33 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
 
       <div className="text-white/70">Alur layanan untuk: <span className="font-medium">{sub.nama}</span></div>
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {visibleSteps.map((code, i) => (<FlowCard key={i} code={code} index={i} />))}
-      </div>
+       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+       {visibleSteps.map((code, i) => (<FlowCard key={i} code={code} index={i} />))}
+       </div>
+       {/* Info dokter + detail layanan */}
+       <div className="mt-4 sm:mt-6">
+       <InfoCard title="Dokter Penanggung Jawab">
+       <div className="font-semibold text-white mb-1">
+       {DOCTORS_BY_POLI[selected.id] ?? "—"}
+       </div>
+       <div className="text-white/70">
+       {/* Dummy info per layanan (pakai lorem ipsum dulu) */}
+       <p className="mb-2">
+        <strong>Detail: </strong>{sub.nama}
+       </p>
+       <p>
+         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
+         dignissim, nisi at tincidunt cursus, urna nibh dictum risus, a
+         ullamcorper ex nunc id augue. Sed ut perspiciatis unde omnis iste natus
+         error sit voluptatem accusantium doloremque laudantium.
+       </p>
+       <p className="mt-2">
+         Informasi ini bersifat contoh/dummy. Silakan ganti dengan ketentuan,
+         persyaratan, atau instruksi khusus untuk layanan <em>{sub.nama}</em>.
+       </p>
+     </div>
+    </InfoCard>
+    </div>
     </div>
   );
 }
