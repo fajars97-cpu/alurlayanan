@@ -338,19 +338,52 @@ function SubServiceCard({ item, onPick }) {
 }
 function FlowCard({ code, index }) {
   const src = resolveFlowImg(code);
+
+  // peta audio per KODE langkah alur
+  const NARRATION_MAP = {
+    1: "alur-loket.mp3", // menuju loket (kamu sudah siapkan)
+    // 2: "alur-kasir.mp3",
+    // 3: "alur-poli-gigi.mp3",
+    // 4: "alur-farmasi.mp3",
+    // 5: "alur-selesai.mp3",
+  };
+
+  const playNarration = () => {
+    const file = NARRATION_MAP[code];
+    if (!file) return; // kalau belum ada narasi untuk kode ini, diamkan saja
+    const url = `${import.meta.env.BASE_URL}voices/${file}`; // perhatikan: folder "voices"
+    const audio = new Audio(url);
+    audio.play().catch(() => {
+      console.warn("Gagal memutar audio:", url);
+    });
+  };
+
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
-      <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
+    <button
+      type="button"
+      onClick={playNarration}
+      className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden text-left hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      aria-label={`Langkah ${index + 1} — klik untuk dengar narasi`}
+    >
+      <div className="px-3 pt-2 text-[11px] text-white/50">
+        Langkah {index + 1}
+      </div>
       <div className="p-2 sm:p-3 flex items-center justify-center">
         {src ? (
-          <img src={src} onError={onFlowError} alt={`Langkah ${index + 1}`} className="max-w-full h-auto object-contain" />
+          <img
+            src={src}
+            onError={onFlowError}
+            alt={`Langkah ${index + 1}`}
+            className="max-w-full h-auto object-contain"
+          />
         ) : (
           <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>
         )}
       </div>
-    </div>
+    </button>
   );
 }
+
 
 // === RightPanel ===
 function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, jump, setJump, searchQuery }) {
