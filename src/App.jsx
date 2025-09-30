@@ -285,26 +285,23 @@ function ServiceCard({ s, onPick }) {
 
 function BpjsBadge({ show }) {
   if (!show) return null;
-  const src = asset("icons/bpjs.svg"); // <-- pakai helper
+  const src = asset("icons/bpjs.svg"); // <- sesuai nama file kamu
+
   return (
     <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 ring-1 ring-white/10"
+      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/8 ring-1 ring-white/12 backdrop-blur-[1px]"
       title="Ditanggung BPJS Kesehatan"
     >
       <img
         src={src}
         alt="BPJS"
-        className="h-4 w-4 md:h-5 md:w-5"
+        // lebih besar di mobile, cukup proporsional di desktop
+        className="h-6 w-6 md:h-5 md:w-5"
         loading="lazy"
-        onError={(e) => {
-          // fallback jika file tidak ditemukan
-          e.currentTarget.replaceWith(Object.assign(document.createElement("span"), {
-            className: "text-[11px] text-emerald-300 font-semibold",
-            innerText: "BPJS",
-          }));
-        }}
       />
-      <span className="hidden md:inline text-[11px] text-white/70">BPJS</span>
+      <span className="hidden md:inline text-[11px] text-white/75 font-medium">
+        BPJS
+      </span>
     </span>
   );
 }
@@ -314,7 +311,7 @@ function PricePill({ tarif }) {
   const isFree = n === 0;
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
+      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight ${
         isFree
           ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30"
           : "bg-sky-500/15 text-sky-300 ring-1 ring-sky-400/30"
@@ -332,19 +329,16 @@ function SubServiceCard({ item, onPick }) {
       onClick={() => onPick(item)}
       className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
     >
-      {/* Badge kanan-atas: selalu di posisi yang sama */}
-      <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
+      {/* meta kanan-atas: BPJS + harga */}
+      <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1.5">
         <BpjsBadge show={!!item.bpjs} />
         <PricePill tarif={item.tarif} />
       </div>
 
-      <div className="p-4 sm:p-5 min-h-[112px] sm:min-h-[124px] pr-24">
-        {/* ikon + judul + deskripsi dengan wrapping */}
+      {/* beri ruang kanan agar teks tak menabrak meta */}
+      <div className="p-4 sm:p-5 pr-28 sm:pr-32 min-h-[120px] sm:min-h-[132px]">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-xl sm:text-2xl shrink-0">
-            {item.ikon ?? "🧩"}
-          </div>
-
+          <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
           <div className="min-w-0 flex-1">
             <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">
               {item.nama}
