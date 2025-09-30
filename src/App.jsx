@@ -1,13 +1,13 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// === Path helper ===
+/* ===================== Path helpers ===================== */
 const BASE = import.meta.env.BASE_URL ?? "/";
 const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
 const DIR_INFO = `${BASE}infografis`;
 const DIR_FLOW = `${BASE}alur`;
 
-// === Infografis helper ===
+/* ===================== Infografis helpers ===================== */
 const resolveInfografis = (service) => {
   const file = (service?.img ?? `${service?.id ?? "missing"}.jpg`).toString();
   if (/^https?:\/\//.test(file)) return file;
@@ -16,109 +16,50 @@ const resolveInfografis = (service) => {
 };
 const INFO_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="22" text-anchor="middle" dominant-baseline="middle">Infografis tidak ditemukan</text></svg>';
-const onInfoError = (e) => {
-  e.currentTarget.onerror = null;
-  e.currentTarget.src = INFO_FALLBACK;
-};
+const onInfoError = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = INFO_FALLBACK; };
 
-// === Flow helper ===
-const FLOW_MAP = {
-  0: null,
-  1: "1-menuju-loket.jpg",
-  2: "2-menuju-kasir.jpg",
-  3: "3-menuju-poli-gigi.jpg",
-  4: "4-menuju-farmasi.jpg",
-  5: "5-selesai.jpg",
-};
-const resolveFlowImg = (code) => {
-  const f = FLOW_MAP[code] ?? null;
-  return f ? `${DIR_FLOW}/${f}` : null;
-};
+/* ===================== Flow helpers ===================== */
+const FLOW_MAP = { 0:null, 1:"1-menuju-loket.jpg", 2:"2-menuju-kasir.jpg", 3:"3-menuju-poli-gigi.jpg", 4:"4-menuju-farmasi.jpg", 5:"5-selesai.jpg" };
+const resolveFlowImg = (code) => (FLOW_MAP[code] ? `${DIR_FLOW}/${FLOW_MAP[code]}` : null);
 const FLOW_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
-const onFlowError = (e) => {
-  e.currentTarget.onerror = null;
-  e.currentTarget.src = FLOW_FALLBACK;
-};
+const onFlowError = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = FLOW_FALLBACK; };
 
-// --- Audio singleton untuk semua FlowCard ---
+/* ===================== Audio singleton ===================== */
 function getFlowAudio() {
   if (!window.__flowAudio) {
     window.__flowAudio = new Audio();
-    window.__flowAudioKey = null; // kode langkah yang sedang diputar
+    window.__flowAudioKey = null;
   }
   return window.__flowAudio;
 }
+function stopFlowAudio() {
+  const a = getFlowAudio();
+  try { a.pause(); a.currentTime = 0; } catch {}
+}
 
-// === Jadwal helper ===
-const DAY_NAMES_ID = [
-  "Minggu",
-  "Senin",
-  "Selasa",
-  "Rabu",
-  "Kamis",
-  "Jumat",
-  "Sabtu",
-];
-const RULE_DEFAULT = {
-  Senin: "08:00–16:00",
-  Selasa: "08:00–16:00",
-  Rabu: "08:00–16:00",
-  Kamis: "08:00–16:00",
-  Jumat: "08:00–16:00",
-  Sabtu: "Tutup",
-  Minggu: "Tutup",
-};
-function buildRuleJadwal(service) {
+/* ===================== Jadwal helpers ===================== */
+const DAY_NAMES_ID = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const RULE_DEFAULT = { Senin:"08:00–16:00", Selasa:"08:00–16:00", Rabu:"08:00–16:00", Kamis:"08:00–16:00", Jumat:"08:00–16:00", Sabtu:"Tutup", Minggu:"Tutup" };
+function buildRuleJadwal(service){
   const id = (service?.id || "").toLowerCase();
-  if (id === "igd")
-    return Object.fromEntries(DAY_NAMES_ID.map((d) => [d, "00:00–24:00"]));
-  if (id.includes("pelayanan-24"))
-    return Object.fromEntries(
-      DAY_NAMES_ID.map((d) => [d, "16:00–24:00, 00:00–06:00"])
-    );
+  if (id === "igd") return Object.fromEntries(DAY_NAMES_ID.map((d)=>[d,"00:00–24:00"]));
+  if (id.includes("pelayanan-24")) return Object.fromEntries(DAY_NAMES_ID.map((d)=>[d,"16:00–24:00, 00:00–06:00"]));
   return { ...RULE_DEFAULT };
 }
-function getEffectiveJadwal(s) {
-  return s?.jadwal && Object.keys(s.jadwal).length ? s.jadwal : buildRuleJadwal(s);
+function getEffectiveJadwal(s){ return s?.jadwal && Object.keys(s.jadwal).length ? s.jadwal : buildRuleJadwal(s); }
+const toMin = (s)=>{ const [h,m]=String(s).split(":").map((n)=>parseInt(n,10)||0); return h*60+m; };
+function parseRanges(v){ const t=String(v||""); if(t.toLowerCase().includes("tutup")) return []; return t.split(",").map((r)=>r.trim().replace(/–|—/g,"-")); }
+function rangesForToday(j,ref=new Date()){
+  const d=ref.getDay(), day=DAY_NAMES_ID[d], prev=DAY_NAMES_ID[(d+6)%7];
+  const today=parseRanges(j[day]), yesterday=parseRanges(j[prev]); const out=[];
+  const push=(r,label)=>{ const [a,b]=r.split("-").map((s)=>s.trim()); if(!a||!b) return; const A=toMin(a),B=toMin(b);
+    if(B>=A) out.push({from:A,to:B}); else { if(label==="yesterday") out.push({from:0,to:B}); else out.push({from:A,to:1440}); } };
+  yesterday.forEach((r)=>push(r,"yesterday")); today.forEach((r)=>push(r,"today")); return out;
 }
-const toMin = (s) => {
-  const [h, m] = String(s).split(":").map((n) => parseInt(n, 10) || 0);
-  return h * 60 + m;
-};
-function parseRanges(v) {
-  const t = String(v || "");
-  if (t.toLowerCase().includes("tutup")) return [];
-  return t.split(",").map((r) => r.trim().replace(/–|—/g, "-"));
-}
-function rangesForToday(j, ref = new Date()) {
-  const d = ref.getDay();
-  const day = DAY_NAMES_ID[d];
-  const prev = DAY_NAMES_ID[(d + 6) % 7];
-  const today = parseRanges(j[day]);
-  const yesterday = parseRanges(j[prev]);
-  const out = [];
-  const push = (r, label) => {
-    const [a, b] = r.split("-").map((s) => s.trim());
-    if (!a || !b) return;
-    const A = toMin(a), B = toMin(b);
-    if (B >= A) out.push({ from: A, to: B });
-    else {
-      if (label === "yesterday") out.push({ from: 0, to: B });
-      else out.push({ from: A, to: 1440 });
-    }
-  };
-  yesterday.forEach((r) => push(r, "yesterday"));
-  today.forEach((r) => push(r, "today"));
-  return out;
-}
-function isOpenNow(s, ref = new Date()) {
-  const j = getEffectiveJadwal(s);
-  const now = ref.getHours() * 60 + ref.getMinutes();
-  return rangesForToday(j, ref).some((R) => now >= R.from && now <= R.to);
-}
+function isOpenNow(s, ref=new Date()){ const j=getEffectiveJadwal(s); const now=ref.getHours()*60+ref.getMinutes(); return rangesForToday(j,ref).some((R)=>now>=R.from && now<=R.to); }
 
-// === Data per fasilitas (Jagakarsa + Pustu) ===
+/* ===================== Data Fasilitas ===================== */
 const FACILITIES = [
   { id: "pkm-jagakarsa", name: "Puskesmas Jagakarsa" },
   { id: "pustu-jagakarsa-1", name: "Pustu Jagakarsa 1" },
@@ -130,7 +71,7 @@ const FACILITIES = [
   { id: "pustu-tanjung-barat", name: "Pustu Tanjung Barat" },
 ];
 
-// Dataset layanan untuk Puskesmas Jagakarsa (lengkap seperti sebelumnya)
+/* ===================== Dataset Layanan Jagakarsa ===================== */
 const SERVICES_JAGAKARSA = [
   {
     id: "poli-umum",
@@ -141,9 +82,9 @@ const SERVICES_JAGAKARSA = [
     telemed: true,
     img: "poli-umum.jpg.png",
     layanan: [
-      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, ket: "Konsultasi dokter umum", alur: [1, 5] },
-      { nama: "Kontrol Berkala", ikon: "📅", tarif: 0, alur: [1, 5] },
-      { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000, alur: [1, 2, 5] },
+      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, bpjs: true,  ket: "Konsultasi dokter umum", alur: [1,5] },
+      { nama: "Kontrol Berkala",   ikon: "📅", tarif: 0, bpjs: true,  ket: "Kontrol kondisi pasien",  alur: [1,5] },
+      { nama: "Surat Keterangan Sehat", ikon: "📝", tarif: 15000, bpjs: false, ket: "Dokumen administrasi sesuai kebutuhan", alur: [1,2,5] },
     ],
   },
   {
@@ -155,8 +96,20 @@ const SERVICES_JAGAKARSA = [
     telemed: false,
     img: "poli-gigi.jpg",
     layanan: [
-      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1, 2, 3, 4, 5] },
-      { nama: "Scaling (Pembersihan Karang)", ikon: "🪥", tarif: 40000, alur: [1, 3, 4, 5] },
+      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, bpjs: true,  ket: "Tindakan pencabutan gigi permanen", alur: [1,2,3,4,5] },
+      { nama: "Scaling (Pembersihan Karang)", ikon: "🪥", tarif: 40000, bpjs: false, ket: "Perawatan kebersihan gigi dan mulut", alur: [1,3,4,5] },
+    ],
+  },
+  {
+    id: "pelayanan-24-jam",
+    nama: "Pelayanan 24 Jam",
+    klaster: "Layanan Malam",
+    ikon: "🌙",
+    lokasi: "Lantai 1 — Layanan 24 Jam",
+    telemed: false,
+    img: "igd.jpg",
+    layanan: [
+      { nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, bpjs: true, ket: "Layanan medis malam hari", alur: [1,5] },
     ],
   },
   {
@@ -167,21 +120,13 @@ const SERVICES_JAGAKARSA = [
     lokasi: "Lantai Dasar — IGD",
     telemed: false,
     img: "igd.jpg",
-    layanan: [ { nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, alur: [1, 5] } ],
-  },
-  {
-    id: "pelayanan-24-jam",
-    nama: "Pelayanan 24 Jam",
-    klaster: "Layanan Malam",
-    ikon: "🌙",
-    lokasi: "Lantai 1 — Layanan 24 Jam",
-    telemed: false,
-    img: "igd.jpg",
-    layanan: [ { nama: "Pelayanan Malam", ikon: "🌙", tarif: 0, alur: [1, 5] } ],
+    layanan: [
+      { nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, bpjs: true, ket: "Penanganan kegawatdaruratan", alur: [1,5] },
+    ],
   },
 ];
 
-// Template 2 poli (Umum & Gigi) untuk Pustu (dummy)
+/* ===================== Template Pustu (dummy) ===================== */
 const makePustuServices = (label) => [
   {
     id: `${label}-umum`,
@@ -191,9 +136,7 @@ const makePustuServices = (label) => [
     lokasi: "Ruang Poli Umum",
     telemed: false,
     img: "poli-umum.jpg.png",
-    layanan: [
-      { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, alur: [1, 5] },
-    ],
+    layanan: [{ nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, bpjs: true, alur: [1,5] }],
   },
   {
     id: `${label}-gigi`,
@@ -204,38 +147,30 @@ const makePustuServices = (label) => [
     telemed: false,
     img: "poli-gigi.jpg",
     layanan: [
-      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, alur: [1, 2, 3, 4, 5] },
-      { nama: "Scaling", ikon: "🪥", tarif: 40000, alur: [1, 3, 4, 5] },
+      { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, bpjs: true,  alur: [1,2,3,4,5] },
+      { nama: "Scaling",    ikon: "🪥", tarif: 40000, bpjs: false, alur: [1,3,4,5] },
     ],
   },
 ];
 
-// === Doctors map per poli ===
+/* ===================== Doctors & Extra Info ===================== */
 const DOCTORS_BY_POLI = {
   "poli-umum": "dr. Natasha Adjani",
   "poli-gigi": "drg. Liza Noah Febriana Marpaung",
   "pelayanan-24-jam": "dr. Alfred Alberta Josua Ritonga",
   "igd": "dr. Ranu Brata Kusuma",
 };
-
 const EXTRA_INFO = {
-  "Pemeriksaan Umum":
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim, nisi at tincidunt cursus, urna nibh dictum risus.",
-  "Kontrol Berkala":
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, laboriosam. Catatan pra-kunjungan dan riwayat obat disarankan.",
-  "Surat Keterangan Sehat":
-    "Lorem ipsum dolor sit amet. Bawa identitas asli dan persyaratan administrasi sesuai ketentuan.",
-  "Cabut Gigi":
-    "Lorem ipsum dolor sit amet, consectetur. Harap informasikan riwayat alergi dan obat pengencer darah bila ada.",
-  "Scaling (Pembersihan Karang)":
-    "Lorem ipsum dolor sit amet. Anjuran kontrol kebersihan gigi dan mulut setelah tindakan.",
-  "Tindakan Darurat":
-    "Lorem ipsum dolor sit amet. Prioritas keselamatan pasien; ikuti instruksi petugas IGD.",
-  "Pelayanan Malam":
-    "Lorem ipsum dolor sit amet. Layanan tersedia pada jam malam; ikuti arahan petugas jaga.",
+  "Pemeriksaan Umum":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim, nisi at tincidunt cursus, urna nibh dictum risus.",
+  "Kontrol Berkala":"Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, laboriosam. Catatan pra-kunjungan dan riwayat obat disarankan.",
+  "Surat Keterangan Sehat":"Lorem ipsum dolor sit amet. Bawa identitas asli dan persyaratan administrasi sesuai ketentuan.",
+  "Cabut Gigi":"Lorem ipsum dolor sit amet, consectetur. Harap informasikan riwayat alergi dan obat pengencer darah bila ada.",
+  "Scaling (Pembersihan Karang)":"Lorem ipsum dolor sit amet. Anjuran kontrol kebersihan gigi dan mulut setelah tindakan.",
+  "Tindakan Darurat":"Lorem ipsum dolor sit amet. Prioritas keselamatan pasien; ikuti instruksi petugas IGD.",
+  "Pelayanan Malam":"Lorem ipsum dolor sit amet. Layanan tersedia pada jam malam; ikuti arahan petugas jaga.",
 };
 
-// Pemetaan services per fasilitas
+/* ===================== Services Map per Facility ===================== */
 const SERVICES_BY_FACILITY = {
   "pkm-jagakarsa": SERVICES_JAGAKARSA,
   "pustu-jagakarsa-1": makePustuServices("pustu-jag1"),
@@ -247,27 +182,20 @@ const SERVICES_BY_FACILITY = {
   "pustu-tanjung-barat": makePustuServices("pustu-tjbrt"),
 };
 
-// === UI kecil ===
+/* ===================== UI kecil ===================== */
 const Chip = ({ children }) => (
-  <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 whitespace-nowrap">
-    {children}
-  </span>
+  <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 whitespace-nowrap">{children}</span>
 );
 function Rupiah({ n }) {
   if (typeof n !== "number") return null;
-  if (n === 0)
-    return (
-      <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">Gratis</span>
-    );
-  return (
-    <span className="px-2 rounded bg-sky-600/20 text-sky-300">Rp {n.toLocaleString("id-ID")}</span>
-  );
+  if (n === 0) return <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">Gratis</span>;
+  return <span className="px-2 rounded bg-sky-600/20 text-sky-300">Rp {n.toLocaleString("id-ID")}</span>;
 }
 const StatusPill = ({ open }) => (
   <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${open?"bg-emerald-500/10 border-emerald-400/30 text-emerald-300":"bg-rose-500/10 border-rose-400/30 text-rose-300"}`}>{open?"Buka":"Tutup"}</span>
 );
 
-// === Sidebar ===
+/* ===================== Sidebar ===================== */
 function Sidebar({ facilityName, query, setQuery, services, onPick, selected, highlightIds = [] }) {
   const [expandedId, setExpandedId] = useState(null);
   const toggle = (s) => { onPick(s); setExpandedId((id) => (id === s.id ? null : s.id)); };
@@ -301,11 +229,9 @@ function Sidebar({ facilityName, query, setQuery, services, onPick, selected, hi
               <button
                 onClick={() => toggle(s)}
                 className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${
-                  selected?.id === s.id
-                    ? "border-emerald-500/60 bg-emerald-500/10"
-                    : hl
-                    ? "border-emerald-400 bg-emerald-400/10"
-                    : "border-white/10"
+                  selected?.id === s.id ? "border-emerald-500/60 bg-emerald-500/10"
+                  : hl ? "border-emerald-400 bg-emerald-400/10"
+                  : "border-white/10"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -339,7 +265,7 @@ function Sidebar({ facilityName, query, setQuery, services, onPick, selected, hi
   );
 }
 
-// === Cards ===
+/* ===================== Cards ===================== */
 function ServiceCard({ s, onPick }) {
   return (
     <button onClick={() => onPick(s)} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left">
@@ -362,8 +288,14 @@ function SubServiceCard({ item, onPick }) {
       <div className="p-3 sm:p-4">
         <div className="flex items-center gap-3">
           <div className="text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
-          <div className="font-semibold text-sm sm:text-base">{item.nama}</div>
-          <div className="ml-auto">{typeof item.tarif === "number" ? <Rupiah n={item.tarif} /> : null}</div>
+          <div className="font-semibold text-sm sm:text-base flex-1">{item.nama}</div>
+          <div className="ml-auto flex items-center gap-2">
+            {item.bpjs ? (
+              <img src={`${import.meta.env.BASE_URL}icons/bpjs.png`} alt="Ditanggung BPJS" className="h-5 w-auto" />
+            ) : (
+              <span className="text-sky-300 text-sm font-medium">Rp {item.tarif?.toLocaleString("id-ID")}</span>
+            )}
+          </div>
         </div>
         {item.ket && <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>}
       </div>
@@ -372,99 +304,52 @@ function SubServiceCard({ item, onPick }) {
 }
 function FlowCard({ code, index }) {
   const src = resolveFlowImg(code);
+  const NARRATION_MAP = { 1:"alur-loket.mp3" /*, 2:"alur-kasir.mp3", 3:"alur-poli-gigi.mp3", 4:"alur-farmasi.mp3", 5:"alur-selesai.mp3"*/ };
 
-  const NARRATION_MAP = {
-    1: "alur-loket.mp3",
-    // 2: "alur-kasir.mp3",
-    // 3: "alur-poli-gigi.mp3",
-    // 4: "alur-farmasi.mp3",
-    // 5: "alur-selesai.mp3",
-  };
-
-  // deteksi double-tap cepat untuk rewind
   let lastTap = 0;
-
   const playNarration = () => {
-    const file = NARRATION_MAP[code];
-    if (!file) return;
+    const file = NARRATION_MAP[code]; if (!file) return;
+    const player = getFlowAudio(); const key = code; const url = `${import.meta.env.BASE_URL}voices/${file}`;
+    const now = Date.now(); const isDoubleTap = now - lastTap < 400; lastTap = now;
 
-    const player = getFlowAudio();
-    const key = code;
-    const url = `${import.meta.env.BASE_URL}voices/${file}`;
-
-    const now = Date.now();
-    const isDoubleTap = now - lastTap < 400; // 400ms window
-    lastTap = now;
-
-    // Jika ketuk cepat pada track yang sama → rewind
-    if (window.__flowAudioKey === key && isDoubleTap) {
-      try {
-        player.pause();
-        player.currentTime = 0;
-        player.play();
-      } catch {}
-      return;
-    }
-
-    // Hentikan apapun yang sedang main, lalu set sumber yang baru
+    if (window.__flowAudioKey === key && isDoubleTap) { try { player.pause(); player.currentTime = 0; player.play(); } catch {} return; }
     try {
-      player.pause();
-      player.currentTime = 0;
-      // kalau track beda atau src belum diset → ganti src
-      if (window.__flowAudioKey !== key || player.src !== new URL(url, location.href).href) {
-        player.src = url;
-      }
-      window.__flowAudioKey = key;
-      player.play().catch(() => {});
-    } catch (e) {
-      console.warn("Gagal memutar audio:", e);
-    }
+      player.pause(); player.currentTime = 0;
+      if (window.__flowAudioKey !== key || player.src !== new URL(url, location.href).href) player.src = url;
+      window.__flowAudioKey = key; player.play().catch(()=>{});
+    } catch (e) { console.warn("Gagal memutar audio:", e); }
   };
 
   return (
-    <button
-      type="button"
-      onClick={playNarration}
+    <button type="button" onClick={playNarration}
       className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden text-left hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      aria-label={`Langkah ${index + 1} — ketuk untuk narasi, ketuk cepat 2x untuk ulang`}
-    >
+      aria-label={`Langkah ${index + 1} — ketuk untuk narasi, ketuk cepat 2x untuk ulang`}>
       <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
       <div className="p-2 sm:p-3 flex items-center justify-center">
-        {src ? (
-          <img src={src} onError={onFlowError} alt={`Langkah ${index + 1}`} className="max-w-full h-auto object-contain" />
-        ) : (
-          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>
-        )}
+        {src ? (<img src={src} onError={onFlowError} alt={`Langkah ${index + 1}`} className="max-w-full h-auto object-contain" />)
+             : (<div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>)}
       </div>
     </button>
   );
 }
 
+/* ===================== Info Card ===================== */
 function InfoCard({ title, children }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
       <div className="text-sm uppercase tracking-wide text-white/60 mb-2">{title}</div>
-      <div className="prose prose-invert max-w-none text-sm leading-relaxed">
-        {children}
-      </div>
+      <div className="prose prose-invert max-w-none text-sm leading-relaxed">{children}</div>
     </div>
   );
 }
 
-function stopFlowAudio() {
-  const a = getFlowAudio();
-  try { a.pause(); a.currentTime = 0; } catch {}
-}
-
-// === RightPanel ===
+/* ===================== Right Panel ===================== */
 function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, jump, setJump, searchQuery }) {
   const [sub, setSub] = useState(null);
-  useEffect(() => setSub(null), [selected]);
-  useEffect(() => {
-    if (jump && selected && selected.id === jump.poliId) {
-      setSub(selected.layanan?.[jump.idx] ?? null);
-      setJump(null);
-    }
+
+  useEffect(()=>setSub(null), [selected]);
+  useEffect(()=>{
+    if (jump && selected && selected.id === jump.poliId) { setSub(selected.layanan?.[jump.idx] ?? null); setJump(null); }
   }, [jump, selected, setJump]);
 
   if (!selected) {
@@ -472,8 +357,8 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
         <AnimatePresence mode="wait">
-          <motion.div key="grid-poli" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.25 }}>
-            {hasServiceResults && (
+          <motion.div key="grid-poli" initial={{opacity:0,x:-20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:20}} transition={{duration:0.25}}>
+            {hasServiceResults ? (
               <section className="mb-6">
                 <div className="mb-2 text-white/70">Hasil Pelayanan</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -482,9 +367,7 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
                   ))}
                 </div>
               </section>
-            )}
-
-            {!hasServiceResults && (
+            ) : (
               <>
                 <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -503,7 +386,7 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <button onClick={() => {stopFlowAudio();setSelected(null);}} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+          <button onClick={()=>{ stopFlowAudio(); setSelected(null); }} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
         </div>
 
         <div className="flex items-center gap-3">
@@ -517,9 +400,9 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
 
         <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
         <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {list.length > 0 ? list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />) : (
-            <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
-          )}
+          {list.length > 0
+            ? list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />)
+            : <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>}
         </div>
       </div>
     );
@@ -531,7 +414,7 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <button onClick={() => {stopFlowAudio();setSub(null);}} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
+        <button onClick={()=>{ stopFlowAudio(); setSub(null); }} className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20">← Kembali</button>
       </div>
 
       <div className="flex items-center gap-3">
@@ -545,58 +428,43 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
 
       <div className="text-white/70">Alur layanan untuk: <span className="font-medium">{sub.nama}</span></div>
 
-       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-       {visibleSteps.map((code, i) => (<FlowCard key={i} code={code} index={i} />))}
-       </div>
-       {/* Info dokter + detail layanan */}
-       <div className="mt-4 sm:mt-6">
-       <InfoCard title="Dokter Penanggung Jawab">
-       <div className="font-semibold text-white mb-1">
-       {DOCTORS_BY_POLI[selected.id] ?? "—"}
-       </div>
-       <div className="text-white/70">
-       {/* Dummy info per layanan (pakai lorem ipsum dulu) */}
-       <p className="mb-2">
-        <strong>Detail: </strong>{sub.nama}
-       </p>
-       <p>
-         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
-         dignissim, nisi at tincidunt cursus, urna nibh dictum risus, a
-         ullamcorper ex nunc id augue. Sed ut perspiciatis unde omnis iste natus
-         error sit voluptatem accusantium doloremque laudantium.
-       </p>
-       <p className="mt-2">
-         Informasi ini bersifat contoh/dummy. Silakan ganti dengan ketentuan,
-         persyaratan, atau instruksi khusus untuk layanan <em>{sub.nama}</em>.
-       </p>
-     </div>
-    </InfoCard>
-    </div>
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {visibleSteps.map((code, i) => (<FlowCard key={i} code={code} index={i} />))}
+      </div>
+
+      {/* Info dokter + detail layanan */}
+      <div className="mt-4 sm:mt-6">
+        <InfoCard title="Dokter Penanggung Jawab">
+          <div className="font-semibold text-white mb-1">{DOCTORS_BY_POLI[selected.id] ?? "—"}</div>
+          <div className="text-white/70">
+            <p className="mb-2"><strong>Detail layanan:</strong> {sub.nama}</p>
+            <p>{EXTRA_INFO[sub.nama] ?? "Informasi tambahan belum tersedia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim, nisi at tincidunt cursus, urna nibh dictum risus."}</p>
+            <p className="mt-2">Informasi ini bersifat contoh/dummy. Silakan ganti dengan ketentuan, persyaratan, atau instruksi khusus untuk layanan <em>{sub.nama}</em>.</p>
+          </div>
+        </InfoCard>
+      </div>
     </div>
   );
 }
 
-// === App Root ===
+/* ===================== App Root ===================== */
 export default function App() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
-  const [facility, setFacility] = useState("pkm-jagakarsa"); // default: Puskesmas Jagakarsa
+  const [facility, setFacility] = useState("pkm-jagakarsa");
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
 
-  // filter poli berdasar nama/klaster
+  // filter poli
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SERVICES_CURRENT.filter(
-      (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
-    );
+    return SERVICES_CURRENT.filter((s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q));
   }, [query, SERVICES_CURRENT]);
 
-  // hasil pencarian untuk sub-layanan (pelayanan)
+  // hasil pencarian untuk sub-layanan
   const subResults = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
+    const q = query.trim().toLowerCase(); if (!q) return [];
     const rows = [];
     SERVICES_CURRENT.forEach((p) => (p.layanan || []).forEach((item, idx) => {
       const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
@@ -605,26 +473,18 @@ export default function App() {
     return rows;
   }, [query, SERVICES_CURRENT]);
 
-  // poli relevan → highlight
   const matchPoliIds = useMemo(() => Array.from(new Set(subResults.map((r) => r.poli.id))), [subResults]);
-
-  // daftar untuk sidebar: kalau filter poli kosong tapi ada hasil pelayanan → tampilkan semua poli
-  const sidebarList = useMemo(() => {
-    if (filtered.length === 0 && query && subResults.length > 0) return SERVICES_CURRENT;
-    return filtered;
-  }, [filtered, query, subResults, SERVICES_CURRENT]);
+  const sidebarList = useMemo(() => (filtered.length === 0 && query && subResults.length > 0 ? SERVICES_CURRENT : filtered), [filtered, query, subResults, SERVICES_CURRENT]);
 
   // loncat otomatis ke sub-layanan
   const [jump, setJump] = useState(null);
-  function handlePickSub(poliId, idx) {
-    const p = SERVICES_CURRENT.find((x) => x.id === poliId);
-    if (!p) return;
-    setSelected(p);
-    setJump({ poliId, idx });
+  function handlePickSub(poliId, idx){
+    const p = SERVICES_CURRENT.find((x) => x.id === poliId); if (!p) return;
+    setSelected(p); setJump({ poliId, idx });
   }
 
-  // reset pilihan saat ganti fasilitas
-  useEffect(() => {stopFlowAudio();setSelected(null);setQuery("");}, [facility]);
+  // reset saat ganti fasilitas
+  useEffect(()=>{ stopFlowAudio(); setSelected(null); setQuery(""); }, [facility]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
@@ -635,17 +495,10 @@ export default function App() {
             <div className="font-semibold">Penampil Jadwal & Tarif Layanan</div>
           </div>
 
-          {/* Dropdown fasilitas */}
           <div className="ml-auto flex items-center gap-2">
             <label className="text-xs text-white/60 hidden sm:block">Fasilitas</label>
-            <select
-              value={facility}
-              onChange={(e) => setFacility(e.target.value)}
-              className="h-9 rounded-lg bg-white/5 border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              {FACILITIES.map((f) => (
-                <option key={f.id} value={f.id}>{f.name}</option>
-              ))}
+            <select value={facility} onChange={(e)=>setFacility(e.target.value)} className="h-9 rounded-lg bg-white/5 border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+              {FACILITIES.map((f) => (<option key={f.id} value={f.id}>{f.name}</option>))}
             </select>
           </div>
         </div>
@@ -657,7 +510,7 @@ export default function App() {
           query={query}
           setQuery={setQuery}
           services={sidebarList}
-          onPick={(s) => setSelected(s)}
+          onPick={(s)=>setSelected(s)}
           selected={selected}
           highlightIds={matchPoliIds}
         />
