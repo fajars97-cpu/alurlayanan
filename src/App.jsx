@@ -282,6 +282,33 @@ function ServiceCard({ s, onPick }) {
     </button>
   );
 }
+
+function BpjsBadge({ show }) {
+  if (!show) return null;
+  const src = asset("icons/bpjs.svg"); // <-- pakai helper
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 ring-1 ring-white/10"
+      title="Ditanggung BPJS Kesehatan"
+    >
+      <img
+        src={src}
+        alt="BPJS"
+        className="h-4 w-4 md:h-5 md:w-5"
+        loading="lazy"
+        onError={(e) => {
+          // fallback jika file tidak ditemukan
+          e.currentTarget.replaceWith(Object.assign(document.createElement("span"), {
+            className: "text-[11px] text-emerald-300 font-semibold",
+            innerText: "BPJS",
+          }));
+        }}
+      />
+      <span className="hidden md:inline text-[11px] text-white/70">BPJS</span>
+    </span>
+  );
+}
+
 function PricePill({ tarif }) {
   const n = Number(tarif || 0);
   const isFree = n === 0;
@@ -299,56 +326,42 @@ function PricePill({ tarif }) {
   );
 }
 
-function BpjsBadge({ show }) {
-  if (!show) return null;
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 ring-1 ring-white/10"
-      title="Ditanggung BPJS Kesehatan"
-    >
-      <img
-        src={`${import.meta.env.BASE_URL}icons/bpjs-mark.svg`}
-        alt="BPJS"
-        className="h-4 w-4 md:h-5 md:w-5"
-        loading="lazy"
-      />
-      <span className="hidden md:inline text-[11px] text-white/70">BPJS</span>
-    </span>
-  );
-}
-
 function SubServiceCard({ item, onPick }) {
   return (
     <button
       onClick={() => onPick(item)}
-      className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
+      className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
     >
-      <div className="p-3 sm:p-4">
-        {/* header: ikon + judul + meta kanan */}
+      {/* Badge kanan-atas: selalu di posisi yang sama */}
+      <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
+        <BpjsBadge show={!!item.bpjs} />
+        <PricePill tarif={item.tarif} />
+      </div>
+
+      <div className="p-4 sm:p-5 min-h-[112px] sm:min-h-[124px] pr-24">
+        {/* ikon + judul + deskripsi dengan wrapping */}
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
+          <div className="mt-0.5 text-xl sm:text-2xl shrink-0">
+            {item.ikon ?? "🧩"}
+          </div>
 
           <div className="min-w-0 flex-1">
-            <div className="font-semibold text-sm sm:text-base leading-snug truncate">
+            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">
               {item.nama}
             </div>
             {item.ket && (
-              <div className="text-xs sm:text-sm text-white/60 mt-1 line-clamp-2">
+              <div className="text-[13px] sm:text-sm text-white/70 mt-1">
                 {item.ket}
               </div>
             )}
-          </div>
-
-          {/* kolom kanan: badge bpjs + harga tersusun vertikal */}
-          <div className="shrink-0 pl-2 flex flex-col items-end gap-1">
-            <BpjsBadge show={!!item.bpjs} />
-            <PricePill tarif={item.tarif} />
           </div>
         </div>
       </div>
     </button>
   );
 }
+
+/* ===================== Flow Card ===================== */
 
 function FlowCard({ code, index }) {
   const src = resolveFlowImg(code);
@@ -409,7 +422,7 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
             {hasServiceResults ? (
               <section className="mb-6">
                 <div className="mb-2 text-white/70">Hasil Pelayanan</div>
-                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
                     <SubServiceCard key={poli.id + "#" + index} item={{ ...item, nama: `${item.nama} — ${poli.nama}` }} onPick={() => onPickSub(poli.id, index)} />
                   ))}
