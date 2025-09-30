@@ -282,6 +282,41 @@ function ServiceCard({ s, onPick }) {
     </button>
   );
 }
+function PricePill({ tarif }) {
+  const n = Number(tarif || 0);
+  const isFree = n === 0;
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
+        isFree
+          ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30"
+          : "bg-sky-500/15 text-sky-300 ring-1 ring-sky-400/30"
+      }`}
+      title="Tarif untuk pasien tanpa BPJS"
+    >
+      {isFree ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`}
+    </span>
+  );
+}
+
+function BpjsBadge({ show }) {
+  if (!show) return null;
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 ring-1 ring-white/10"
+      title="Ditanggung BPJS Kesehatan"
+    >
+      <img
+        src={`${import.meta.env.BASE_URL}icons/bpjs-mark.svg`}
+        alt="BPJS"
+        className="h-4 w-4 md:h-5 md:w-5"
+        loading="lazy"
+      />
+      <span className="hidden md:inline text-[11px] text-white/70">BPJS</span>
+    </span>
+  );
+}
+
 function SubServiceCard({ item, onPick }) {
   return (
     <button
@@ -289,37 +324,27 @@ function SubServiceCard({ item, onPick }) {
       className="w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
     >
       <div className="p-3 sm:p-4">
-        <div className="flex items-center gap-3">
-          <div className="text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
+        {/* header: ikon + judul + meta kanan */}
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 text-lg sm:text-xl">{item.ikon ?? "🧩"}</div>
 
-          <div className="font-semibold text-sm sm:text-base flex-1">
-            {item.nama}
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-sm sm:text-base leading-snug truncate">
+              {item.nama}
+            </div>
+            {item.ket && (
+              <div className="text-xs sm:text-sm text-white/60 mt-1 line-clamp-2">
+                {item.ket}
+              </div>
+            )}
           </div>
 
-          <div className="ml-auto flex items-center gap-2">
-            {item.bpjs && (
-              <img
-                src={`${import.meta.env.BASE_URL}icons/bpjs.svg`}
-                alt="Ditanggung BPJS"
-                className="h-5 w-auto"
-                loading="lazy"
-              />
-            )}
-            <span
-              className={`text-sm font-medium ${
-                item.tarif === 0 ? "text-emerald-300" : "text-sky-300"
-              }`}
-              aria-label={`Tarif layanan untuk pasien tanpa BPJS: Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`}
-              title="Tarif untuk pasien tanpa BPJS"
-            >
-              {item.tarif === 0 ? "Gratis" : `Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`}
-            </span>
+          {/* kolom kanan: badge bpjs + harga tersusun vertikal */}
+          <div className="shrink-0 pl-2 flex flex-col items-end gap-1">
+            <BpjsBadge show={!!item.bpjs} />
+            <PricePill tarif={item.tarif} />
           </div>
         </div>
-
-        {item.ket && (
-          <div className="text-xs sm:text-sm text-white/60 mt-1">{item.ket}</div>
-        )}
       </div>
     </button>
   );
