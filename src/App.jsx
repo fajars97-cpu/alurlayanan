@@ -186,10 +186,23 @@ const SERVICES_BY_FACILITY = {
 const Chip = ({ children }) => (
   <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 whitespace-nowrap">{children}</span>
 );
-function Rupiah({ n }) {
-  if (typeof n !== "number") return null;
-  if (n === 0) return <span className="px-2 rounded bg-emerald-600/20 text-emerald-300">Gratis</span>;
-  return <span className="px-2 rounded bg-sky-600/20 text-sky-300">Rp {n.toLocaleString("id-ID")}</span>;
+
+/* Pills: BPJS & Harga (Gratis/Rp) */
+function Pill({ children, tone = "emerald" }) {
+  const tones = {
+    emerald: "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30",
+    sky:     "bg-sky-500/15     text-sky-300     ring-1 ring-sky-400/30",
+    slate:   "bg-white/8        text-white/80    ring-1 ring-white/12",
+  };
+  return (
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight ${tones[tone]}`}>
+      {children}
+    </span>
+  );
+}
+function PricePill({ tarif }) {
+  const n = Number(tarif || 0);
+  return n === 0 ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">Rp {n.toLocaleString("id-ID")}</Pill>;
 }
 const StatusPill = ({ open }) => (
   <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${open?"bg-emerald-500/10 border-emerald-400/30 text-emerald-300":"bg-rose-500/10 border-rose-400/30 text-rose-300"}`}>{open?"Buka":"Tutup"}</span>
@@ -283,71 +296,26 @@ function ServiceCard({ s, onPick }) {
   );
 }
 
-function BpjsBadge({ show }) {
-  if (!show) return null;
-  const src = asset("icons/bpjs.svg"); // <- sesuai nama file kamu
-
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/8 ring-1 ring-white/12 backdrop-blur-[1px]"
-      title="Ditanggung BPJS Kesehatan"
-    >
-      <img
-        src={src}
-        alt="BPJS"
-        // lebih besar di mobile, cukup proporsional di desktop
-        className="h-6 w-6 md:h-5 md:w-5"
-        loading="lazy"
-      />
-      <span className="hidden md:inline text-[11px] text-white/75 font-medium">
-        BPJS
-      </span>
-    </span>
-  );
-}
-
-function PricePill({ tarif }) {
-  const n = Number(tarif || 0);
-  const isFree = n === 0;
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight ${
-        isFree
-          ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30"
-          : "bg-sky-500/15 text-sky-300 ring-1 ring-sky-400/30"
-      }`}
-      title="Tarif untuk pasien tanpa BPJS"
-    >
-      {isFree ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`}
-    </span>
-  );
-}
-
+/* Pill-only meta (BPJS + Harga) & SubServiceCard */
 function SubServiceCard({ item, onPick }) {
   return (
     <button
       onClick={() => onPick(item)}
       className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
     >
-      {/* meta kanan-atas: BPJS + harga */}
+      {/* meta kanan-atas */}
       <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1.5">
-        <BpjsBadge show={!!item.bpjs} />
+        {item.bpjs && <Pill tone="emerald">BPJS</Pill>}
         <PricePill tarif={item.tarif} />
       </div>
 
-      {/* beri ruang kanan agar teks tak menabrak meta */}
+      {/* ruang kanan agar tidak menabrak meta */}
       <div className="p-4 sm:p-5 pr-28 sm:pr-32 min-h-[120px] sm:min-h-[132px]">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
           <div className="min-w-0 flex-1">
-            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">
-              {item.nama}
-            </div>
-            {item.ket && (
-              <div className="text-[13px] sm:text-sm text-white/70 mt-1">
-                {item.ket}
-              </div>
-            )}
+            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">{item.nama}</div>
+            {item.ket && <div className="text-[13px] sm:text-sm text-white/70 mt-1">{item.ket}</div>}
           </div>
         </div>
       </div>
@@ -356,7 +324,6 @@ function SubServiceCard({ item, onPick }) {
 }
 
 /* ===================== Flow Card ===================== */
-
 function FlowCard({ code, index }) {
   const src = resolveFlowImg(code);
   const NARRATION_MAP = { 1:"alur-loket.mp3" /*, 2:"alur-kasir.mp3", 3:"alur-poli-gigi.mp3", 4:"alur-farmasi.mp3", 5:"alur-selesai.mp3"*/ };
@@ -407,18 +374,25 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
     if (jump && selected && selected.id === jump.poliId) { setSub(selected.layanan?.[jump.idx] ?? null); setJump(null); }
   }, [jump, selected, setJump]);
 
-  if (!selected) {
-    const hasServiceResults = searchQuery && subMatches?.length > 0;
+  // Prioritas: saat ada query dengan hasil → tampilkan hasil layanan global,
+  // meskipun sebelumnya ada poli yang terpilih.
+  const showSearchResults = (searchQuery?.trim()?.length > 0) && (subMatches?.length > 0);
+
+  if (!selected || showSearchResults) {
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
         <AnimatePresence mode="wait">
-          <motion.div key="grid-poli" initial={{opacity:0,x:-20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:20}} transition={{duration:0.25}}>
-            {hasServiceResults ? (
+          <motion.div key="grid-poli-or-search" initial={{opacity:0,x:-20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:20}} transition={{duration:0.25}}>
+            {showSearchResults ? (
               <section className="mb-6">
                 <div className="mb-2 text-white/70">Hasil Pelayanan</div>
                 <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
-                    <SubServiceCard key={poli.id + "#" + index} item={{ ...item, nama: `${item.nama} — ${poli.nama}` }} onPick={() => onPickSub(poli.id, index)} />
+                    <SubServiceCard
+                      key={poli.id + "#" + index}
+                      item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
+                      onPick={() => onPickSub(poli.id, index)}
+                    />
                   ))}
                 </div>
               </section>
@@ -454,7 +428,7 @@ function RightPanel({ selected, setSelected, filtered, subMatches, onPickSub, ju
         </div>
 
         <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
-        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {list.length > 0
             ? list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />)
             : <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>}
@@ -511,13 +485,23 @@ export default function App() {
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
 
-  // filter poli
+  // reset pilihan poli saat user mulai mengetik agar hasil pencarian muncul
+  useEffect(() => {
+    if (query.trim().length > 0) {
+      setSelected(null);
+      stopFlowAudio();
+    }
+  }, [query]);
+
+  // filter poli (judul/klaster)
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SERVICES_CURRENT.filter((s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q));
+    return SERVICES_CURRENT.filter(
+      (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
+    );
   }, [query, SERVICES_CURRENT]);
 
-  // hasil pencarian untuk sub-layanan
+  // hasil pencarian untuk sub-layanan (nama/ket)
   const subResults = useMemo(() => {
     const q = query.trim().toLowerCase(); if (!q) return [];
     const rows = [];
@@ -529,7 +513,10 @@ export default function App() {
   }, [query, SERVICES_CURRENT]);
 
   const matchPoliIds = useMemo(() => Array.from(new Set(subResults.map((r) => r.poli.id))), [subResults]);
-  const sidebarList = useMemo(() => (filtered.length === 0 && query && subResults.length > 0 ? SERVICES_CURRENT : filtered), [filtered, query, subResults, SERVICES_CURRENT]);
+  const sidebarList = useMemo(
+    () => (filtered.length === 0 && query && subResults.length > 0 ? SERVICES_CURRENT : filtered),
+    [filtered, query, subResults, SERVICES_CURRENT]
+  );
 
   // loncat otomatis ke sub-layanan
   const [jump, setJump] = useState(null);
