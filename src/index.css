@@ -1,19 +1,37 @@
 @import "tailwindcss";
 
-/* === Dark dropdown for native <select> === */
-select,
-select option {
-  background-color: #0b1220;   /* slate-950-ish */
-  color: #fff;
+/* === Select mengikuti tema === */
+
+/* Light (default) */
+select, select option {
+  background-color: #ffffff;
+  color: #0f172a;   /* slate-900 */
+  border-color: #e5e7eb; /* gray-200 via Tailwind border utility */
 }
 
-/* Warna baris yang terseleksi saat menu terbuka */
+/* Dark via prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  select, select option {
+    background-color: #0b1220; /* slate-950-ish */
+    color: #ffffff;
+    border-color: #334155; /* slate-700 */
+  }
+}
+
+/* Dark via class .dark (kalau kamu pakai toggle manual) */
+.dark select, .dark select option {
+  background-color: #0b1220;
+  color: #ffffff;
+  border-color: #334155;
+}
+
+/* Highlight item selected pada menu */
 select option:checked {
   background-color: #1f2937;   /* slate-800-ish */
   color: #fff;
 }
 
-/* Windows/Edge high-contrast tweak */
+/* High-contrast Windows */
 @media (forced-colors: active) {
   select, select option { forced-color-adjust: none; }
 }

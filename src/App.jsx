@@ -281,7 +281,7 @@ function Sidebar({ facilityName, query, setQuery, services, onPick, selected, hi
 /* ===================== Cards ===================== */
 function ServiceCard({ s, onPick }) {
   return (
-    <button onClick={() => onPick(s)} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-left">
+    <button onClick={() => onPick(s)} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition text-left touch-manipulation">
       <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden">
         <img src={resolveInfografis(s)} onError={onInfoError} alt={s.nama} className="w-full h-full object-cover" />
       </div>
@@ -301,7 +301,7 @@ function SubServiceCard({ item, onPick }) {
   return (
     <button
       onClick={() => onPick(item)}
-      className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
+      className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition overflow-hidden touch-manipulation"
     >
       {/* BPJS pill: kanan-atas */}
       {item.bpjs && (
@@ -315,7 +315,7 @@ function SubServiceCard({ item, onPick }) {
         <PricePill tarif={item.tarif} />
       </div>
 
-      {/* Konten utama - beri ruang atas/kanan/bawah agar tak menabrak pill */}
+      {/* Konten utama - beri ruang agar tak menabrak pill */}
       <div className="p-4 sm:p-5 pt-6 sm:pt-7 pr-28 sm:pr-32 pb-12 sm:pb-14 min-h-[132px] sm:min-h-[156px]">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
@@ -494,6 +494,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
   const [facility, setFacility] = useState("pkm-jagakarsa");
+  const [navOpen, setNavOpen] = useState(false); // NEW: drawer state
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
@@ -536,15 +537,35 @@ export default function App() {
   function handlePickSub(poliId, idx){
     const p = SERVICES_CURRENT.find((x) => x.id === poliId); if (!p) return;
     setSelected(p); setJump({ poliId, idx });
+    setNavOpen(false); // jika drawer terbuka, tutup
   }
 
   // reset saat ganti fasilitas
   useEffect(()=>{ stopFlowAudio(); setSelected(null); setQuery(""); }, [facility]);
 
+  // Esc untuk menutup drawer
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") setNavOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
+      {/* HEADER */}
       <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
+          {/* Hamburger (mobile) */}
+          <button
+            className="md:hidden inline-flex items-center justify-center size-9 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10"
+            aria-label="Buka menu"
+            onClick={()=>setNavOpen(true)}
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
             <div className="font-semibold">Penampil Jadwal & Tarif Layanan</div>
@@ -552,23 +573,45 @@ export default function App() {
 
           <div className="ml-auto flex items-center gap-2">
             <label className="text-xs text-white/60 hidden sm:block">Fasilitas</label>
-            <select value={facility} onChange={(e)=>setFacility(e.target.value)} className="h-9 rounded-lg bg-slate-800 text-white border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 appearance-none">
+            <select
+              value={facility}
+              onChange={(e)=>setFacility(e.target.value)}
+              className="h-9 rounded-lg bg-slate-800 text-white border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 appearance-none"
+            >
               {FACILITIES.map((f) => (<option key={f.id} value={f.id}>{f.name}</option>))}
             </select>
           </div>
         </div>
       </header>
 
+      {/* LAYOUT dengan Drawer */}
       <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
-        <Sidebar
-          facilityName={facilityName}
-          query={query}
-          setQuery={setQuery}
-          services={sidebarList}
-          onPick={(s)=>setSelected(s)}
-          selected={selected}
-          highlightIds={matchPoliIds}
-        />
+        {/* Overlay (mobile) */}
+        {navOpen && (
+          <button
+            aria-label="Tutup menu"
+            onClick={()=>setNavOpen(false)}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+          />
+        )}
+
+        {/* Sidebar (drawer on mobile) */}
+        <div
+          className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto transition-transform md:transition-none ${navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+          role="dialog" aria-modal="true"
+        >
+          <Sidebar
+            facilityName={facilityName}
+            query={query}
+            setQuery={setQuery}
+            services={sidebarList}
+            onPick={(s)=>{ setSelected(s); setNavOpen(false); }}
+            selected={selected}
+            highlightIds={matchPoliIds}
+          />
+        </div>
+
+        {/* Panel kanan */}
         <RightPanel
           selected={selected}
           setSelected={setSelected}
