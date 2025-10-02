@@ -536,7 +536,7 @@ export default function App() {
   const [jump, setJump] = useState(null);
   function handlePickSub(poliId, idx){
     const p = SERVICES_CURRENT.find((x) => x.id === poliId); if (!p) return;
-    setSelected(p); setJump({ poliId, idx });
+    setQuery(''); setSelected(p); setJump({ poliId, idx });
     setNavOpen(false); // jika drawer terbuka, tutup
   }
 
@@ -597,8 +597,10 @@ export default function App() {
 
         {/* Sidebar (drawer on mobile) */}
         <div
-          className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto transition-transform md:transition-none ${navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
-          role="dialog" aria-modal="true"
+        className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
+        transition-transform md:transition-none
+        ${navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 pointer-events-none'}`}
+        role="dialog" aria-modal="true"
         >
           <Sidebar
             facilityName={facilityName}
