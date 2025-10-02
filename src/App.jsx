@@ -597,6 +597,7 @@ export default function App() {
   const [navOpen, setNavOpen] = useState(false); // Drawer state
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
+  console.log("SERVICES_CURRENT:", SERVICES_CURRENT.length, SERVICES_CURRENT.map(s => s.id));
   const facilityName =
     FACILITIES.find((f) => f.id === facility)?.name || "-";
 

@@ -47,7 +47,18 @@ export const SERVICES_BY_FACILITY = {
         { nama: "Tindakan Darurat", ikon: "⚡", tarif: 0, bpjs: true, ket: "Penanganan kegawatdaruratan", alur: [1, 5] },
       ],
     },
-
+    {
+      id: "Pelayanan 24 Jam",
+      nama: "Pelayanan 24 Jam",
+      klaster: "Layanan Medik",
+      ikon: "🚑",
+      lokasi: "Lantai Dasar — IGD",
+      telemed: false,
+      img: "igd.jpg",
+      layanan: [
+        { nama: "Layanan 24 jam", ikon: "⚡", tarif: 0, bpjs: true, ket: "Pelayanan Umum 24 Jam", alur: [1, 5] },
+      ],
+    },
     // 🔹 Kebidanan & Anak
     { id: "ki-hamil", nama: "KI Hamil", klaster: "Kebidanan", ikon: "🤰", lokasi: "Poli KIA", telemed: false, img: "ki-hamil.jpg",
       layanan: [{ nama: "Pemeriksaan Ibu Hamil", ikon: "🤰", tarif: 0, bpjs: true, ket: "Antenatal care", alur: [1,5] }] },
