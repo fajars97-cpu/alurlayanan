@@ -48,7 +48,7 @@ export const SERVICES_BY_FACILITY = {
       ],
     },
     {
-      id: "Pelayanan 24 Jam",
+      id: "pelayanan-24",
       nama: "Pelayanan 24 Jam",
       klaster: "Layanan Medik",
       ikon: "🚑",
