@@ -194,7 +194,16 @@ function Sidebar({
   };
 
   return (
-    <aside className="w-full md:w-80 shrink-0 bg-slate-950/70 backdrop-blur border-r border-white/10 flex flex-col">
+    <aside
+      className={`
+        w-full md:w-80 shrink-0
+        bg-slate-950/70 backdrop-blur border-r border-white/10
+        flex flex-col
+        h-[100svh]                   /* mobile: penuh */
+        md:h-[calc(100svh-56px)]     /* desktop: viewport - header (~56px) */
+      `}
+    >
+      {/* Header kecil di dalam sidebar */}
       <div className="p-4 flex items-center gap-2 border-b border-white/10">
         <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
         <div className="font-semibold truncate">Jadwal & Tarif</div>
@@ -205,6 +214,7 @@ function Sidebar({
         <span className="text-white/90 font-medium">{facilityName}</span>
       </div>
 
+      {/* Pencarian */}
       <div className="p-4 space-y-3">
         <label className="text-xs uppercase text-white/50">Pencarian</label>
         <input
@@ -215,8 +225,18 @@ function Sidebar({
         />
       </div>
 
-      <div className="px-4 pb-2 flex-1 overflow-y-auto space-y-2">
+      {/* Daftar poli: batasi tinggi ≈ 7 item; sisanya scroll */}
+      <div
+        className={`
+          px-4 pb-2 space-y-2
+          overflow-y-auto overscroll-contain
+          [scrollbar-width:thin]    /* Firefox */
+          md:max-h-[28rem]          /* ≈ 7 item di desktop */
+          flex-1                    /* mobile: sisa tinggi akan scroll */
+        `}
+      >
         <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
+
         {services.map((s) => {
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
@@ -264,6 +284,7 @@ function Sidebar({
     </aside>
   );
 }
+
 
 /* ===================== Cards ===================== */
 function ServiceCard({ s, onPick }) {
