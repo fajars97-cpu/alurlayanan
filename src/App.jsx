@@ -599,9 +599,14 @@ export default function App() {
         <div
         className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
         transition-transform md:transition-none
-        ${navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 pointer-events-none'}`}
-        role="dialog" aria-modal="true"
-        >
+        ${
+        navOpen
+        ? 'translate-x-0 pointer-events-auto'
+        : '-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        > 
           <Sidebar
             facilityName={facilityName}
             query={query}
