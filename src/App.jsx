@@ -303,25 +303,38 @@ function SubServiceCard({ item, onPick }) {
       onClick={() => onPick(item)}
       className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
     >
-      {/* meta kanan-atas */}
-      <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1.5">
-        {item.bpjs && <Pill tone="emerald">BPJS</Pill>}
+      {/* BPJS pill: kanan-atas */}
+      {item.bpjs && (
+        <div className="absolute top-2 right-2 z-10">
+          <Pill tone="emerald">BPJS</Pill>
+        </div>
+      )}
+
+      {/* Harga: kanan-bawah */}
+      <div className="absolute bottom-2 right-2 z-10">
         <PricePill tarif={item.tarif} />
       </div>
 
-      {/* ruang kanan agar tidak menabrak meta */}
-      <div className="p-4 sm:p-5 pr-28 sm:pr-32 min-h-[120px] sm:min-h-[132px]">
+      {/* Konten utama - beri ruang atas/kanan/bawah agar tak menabrak pill */}
+      <div className="p-4 sm:p-5 pt-6 sm:pt-7 pr-28 sm:pr-32 pb-12 sm:pb-14 min-h-[132px] sm:min-h-[156px]">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
           <div className="min-w-0 flex-1">
-            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">{item.nama}</div>
-            {item.ket && <div className="text-[13px] sm:text-sm text-white/70 mt-1">{item.ket}</div>}
+            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">
+              {item.nama}
+            </div>
+            {item.ket && (
+              <div className="text-[13px] sm:text-sm text-white/70 mt-1">
+                {item.ket}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </button>
   );
 }
+
 
 /* ===================== Flow Card ===================== */
 function FlowCard({ code, index }) {
@@ -539,7 +552,7 @@ export default function App() {
 
           <div className="ml-auto flex items-center gap-2">
             <label className="text-xs text-white/60 hidden sm:block">Fasilitas</label>
-            <select value={facility} onChange={(e)=>setFacility(e.target.value)} className="h-9 rounded-lg bg-white/5 border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+            <select value={facility} onChange={(e)=>setFacility(e.target.value)} className="h-9 rounded-lg bg-slate-800 text-white border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 appearance-none">
               {FACILITIES.map((f) => (<option key={f.id} value={f.id}>{f.name}</option>))}
             </select>
           </div>

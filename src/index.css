@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+/* === Dark dropdown for native <select> === */
+select,
+select option {
+  background-color: #0b1220;   /* slate-950-ish */
+  color: #fff;
+}
+
+/* Warna baris yang terseleksi saat menu terbuka */
+select option:checked {
+  background-color: #1f2937;   /* slate-800-ish */
+  color: #fff;
+}
+
+/* Windows/Edge high-contrast tweak */
+@media (forced-colors: active) {
+  select, select option { forced-color-adjust: none; }
+}
