@@ -397,7 +397,7 @@ function FlowCard({ step, index }) {
       aria-label={`Langkah ${index + 1} — ketuk untuk narasi, ketuk cepat 2x untuk ulang`}
     >
       <div className="px-3 pt-2 text-[11px] text-white/50">
-        {step?.title || `Langkah ${index + 1}`}
+      Langkah {index + 1}
       </div>
 
       {/* Gambar */}
