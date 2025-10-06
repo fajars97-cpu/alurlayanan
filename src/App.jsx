@@ -289,21 +289,21 @@ function ServiceCard({ s, onPick }) {
       onClick={() => onPick(s)}
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition text-left touch-manipulation"
     >
-      {/* Kontainer rasio tetap agar grid konsisten */}
-      <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden bg-slate-900/40">
-        {/* Center + contain + padding supaya gambar utuh & tidak nempel tepi */}
-        <div className="w-full h-full grid place-items-center p-2 sm:p-3">
+      {/* ── Gambar: full-fit (tidak terpotong) ───────────────────────── */}
+      <div className="w-full bg-slate-900/40">
+        {/* tinggi tetap agar stabil di semua rasio gambar */}
+        <div className="h-36 sm:h-44 md:h-48 lg:h-52 grid place-items-center p-2 sm:p-3">
           <img
             src={resolveInfografis(s)}
             onError={onInfoError}
             alt={s.nama}
-            className="max-w-full max-h-full object-contain"
+            className="block max-h-full max-w-full object-contain"
             loading="lazy"
           />
         </div>
       </div>
 
-      {/* Area judul/klaster tetap terpisah agar profesional & mudah dibaca */}
+      {/* ── Teks kartu ──────────────────────────────────────────────── */}
       <div className="p-3">
         <div className="flex items-center gap-2">
           <div className="text-xl">{s.ikon}</div>
@@ -429,7 +429,7 @@ function FlowCard({ step, index }) {
             src={src}
             onError={onFlowError}
             alt={step?.name || `Langkah ${index + 1}`}
-            className="max-w-full h-auto object-contain"
+            className="block max-w-full max-h-[12rem] md:max-h-[14rem] object-contain"
           />
         ) : (
           <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">
