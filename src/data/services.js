@@ -11,33 +11,33 @@ export const FLOW_STEPS = {
     title: "Langkah 1",
     name: "Daftar / Loket",
     description:
-      "Pasien mendaftar di loket/pendaftaran. Serahkan identitas atau kartu BPJS bila ada.",
-    img: "/alur/loket.png",        // opsional; ganti sesuai asetmu
-    audio: "/voices/alur-loket.mp3" // opsional
+      "Silahkan mendaftar di loket/pendaftaran. Serahkan identitas atau kartu BPJS bila ada.",
+    img: "/alur/1-menuju-loket.jpg", 
+    audio: "/voices/alur-loket.mp3" 
   },
   2: {
     id: 2,
     title: "Langkah 2",
-    name: "Menuju Unit / Poli",
+    name: "Menuju Kasir",
     description:
-      "Pasien menuju unit tujuan (misal poli gigi atau poli umum) sesuai arahan petugas.",
-    img: "/alur/menuju-poli.png"
+      "Silahkan menuju kasir lantai 3 untuk membayar biaya administrasi/ layanan",
+    img: "/alur/2-menuju-kasir.jpg"
   },
   3: {
     id: 3,
     title: "Langkah 3",
-    name: "Pemeriksaan / Tindakan",
+    name: "Menuju Poli Gigi",
     description:
-      "Dilakukan pemeriksaan/tindakan oleh tenaga kesehatan sesuai keluhan pasien.",
-    img: "/alur/pemeriksaan.png"
+      "Silahkan menuju poli gigi lantai 2",
+    img: "/alur/3-menuju-poli-gigi.jpg"
   },
   4: {
     id: 4,
     title: "Langkah 4",
-    name: "Farmasi",
+    name: "Menuju Farmasi",
     description:
-      "Ambil obat sesuai resep di unit farmasi. Ikuti petunjuk penggunaan obat.",
-    img: "/alur/farmasi.png"
+      "Ambil obat sesuai resep di unit farmasi lantai 1. Ikuti petunjuk penggunaan obat",
+    img: "/alur/4-menuju-farmasi.jpg"
   },
   5: {
     id: 5,
@@ -45,7 +45,31 @@ export const FLOW_STEPS = {
     name: "Selesai / Pulang",
     description:
       "Layanan selesai. Pasien boleh pulang atau mendapat instruksi kontrol berikutnya.",
-    img: "/alur/selesai.png"
+    img: "/alur/5-selesai.jpg"
+  },
+  6: {
+    id: 6,
+    title: "Langkah 6",
+    name: "Menuju Poli Umum",
+    description:
+      "Silahkan menuju poli umum lantai 2 dan tunggu panggilan",
+    img: "/alur/6-menuju-ke-poli-umum.jpg"
+  },
+  7: {
+    id: 7,
+    title: "Langkah 7",
+    name: "Menuju Laboratorium",
+    description:
+      "Silahkan menuju laboratorium lantai 3 lalu taruh kertas antrian di box yang tersedia, tunggu panggilan",
+    img: "/alur/7-menuju-laboratorium.jpg"
+  },
+  8: {
+    id: 8,
+    title: "Langkah 8",
+    name: "Menunggu Hasil Lab",
+    description:
+      "Silahkan menunggu hasil lab sesuai waktu tunggu pemeriksaan",
+    img: "/alur/8-menunggu-hasil-lab.jpg"
   },
   // Kamu bisa tambah 6,7,... tanpa ubah struktur layanan
 };
