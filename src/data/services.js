@@ -93,8 +93,8 @@ export const SERVICES_BY_FACILITY = {
       telemed: true,
       img: "poli-umum.jpg.png",
       layanan: [
-        { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, bpjs: true, ket: "Konsultasi dokter umum", alur: [1, 5] },
-        { nama: "Kontrol Berkala",   ikon: "📅", tarif: 0, bpjs: true, ket: "Kontrol kondisi pasien", alur: [1, 5] },
+        { nama: "Pemeriksaan Umum", ikon: "🩺", tarif: 0, bpjs: true, ket: "Konsultasi dokter umum", alur: [1, 6, 5] },
+        { nama: "Kontrol Berkala",   ikon: "📅", tarif: 0, bpjs: true, ket: "Kontrol kondisi pasien", alur: [1, 6, 5] },
       ],
     },
     {
@@ -106,7 +106,7 @@ export const SERVICES_BY_FACILITY = {
       telemed: false,
       img: "poli-gigi.jpg",
       layanan: [
-        { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, bpjs: true,  ket: "Pencabutan gigi permanen", alur: [1, 2, 3, 4, 5] },
+        { nama: "Cabut Gigi", ikon: "🦷", tarif: 30000, bpjs: true,  ket: "Pencabutan gigi permanen", alur: [1, 3, 4, 5] },
         { nama: "Scaling",   ikon: "🪥", tarif: 40000, bpjs: false, ket: "Pembersihan karang gigi",   alur: [1, 3, 4, 5] },
       ],
     },
