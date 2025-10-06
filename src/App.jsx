@@ -30,6 +30,14 @@ const onInfoError = (e) => {
   e.currentTarget.src = INFO_FALLBACK;
 };
 
+/* ===================== Alur Layanan helpers ===================== */
+const resolveFlowImg = (img) => {
+  if (!img) return null;
+  if (/^https?:\/\//.test(img)) return img; // kalau URL penuh, pakai apa adanya
+  const p = img.startsWith("/") ? img.slice(1) : img; // buang leading slash
+  return asset(p); // prefix dengan BASE_URL
+};
+
 /* ===================== (Flow) Fallback image & audio singleton ===================== */
 const FLOW_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
@@ -68,7 +76,7 @@ const RULE_DEFAULT = {
   Selasa: "08:00–16:00",
   Rabu: "08:00–16:00",
   Kamis: "08:00–16:00",
-  Jumat: "08:00–16:00",
+  Jumat: "08:00–16:30",
   Sabtu: "Tutup",
   Minggu: "Tutup",
 };
@@ -344,7 +352,7 @@ function SubServiceCard({ item, onPick }) {
 /* ===================== Flow Card (pakai FLOW_STEPS) ===================== */
 function FlowCard({ step, index }) {
   // step: object dari FLOW_STEPS[id]
-  const src = step?.img || null;
+  const src = resolveFlowImg(step?.img);
 
   // Dukungan audio narasi per langkah
   let lastTap = 0;
