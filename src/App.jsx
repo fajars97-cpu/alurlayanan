@@ -289,14 +289,21 @@ function ServiceCard({ s, onPick }) {
       onClick={() => onPick(s)}
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition text-left touch-manipulation"
     >
-      <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden">
-        <img
-          src={resolveInfografis(s)}
-          onError={onInfoError}
-          alt={s.nama}
-          className="w-full h-full object-cover"
-        />
+      {/* Kontainer rasio tetap agar grid konsisten */}
+      <div className="aspect-[4/3] sm:aspect-[16/9] w-full overflow-hidden bg-slate-900/40">
+        {/* Center + contain + padding supaya gambar utuh & tidak nempel tepi */}
+        <div className="w-full h-full grid place-items-center p-2 sm:p-3">
+          <img
+            src={resolveInfografis(s)}
+            onError={onInfoError}
+            alt={s.nama}
+            className="max-w-full max-h-full object-contain"
+            loading="lazy"
+          />
+        </div>
       </div>
+
+      {/* Area judul/klaster tetap terpisah agar profesional & mudah dibaca */}
       <div className="p-3">
         <div className="flex items-center gap-2">
           <div className="text-xl">{s.ikon}</div>
@@ -310,7 +317,7 @@ function ServiceCard({ s, onPick }) {
 
 /* Pill-only meta (BPJS + Harga) & SubServiceCard */
 function SubServiceCard({ item, onPick }) {
-  const bpjsText = item.bpjs ? "BPJS: Tercaver" : "BPJS: Tidak Tercaver";
+  const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
   const bpjsClass =
     item.bpjs
       ? "text-emerald-400"
