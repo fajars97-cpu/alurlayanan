@@ -8,13 +8,13 @@ import {
   SERVICES_BY_FACILITY,
   DOCTORS_BY_POLI,
   EXTRA_INFO,
+  FLOW_STEPS, // ⬅️ flow steps sekarang dari services.js
 } from "./data/services";
 
 /* ===================== Path helpers ===================== */
 const BASE = import.meta.env.BASE_URL ?? "/";
 const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
 const DIR_INFO = `${BASE}infografis`;
-const DIR_FLOW = `${BASE}alur`;
 
 /* ===================== Infografis helpers ===================== */
 const resolveInfografis = (service) => {
@@ -30,17 +30,7 @@ const onInfoError = (e) => {
   e.currentTarget.src = INFO_FALLBACK;
 };
 
-/* ===================== Flow helpers ===================== */
-const FLOW_MAP = {
-  0: null,
-  1: "1-menuju-loket.jpg",
-  2: "2-menuju-kasir.jpg",
-  3: "3-menuju-poli-gigi.jpg",
-  4: "4-menuju-farmasi.jpg",
-  5: "5-selesai.jpg",
-};
-const resolveFlowImg = (code) =>
-  FLOW_MAP[code] ? `${DIR_FLOW}/${FLOW_MAP[code]}` : null;
+/* ===================== (Flow) Fallback image & audio singleton ===================== */
 const FLOW_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
 const onFlowError = (e) => {
@@ -48,7 +38,6 @@ const onFlowError = (e) => {
   e.currentTarget.src = FLOW_FALLBACK;
 };
 
-/* ===================== Audio singleton ===================== */
 function getFlowAudio() {
   if (!window.__flowAudio) {
     window.__flowAudio = new Audio();
@@ -199,8 +188,8 @@ function Sidebar({
         w-full md:w-80 shrink-0
         bg-slate-950/70 backdrop-blur border-r border-white/10
         flex flex-col
-        h-[100svh]                   /* mobile: penuh */
-        md:h-[calc(100svh-56px)]     /* desktop: viewport - header (~56px) */
+        h-full
+        md:h-[calc(100svh-56px)]
       `}
     >
       {/* Header kecil di dalam sidebar */}
@@ -230,9 +219,9 @@ function Sidebar({
         className={`
           px-4 pb-2 space-y-2
           overflow-y-auto overscroll-contain
-          [scrollbar-width:thin]    /* Firefox */
-          md:max-h-[28rem]          /* ≈ 7 item di desktop */
-          flex-1                    /* mobile: sisa tinggi akan scroll */
+          [scrollbar-width:thin]
+          md:max-h-[28rem]
+          flex-1
         `}
       >
         <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
@@ -284,7 +273,6 @@ function Sidebar({
     </aside>
   );
 }
-
 
 /* ===================== Cards ===================== */
 function ServiceCard({ s, onPick }) {
@@ -353,23 +341,18 @@ function SubServiceCard({ item, onPick }) {
   );
 }
 
-/* ===================== Flow Card ===================== */
-function FlowCard({ code, index }) {
-  const src = resolveFlowImg(code);
-  const NARRATION_MAP = {
-    1: "alur-loket.mp3",
-    // 2: "alur-kasir.mp3",
-    // 3: "alur-poli-gigi.mp3",
-    // 4: "alur-farmasi.mp3",
-    // 5: "alur-selesai.mp3"
-  };
+/* ===================== Flow Card (pakai FLOW_STEPS) ===================== */
+function FlowCard({ step, index }) {
+  // step: object dari FLOW_STEPS[id]
+  const src = step?.img || null;
 
+  // Dukungan audio narasi per langkah
   let lastTap = 0;
   const playNarration = () => {
-    const file = NARRATION_MAP[code];
+    const file = step?.audio;
     if (!file) return;
     const player = getFlowAudio();
-    const key = code;
+    const key = step.id;
     const url = `${import.meta.env.BASE_URL}voices/${file}`;
     const now = Date.now();
     const isDoubleTap = now - lastTap < 400;
@@ -405,13 +388,17 @@ function FlowCard({ code, index }) {
       className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden text-left hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
       aria-label={`Langkah ${index + 1} — ketuk untuk narasi, ketuk cepat 2x untuk ulang`}
     >
-      <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
+      <div className="px-3 pt-2 text-[11px] text-white/50">
+        {step?.title || `Langkah ${index + 1}`}
+      </div>
+
+      {/* Gambar */}
       <div className="p-2 sm:p-3 flex items-center justify-center">
         {src ? (
           <img
             src={src}
             onError={onFlowError}
-            alt={`Langkah ${index + 1}`}
+            alt={step?.name || `Langkah ${index + 1}`}
             className="max-w-full h-auto object-contain"
           />
         ) : (
@@ -420,6 +407,20 @@ function FlowCard({ code, index }) {
           </div>
         )}
       </div>
+
+      {/* Keterangan langkah */}
+      {(step?.name || step?.description) && (
+        <div className="px-3 pb-3">
+          {step?.name && (
+            <div className="text-sm font-semibold text-white">
+              {step.name}
+            </div>
+          )}
+          {step?.description && (
+            <p className="text-xs text-white/70 mt-1">{step.description}</p>
+          )}
+        </div>
+      )}
     </button>
   );
 }
@@ -546,8 +547,10 @@ function RightPanel({
     );
   }
 
-  const steps = Array.from({ length: 9 }, (_, i) => sub.alur?.[i] ?? 0);
-  const visibleSteps = steps.filter((code) => code && code !== 0);
+  // Ambil metadata langkah dari FLOW_STEPS sesuai urutan di layanan (ringkas, skalabel)
+  const flowSteps = (sub.alur || [])
+    .map((id) => FLOW_STEPS[id])
+    .filter(Boolean);
 
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
@@ -570,7 +573,8 @@ function RightPanel({
         </h2>
         <div className="ml-auto flex gap-2">
           <Chip>{selected.klaster}</Chip>
-          {selected.telemed && <Chip>Telemed</Chip>}
+          {selected.telemed && <Chip>Telemed</Chip>
+          }
         </div>
       </div>
 
@@ -579,8 +583,8 @@ function RightPanel({
       </div>
 
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {visibleSteps.map((code, i) => (
-          <FlowCard key={i} code={code} index={i} />
+        {flowSteps.map((step, i) => (
+          <FlowCard key={step.id ?? i} step={step} index={i} />
         ))}
       </div>
 
@@ -618,7 +622,11 @@ export default function App() {
   const [navOpen, setNavOpen] = useState(false); // Drawer state
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
-  console.log("SERVICES_CURRENT:", SERVICES_CURRENT.length, SERVICES_CURRENT.map(s => s.id));
+  console.log(
+    "SERVICES_CURRENT:",
+    SERVICES_CURRENT.length,
+    SERVICES_CURRENT.map((s) => s.id)
+  );
   const facilityName =
     FACILITIES.find((f) => f.id === facility)?.name || "-";
 
@@ -759,12 +767,12 @@ export default function App() {
         {/* Sidebar (drawer on mobile) */}
         <div
           className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
-        transition-transform md:transition-none
-        ${
-          navOpen
-            ? "translate-x-0 pointer-events-auto"
-            : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"
-        }`}
+          transition-transform md:transition-none
+           ${navOpen
+          ? 'translate-x-0 pointer-events-auto'
+          : '-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto'}
+        h-[100dvh] overflow-y-auto overscroll-contain
+      `}
           role="dialog"
           aria-modal="true"
         >
