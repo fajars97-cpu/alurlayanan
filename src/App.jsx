@@ -315,18 +315,15 @@ function SubServiceCard({ item, onPick }) {
       onClick={() => onPick(item)}
       className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition overflow-hidden touch-manipulation"
     >
-      {/* BPJS pill: kanan-atas */}
-      {item.bpjs && (
-        <div className="absolute top-2 right-2 z-10">
-          <Pill tone="emerald">BPJS</Pill>
-        </div>
-      )}
-
-      {/* Harga: kanan-bawah */}
-      <div className="absolute bottom-2 right-2 z-10">
-        <PricePill tarif={item.tarif} />
+      <div className="mt-2 text-xs sm:text-sm">
+      <p className={item.bpjs ? "text-green-400 font-semibold" : "text-red-400 font-semibold"}>
+      BPJS: {item.bpjs ? "Tercover" : "Tidak Tercover"}
+      </p>
+      <p className="text-white/70">
+      Tarif Umum: Rp {Number(item.tarif || 0).toLocaleString("id-ID")}
+      </p>
       </div>
-
+      
       {/* Konten utama - beri ruang agar tak menabrak pill */}
       <div className="p-4 sm:p-5 pt-6 sm:pt-7 pr-28 sm:pr-32 pb-12 sm:pb-14 min-h-[132px] sm:min-h-[156px]">
         <div className="flex items-start gap-3">
