@@ -310,23 +310,41 @@ function ServiceCard({ s, onPick }) {
 
 /* Pill-only meta (BPJS + Harga) & SubServiceCard */
 function SubServiceCard({ item, onPick }) {
+  const bpjsText = item.bpjs ? "BPJS: Tercaver" : "BPJS: Tidak Tercaver";
+  const bpjsClass =
+    item.bpjs
+      ? "text-emerald-400"
+      : "text-rose-400";
+
+  const tarifText = `Tarif Umum: Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`;
+
   return (
     <button
       onClick={() => onPick(item)}
-      className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition overflow-hidden touch-manipulation"
+      className="
+        relative w-full text-left rounded-2xl border border-white/10
+        bg-white/5 hover:bg-white/8
+        ring-0 hover:ring-1 hover:ring-white/15
+        transition-all
+        shadow-sm hover:shadow
+        active:scale-[.99]
+        focus:outline-none focus:ring-2 focus:ring-emerald-500
+      "
     >
-      <div className="mt-2 text-xs sm:text-sm">
-      <p className={item.bpjs ? "text-green-400 font-semibold" : "text-red-400 font-semibold"}>
-      BPJS: {item.bpjs ? "Tercover" : "Tidak Tercover"}
-      </p>
-      <p className="text-white/70">
-      Tarif Umum: Rp {Number(item.tarif || 0).toLocaleString("id-ID")}
-      </p>
-      </div>
-      
-      {/* Konten utama - beri ruang agar tak menabrak pill */}
-      <div className="p-4 sm:p-5 pt-6 sm:pt-7 pr-28 sm:pr-32 pb-12 sm:pb-14 min-h-[132px] sm:min-h-[156px]">
-        <div className="flex items-start gap-3">
+      <div className="p-4 sm:p-5 space-y-3">
+        {/* Header status: BPJS & Tarif (rata kiri, tipografi konsisten) */}
+        <div className="text-[12px] sm:text-[13px] font-semibold tracking-tight">
+          <span className={bpjsClass}>{bpjsText}</span>
+        </div>
+        <div className="text-[12px] sm:text-[13px] text-white/70 -mt-2">
+          {tarifText}
+        </div>
+
+        {/* Divider halus */}
+        <div className="h-px bg-white/10" />
+
+        {/* Konten utama: ikon + judul + keterangan (grid rapi) */}
+        <div className="flex items-start gap-3 min-h-[92px]">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">
             {item.ikon ?? "🧩"}
           </div>
@@ -335,7 +353,7 @@ function SubServiceCard({ item, onPick }) {
               {item.nama}
             </div>
             {item.ket && (
-              <div className="text-[13px] sm:text-sm text-white/70 mt-1">
+              <div className="text-[13px] sm:text-sm text-white/70 mt-1 line-clamp-3">
                 {item.ket}
               </div>
             )}
