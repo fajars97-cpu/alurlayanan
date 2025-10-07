@@ -92,7 +92,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🩺",
       lokasi: "Lantai 1 — Ruang 101",
       telemed: true,
-      img: "poli-umum.jpg.png",
+      img: "poli-umum.png",
       layanan: [
         {
           nama: "Pemeriksaan Umum",
@@ -285,7 +285,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧒",
       lokasi: "Poli Anak",
       telemed: false,
-      img: "tumbang.jpg",
+      img: "poli-tumbang.png",
       layanan: [
         {
           nama: "Tumbuh Kembang Anak",
@@ -304,7 +304,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "👶",
       lokasi: "Poli Anak",
       telemed: false,
-      img: "mtbs.jpg",
+      img: "poli-mtbs.png",
       layanan: [
         {
           nama: "Manajemen Terpadu Balita Sakit",
@@ -325,7 +325,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🎒",
       lokasi: "Poli Remaja",
       telemed: false,
-      img: "pkpr.jpg",
+      img: "poli-pkpr.png",
       layanan: [
         {
           nama: "Pelayanan Kesehatan Peduli Remaja",
@@ -344,7 +344,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧓",
       lokasi: "Poli Lansia",
       telemed: false,
-      img: "lansia.jpg",
+      img: "poli-lansia.png",
       layanan: [
         {
           nama: "Pelayanan Kesehatan Lansia",
@@ -365,7 +365,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "❤️‍🩹",
       lokasi: "Poli PTM",
       telemed: false,
-      img: "ptm.jpg",
+      img: "poli-ptm.png",
       layanan: [
         {
           nama: "Konsultasi PTM",
@@ -384,7 +384,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧫",
       lokasi: "Poli PM",
       telemed: false,
-      img: "pm.jpg",
+      img: "poli-pm.png",
       layanan: [
         {
           nama: "Konsultasi Penyakit Menular",
@@ -403,7 +403,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "⚕️",
       lokasi: "Poli IMS",
       telemed: false,
-      img: "ims.jpg",
+      img: "poli-ims.png",
       layanan: [
         {
           nama: "Infeksi Menular Seksual",
@@ -422,7 +422,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🫁",
       lokasi: "Poli ISPA",
       telemed: false,
-      img: "ispa.jpg",
+      img: "poli-pm.png",
       layanan: [
         {
           nama: "Infeksi Saluran Pernafasan Akut",
@@ -443,7 +443,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "👁️",
       lokasi: "Poli Mata",
       telemed: false,
-      img: "mata.jpg",
+      img: "poli-mata.png",
       layanan: [
         {
           nama: "Pemeriksaan Mata",
@@ -462,7 +462,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🥗",
       lokasi: "Poli Gizi",
       telemed: true,
-      img: "gizi.jpg",
+      img: "poli-gizi.png",
       layanan: [
         {
           nama: "Konseling Gizi",
@@ -475,32 +475,13 @@ export const SERVICES_BY_FACILITY = {
       ],
     },
     {
-      id: "akupresur",
-      nama: "Akupresur",
-      klaster: "Tradisional",
-      ikon: "👐",
-      lokasi: "Pelayanan Tradisional",
-      telemed: false,
-      img: "akupresur.jpg",
-      layanan: [
-        {
-          nama: "Terapi Akupresur",
-          ikon: "👐",
-          tarif: 20000,
-          bpjs: false,
-          ket: "Relaksasi & kesehatan",
-          alur: [1, 2, 5],
-        },
-      ],
-    },
-    {
       id: "kirana",
       nama: "KIRANA Konseling",
       klaster: "Konseling",
       ikon: "🧠",
       lokasi: "Unit Konseling",
       telemed: true,
-      img: "kirana.jpg",
+      img: "poli-kirana.png",
       layanan: [
         {
           nama: "Konseling Psikososial",
@@ -592,7 +573,6 @@ export const DOCTORS_BY_POLI = {
   ispa: "dr. ISPA",
   mata: "dr. Mata",
   gizi: "dr. Gizi",
-  akupresur: "Terapis Tradisional",
   kirana: "Psikolog",
   "klinik-sanitasi": "Sanitarian",
   uks: "Petugas UKS",
