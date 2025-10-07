@@ -379,37 +379,40 @@ function FlowCard({ step, index }) {
   // Dukungan audio narasi per langkah
   let lastTap = 0;
   const playNarration = () => {
-    const file = step?.audio;
-    if (!file) return;
-    const player = getFlowAudio();
-    const key = step.id;
-    const url = `${import.meta.env.BASE_URL}voices/${file}`;
-    const now = Date.now();
-    const isDoubleTap = now - lastTap < 400;
-    lastTap = now;
+  const file = step?.audio;
+  if (!file) return;
+  const player = getFlowAudio();
+  const key = step.id;
 
-    if (window.__flowAudioKey === key && isDoubleTap) {
-      try {
-        player.pause();
-        player.currentTime = 0;
-        player.play();
-      } catch {}
-      return;
-    }
+  // Gunakan helper asset() untuk path relatif/absolut
+  const url = asset(file);
+
+  const now = Date.now();
+  const isDoubleTap = now - lastTap < 400;
+  lastTap = now;
+
+  if (window.__flowAudioKey === key && isDoubleTap) {
     try {
       player.pause();
       player.currentTime = 0;
-      if (
-        window.__flowAudioKey !== key ||
-        player.src !== new URL(url, location.href).href
-      )
-        player.src = url;
-      window.__flowAudioKey = key;
-      player.play().catch(() => {});
-    } catch (e) {
-      console.warn("Gagal memutar audio:", e);
-    }
-  };
+      player.play();
+    } catch {}
+    return;
+  }
+  try {
+    player.pause();
+    player.currentTime = 0;
+    if (
+      window.__flowAudioKey !== key ||
+      player.src !== new URL(url, location.href).href
+    )
+      player.src = url;
+    window.__flowAudioKey = key;
+    player.play().catch(() => {});
+  } catch (e) {
+    console.warn("Gagal memutar audio:", e);
+  }
+};
 
   return (
     <button
