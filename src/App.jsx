@@ -580,10 +580,25 @@ function RightPanel({
     );
   }
 
-  // Ambil metadata langkah dari FLOW_STEPS sesuai urutan di layanan (ringkas, skalabel)
-  const flowSteps = (sub.alur || [])
-    .map((id) => FLOW_STEPS[id])
-    .filter(Boolean);
+  // ✅ dukung array (lama) & objek (multi-skenario)
+const scenarios = useMemo(() => {
+  const A = sub?.alur;
+  if (!A) return {};
+  if (Array.isArray(A)) return { standar: A };     // kompatibel data lama
+  return A;                                        // objek {key: [ids]}
+}, [sub]);
+
+const scenarioKeys = Object.keys(scenarios);
+const [scenarioKey, setScenarioKey] = useState(scenarioKeys[0] || null);
+
+// reset saat ganti sub
+useEffect(() => {
+  setScenarioKey(Object.keys(scenarios)[0] || null);
+}, [sub]); // eslint-disable-line
+
+const flowSteps = (scenarios[scenarioKey] || [])
+  .map((id) => FLOW_STEPS[id])
+  .filter(Boolean);
 
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
@@ -614,6 +629,30 @@ function RightPanel({
       <div className="text-white/70">
         Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
       </div>
+
+      {/* Switcher skenario (muncul kalau >1) */}
+      {scenarioKeys.length > 1 && (
+      <div className="flex flex-wrap gap-2 -mt-1">
+       {scenarioKeys.map((key) => (
+       <button
+        key={key}
+        onClick={() => {
+          stopFlowAudio();
+          setScenarioKey(key);
+        }}
+        className={`px-3 py-1.5 rounded-lg border text-sm transition
+          ${key === scenarioKey
+            ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-300"
+            : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"}`}
+        aria-pressed={key === scenarioKey}
+        >
+        {key
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (m) => m.toUpperCase())}
+       </button>
+       ))}
+      </div>
+      )}
 
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {flowSteps.map((step, i) => (
