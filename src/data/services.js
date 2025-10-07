@@ -302,9 +302,9 @@ export const SERVICES_BY_FACILITY = {
       img: "poli-tumbang.png",
       layanan: [
         {
-          nama: "Tumbuh Kembang Anak",
+          nama: "Konsultasi Tumbuh Kembang Anak",
           ikon: "📈",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Asesmen perkembangan anak",
           alur: [1, 5],
@@ -508,19 +508,51 @@ export const SERVICES_BY_FACILITY = {
       ],
     },
     {
-      id: "klinik-sanitasi",
-      nama: "Klinik Sanitasi",
-      klaster: "Sanitasi",
+      id: "kesling_surveilans",
+      nama: "Kesehatan Lingkungan & Surveilans",
+      klaster: "Kesling & Surveilans",
       ikon: "🧼",
-      lokasi: "Klinik Sanitasi",
+      lokasi: "Kesehatan Lingkungan & Surveilans",
       telemed: false,
-      img: "klinik-sanitasi.jpg",
+      img: "kesehatan-lingkungan.png",
       layanan: [
         {
-          nama: "Konsultasi Sanitasi",
+          nama: "Klinik Sanitasi",
           ikon: "🧼",
           tarif: 0,
           bpjs: true,
+          ket: "Lingkungan & perilaku sehat",
+          alur: [1, 5],
+        },
+        {
+          nama: "Laporan DBD & Cikungunya",
+          ikon: "🦟",
+          tarif: 0,
+          bpjs: true,
+          ket: "Lingkungan & perilaku sehat",
+          alur: [1, 5],
+        },
+        {
+          nama: "Laporan Kematian Jenazah Sudah Dikuburkan",
+          ikon: "⚰️",
+          tarif: 0,
+          bpjs: false,
+          ket: "Lingkungan & perilaku sehat",
+          alur: [1, 5],
+        },
+        {
+          nama: "Laporan Kematian Jenazah Belum Dikuburkan",
+          ikon: "⚰️",
+          tarif: 30000,
+          bpjs: false,
+          ket: "Lingkungan & perilaku sehat",
+          alur: [1, 5],
+        },
+        {
+          nama: "Laporan Penyakit Potensi KLB/ Wabah",
+          ikon: "🦠",
+          tarif: 0,
+          bpjs: false,
           ket: "Lingkungan & perilaku sehat",
           alur: [1, 5],
         },
@@ -646,8 +678,12 @@ export const EXTRA_INFO = {
   // Kirana
   "Pemeriksaan Kirana": "Informasi tambahan belum tersedia.",
 
-  // Klinik Sanitasi
-  "Konsultasi Sanitasi": "Informasi tambahan belum tersedia.",
+  // Kesling_surveilans
+  "Klinik Sanitasi": "Upaya mengintegrasikan pelayanan kesehatan promotif, preventif, dan kuratif, di tingkat puskesmas yang difokuskan pada masalah kesehatan lingkungan untuk mencegah dan menanggulangi penyakit berbasis lingkungan",
+  "Laporan DBD & Cikungunya": "Informasi tambahan belum tersedia.",
+  "Laporan Kematian Jenazah Sudah Dikuburkan": "Informasi tambahan belum tersedia.",
+  "Laporan Kematian Jenazah Belum Dikuburkan": "Informasi tambahan belum tersedia.",
+  "Laporan Penyakit Potensi KLB/ Wabah": "Informasi tambahan belum tersedia.",
 
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
