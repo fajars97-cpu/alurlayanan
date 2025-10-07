@@ -650,21 +650,28 @@ function RightPanel({
       </div>
 
       <div className="mt-4 sm:mt-6">
-        <InfoCard title="Petugas Penanggung Jawab">
-          <div className="font-semibold text-white mb-1">
-            {DOCTORS_BY_POLI[selected.id] ?? "—"}
-          </div>
-          <div className="text-white/70">
-            <p className="mb-2"><strong>Detail layanan:</strong> {sub.nama}</p>
-            <p>
-              {EXTRA_INFO[sub.nama] ??
-                "Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan."}
-            </p>
-            <p className="mt-2">
-              Informasi ini bersifat contoh/dummy. Silakan ganti dengan
-              persyaratan atau instruksi khusus untuk layanan <em>{sub.nama}</em>.
-            </p>
-          </div>
+        <InfoCard title="Dokter Penanggung Jawab">
+        <div className="font-semibold text-white mb-1">
+        {DOCTORS_BY_POLI[selected.id] ?? "—"}
+        </div>
+        <div className="text-white/70">
+        <p className="mb-2"><strong>Detail layanan:</strong> {sub.nama}</p>
+
+        {(() => {
+        const extra = sub.info ?? EXTRA_INFO[sub.nama];
+        return extra ? (
+        <p>{extra}</p>                // ada info → tampilkan
+        ) : (
+        <>
+          <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+          <p className="mt-2">
+            Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
+            instruksi khusus untuk layanan <em>{sub.nama}</em>.
+          </p>
+        </>
+        );
+        })()}
+        </div>
         </InfoCard>
       </div>
     </div>
