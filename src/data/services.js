@@ -51,7 +51,7 @@ export const FLOW_STEPS = {
     id: 6,
     title: "Langkah 6",
     name: "Menuju Poli Umum",
-    description: "Silahkan menuju poli umum lantai 2 dan tunggu panggilan.",
+    description: "Silahkan menuju poli umum lantai 2 (ruangan dibalik nurse station)dan tunggu panggilan.",
     img: "/alur/6-menuju-ke-poli-umum.jpg",
   },
   7: {
@@ -66,9 +66,23 @@ export const FLOW_STEPS = {
     id: 8,
     title: "Langkah 8",
     name: "Menunggu Hasil Lab",
-    description: "Silahkan menunggu hasil lab sesuai waktu tunggu pemeriksaan.",
+    description: "Silahkan menunggu hasil lab sesuai waktu tunggu pemeriksaan, jika ada resep obat, bisa diambil di farmasi lantai 1.",
     img: "/alur/8-menunggu-hasil-lab.jpg",
   },
+  9: {
+    id: 9,
+    title: "Langkah 9",
+    name: "Menuju Nurse Station Poli Umum",
+    description: "Silahkan menuju nurse station poli umum di lantai 2 (di depan tangga) dan serahkan resi pendaftaran.",
+    img: "/alur/9-menuju-nurse-station-poli-umum.png",
+  },
+  10: {
+    id: 10,
+    title: "Langkah 10",
+    name: "Menuju Poli Umum Baca Hasil Lab",
+    description: "Silahkan menuju poli umum lantai 2 untuk membaca hasil lab, serahkan hasil lab kepada perawat ruangan poli umum.",
+    img: "/alur/6-menuju-ke-poli-umum.jpg",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -95,21 +109,21 @@ export const SERVICES_BY_FACILITY = {
       img: "poli-umum.png",
       layanan: [
         {
-          nama: "Pemeriksaan Umum",
+          nama: "Pemeriksaan Dokter Umum",
           ikon: "🩺",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
-          ket: "Konsultasi dokter umum",
+          ket: "Pemeriksaan dokter umum",
           alur: {
-            farmasi:        [1, 6, 4, 5], // ambil obat
-            rujuk_internal: [1, 6, 7, 5], // ke Lab/Gizi
-            rujuk_luar:     [1, 6, 5],    // rujuk RS
+            farmasi:        [1, 9, 6, 4, 5], // ambil obat
+            pemeriksaan_laboratorium: [1, 9, 6, 7, 8, 10, 5], // ke Lab
+            rujuk_luar:     [1, 9, 6, 5],    // rujuk RS
             },
         },
         {
           nama: "Kontrol Berkala",
           ikon: "📅",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Kontrol kondisi pasien",
           alur: [1, 6, 5],
