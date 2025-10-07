@@ -37,7 +37,7 @@ export const FLOW_STEPS = {
     name: "Menuju Farmasi",
     description:
       "Ambil obat sesuai resep di unit farmasi lantai 1. Ikuti petunjuk penggunaan obat.",
-    img: "/alur/4-menuju-farmasi.jpg",
+    img: "/alur/4-menuju-farmasi.png",
   },
   5: {
     id: 5,
@@ -569,7 +569,7 @@ export const SERVICES_BY_FACILITY = {
 
 /* ===================== Dokter Penanggung Jawab ===================== */
 export const DOCTORS_BY_POLI = {
-  "poli-umum": "dr. Umum",
+  "poli-umum": "dr. Natasha Adjani",
   "poli-gigi": "drg. Gigi",
   igd: "dr. IGD",
   "ki-hamil": "Bidan Ani",
@@ -595,8 +595,63 @@ export const DOCTORS_BY_POLI = {
 
 /* ===================== Info Tambahan (contoh) ===================== */
 export const EXTRA_INFO = {
-  "Pemeriksaan Umum": "Layanan pemeriksaan umum oleh dokter.",
-  "Cabut Gigi": "Tindakan pencabutan gigi permanen.",
-  Scaling: "Pembersihan karang gigi.",
-  "Tindakan Darurat": "Penanganan kasus gawat darurat.",
+  // Poli Umum
+  "Pemeriksaan Umum": "Informasi tambahan belum tersedia.",
+  "Kontrol Berkala": "Informasi tambahan belum tersedia.",
+
+  // Poli Gigi
+  "Cabut Gigi": "Informasi tambahan belum tersedia.",
+  "Scaling": "Informasi tambahan belum tersedia.",
+
+  // IGD
+  "Tindakan Darurat": "Informasi tambahan belum tersedia.",
+
+  // KB & IVA
+  "Konseling KB": "Informasi tambahan belum tersedia.",
+  "Pemeriksaan IVA": "Informasi tambahan belum tersedia.",
+
+  // Tumbang
+  "Pemeriksaan Tumbuh Kembang": "Informasi tambahan belum tersedia.",
+
+  // MTBS
+  "Pemeriksaan Balita Sakit": "Informasi tambahan belum tersedia.",
+
+  // PKPR
+  "Konseling Remaja": "Informasi tambahan belum tersedia.",
+
+  // Lansia
+  "Pemeriksaan Lansia": "Informasi tambahan belum tersedia.",
+
+  // PTM
+  "Pemeriksaan Hipertensi": "Informasi tambahan belum tersedia.",
+
+  // PM (Program Malaria, TB, dll. – sesuaikan dengan data kamu)
+  "Pemeriksaan PM": "Informasi tambahan belum tersedia.",
+
+  // IMS
+  "Pemeriksaan IMS": "Informasi tambahan belum tersedia.",
+
+  // ISPA
+  "Pemeriksaan ISPA": "Informasi tambahan belum tersedia.",
+
+  // Mata
+  "Pemeriksaan Mata": "Informasi tambahan belum tersedia.",
+
+  // Gizi
+  "Konsultasi Gizi": "Informasi tambahan belum tersedia.",
+
+  // Akupresur
+  "Akupresur": "Informasi tambahan belum tersedia.",
+
+  // Kirana
+  "Pemeriksaan Kirana": "Informasi tambahan belum tersedia.",
+
+  // Klinik Sanitasi
+  "Konsultasi Sanitasi": "Informasi tambahan belum tersedia.",
+
+  // UKS
+  "Pelayanan UKS": "Informasi tambahan belum tersedia.",
+
+  // Vaksin Dengue
+  "Vaksin Dengue": "Informasi tambahan belum tersedia.",
 };
