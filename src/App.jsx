@@ -659,26 +659,41 @@ function RightPanel({
 
         {(() => {
         const extra = sub.info ?? EXTRA_INFO[sub.nama];
-        return extra ? (
-        <p>{extra}</p>                // ada info → tampilkan
-        ) : (
-        <>
-          <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-          <p className="mt-2">
-            Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
-            instruksi khusus untuk layanan <em>{sub.nama}</em>.
-          </p>
-        </>
+        if (extra) {
+        // Jika teks mengandung http/https/bit.ly maka tampilkan sebagai link
+        if (/(https?:\/\/|bit\.ly)/i.test(extra)) {
+        return (
+        <a
+          href={extra}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-emerald-400 underline hover:text-emerald-300"
+        >
+          {extra}
+        </a>
         );
-        })()}
+        }
+        // Kalau bukan link, tampilkan biasa
+        return <p>{extra}</p>;
+      }
+
+        // fallback dummy
+      return (
+      <>
+      <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+      <p className="mt-2">
+        Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
+        instruksi khusus untuk layanan <em>{sub.nama}</em>.
+      </p>
+      </>
+      );
+      })()}
         </div>
         </InfoCard>
       </div>
     </div>
   );
 }
-
-
 
 /* ===================== App Root ===================== */
 export default function App() {
