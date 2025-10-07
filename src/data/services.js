@@ -599,7 +599,7 @@ export const SERVICES_BY_FACILITY = {
   ],
 };
 
-/* ===================== Dokter Penanggung Jawab ===================== */
+/* ===================== Petugas Penanggung Jawab ===================== */
 export const DOCTORS_BY_POLI = {
   "poli-umum": "dr. Natasha Adjani",
   "poli-gigi": "drg. Gigi",
@@ -623,6 +623,7 @@ export const DOCTORS_BY_POLI = {
   "klinik-sanitasi": "Sanitarian",
   uks: "Petugas UKS",
   "vaksin-dengue": "Perawat Vaksin",
+  "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -681,10 +682,13 @@ export const EXTRA_INFO = {
   // Kesling_surveilans
   "Klinik Sanitasi": "Upaya mengintegrasikan pelayanan kesehatan promotif, preventif, dan kuratif, di tingkat puskesmas yang difokuskan pada masalah kesehatan lingkungan untuk mencegah dan menanggulangi penyakit berbasis lingkungan",
   "Laporan DBD & Cikungunya": "Informasi tambahan belum tersedia.",
-  "Laporan Kematian Jenazah Sudah Dikuburkan": "Informasi tambahan belum tersedia.",
-  "Laporan Kematian Jenazah Belum Dikuburkan": "Informasi tambahan belum tersedia.",
-  "Laporan Penyakit Potensi KLB/ Wabah": "Informasi tambahan belum tersedia.",
-
+  "Laporan Kematian Jenazah Sudah Dikuburkan": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal.",
+  "Laporan Kematian Jenazah Belum Dikuburkan": "Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
+  "Laporan Penyakit Potensi KLB/ Wabah Difteri": "Penyakit bakteri yang menyerang tenggorokan dengan gejala demam ringan, sakit tenggorokan, terdapat selaput pada tenggorokan yang bisa membengkak. No telp pelaporan Wita:085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Pertusis (Batuk Rejan)": "Penyakit batuk 100 hari akibat bakteri dengan gejala batuk hebat bertahap, disertai suara whoop dan bisa sampai muntah. No telp pelaporan Wita:085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Campak": "Penyakit virus yang sangat menular dengan gejala demam tinggi, batuk pilek, mata merah, muncul bintih putih dalam mulut dan ruam merah pada kulit. No telp pelaporan Wita:085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Lumpuh Layu (Polio)": "Penyakit virus yang menyerang saraf dan bisa menyebabkan kelumpuhan mendadak yang ditulakan lewat makanan/minuman yang terkontaminasi feses dengan gejala demam, nyeri, lalu kelumpuhan umumnya bagian tungkai. No telp pelaporan Wita:085927002059",
+  "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita:085927002059",
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
 

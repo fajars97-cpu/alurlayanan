@@ -650,7 +650,7 @@ function RightPanel({
       </div>
 
       <div className="mt-4 sm:mt-6">
-        <InfoCard title="Dokter Penanggung Jawab">
+        <InfoCard title="Petugas Penanggung Jawab">
         <div className="font-semibold text-white mb-1">
         {DOCTORS_BY_POLI[selected.id] ?? "—"}
         </div>
