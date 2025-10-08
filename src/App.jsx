@@ -38,6 +38,39 @@ const resolveFlowImg = (img) => {
   return asset(p); // prefix dengan BASE_URL
 };
 
+// --- Auto-link URL di dalam teks (https, http, www., bit.ly) ---
+const URL_RE = /((https?:\/\/|www\.)[^\s)]+|bit\.ly\/[^\s)]+)/gi;
+function linkify(text) {
+  if (!text) return text;
+  // Pecah per baris agar \n jadi <br/>
+  const lines = String(text).split(/\r?\n/);
+  const nodes = [];
+  lines.forEach((line, li) => {
+    let lastIndex = 0;
+    line.replace(URL_RE, (m, url, _proto, idx) => {
+      if (idx > lastIndex) nodes.push(line.slice(lastIndex, idx));
+      // pastikan ada skema
+      const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+      nodes.push(
+        <a
+          key={`${li}-${idx}`}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-emerald-400 underline hover:text-emerald-300"
+        >
+          {url}
+        </a>
+      );
+      lastIndex = idx + url.length;
+      return url;
+    });
+    if (lastIndex < line.length) nodes.push(line.slice(lastIndex));
+    if (li < lines.length - 1) nodes.push(<br key={`br-${li}`} />);
+  });
+  return nodes;
+}
+
 /* ===================== (Flow) Fallback image & audio singleton ===================== */
 const FLOW_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
@@ -660,34 +693,19 @@ function RightPanel({
         {(() => {
         const extra = sub.info ?? EXTRA_INFO[sub.nama];
         if (extra) {
-        // Jika teks mengandung http/https/bit.ly maka tampilkan sebagai link
-        if (/(https?:\/\/|bit\.ly)/i.test(extra)) {
-        return (
-        <a
-          href={extra}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-emerald-400 underline hover:text-emerald-300"
-        >
-          {extra}
-        </a>
-        );
+        return <p>{linkify(extra)}</p>;   // ⬅️ hanya URL yang jadi link
         }
-        // Kalau bukan link, tampilkan biasa
-        return <p>{extra}</p>;
-      }
-
         // fallback dummy
-      return (
-      <>
-      <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-      <p className="mt-2">
+        return (
+        <>
+        <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+        <p className="mt-2">
         Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
         instruksi khusus untuk layanan <em>{sub.nama}</em>.
-      </p>
-      </>
-      );
-      })()}
+        </p>
+        </>
+        );
+        })()}
         </div>
         </InfoCard>
       </div>
