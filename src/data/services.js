@@ -52,7 +52,7 @@ export const FLOW_STEPS = {
     title: "Langkah 6",
     name: "Menuju Poli Umum",
     description: "Silahkan menuju poli umum lantai 2 (ruangan dibalik nurse station)dan tunggu panggilan.",
-    img: "/alur/6-menuju-ke-poli-umum.jpg",
+    img: "/alur/12-menuju-poli-umum-pertama.png",
   },
   7: {
     id: 7,
@@ -79,9 +79,65 @@ export const FLOW_STEPS = {
   10: {
     id: 10,
     title: "Langkah 10",
-    name: "Menuju Poli Umum Baca Hasil Lab",
-    description: "Silahkan menuju poli umum lantai 2 untuk membaca hasil lab, serahkan hasil lab kepada perawat ruangan poli umum.",
-    img: "/alur/6-menuju-ke-poli-umum.jpg",
+    name: "Melakukan pemeriksaan Poli Umum",
+    description: "Silahkan masuk ke dalam ruang poli umum setelah nama Anda di panggil",
+    img: "/alur/10-pemeriksaan-poli-umum.png",
+    },
+    11: {
+    id: 11,
+    title: "Langkah 11",
+    name: "Menuju Perawat Poli Umum",
+    description: "Silahkan masuk ke dalam ruang poli umum dan menuju perawat poli umum.",
+    img: "/alur/11-perawat-poli-umum.png",
+    },
+     12: {
+    id: 12,
+    title: "Langkah 12",
+    name: "Menuju Perawat Poli Umum",
+    description: "Silahkan menuju ruang tunggu di depan ruang poli umum di balik nurse station.",
+    img: "/alur/12-menuju-poli-umum-pertama.png",
+    },
+    13: {
+    id: 13,
+    title: "Langkah 13",
+    name: "Pelaporan Kasus Campak",
+    description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian campak.",
+    img: "/alur/13-pelaporan-campak.png",
+    },
+    14: {
+    id: 14,
+    title: "Langkah 14",
+    name: "Pelaporan Kasus Difteri",
+    description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian difteri.",
+    img: "/alur/14-pelaporan-difteri.png",
+    },
+    15: {
+    id: 15,
+    title: "Langkah 15",
+    name: "Pelaporan Kasus Polio",
+    description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian polio.",
+    img: "/alur/15-pelaporan-polio.png",
+    },
+    16: {
+    id: 16,
+    title: "Langkah 16",
+    name: "Pelaporan Kasus Pertusis (Batuk Rejan)",
+    description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian pertusis.",
+    img: "/alur/16-pelaporan-pertusis.png",
+    },
+    17: {
+    id: 17,
+    title: "Langkah 17",
+    name: "Pelaporan Kasus Keracunan Pangan",
+    description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian keracunan pangan.",
+    img: "/alur/17-pelaporan-keracunan-pangan.png",
+    },
+    18: {
+    id: 18,
+    title: "Langkah 18",
+    name: "Petugas Puskesmas Menerima Laporan",
+    description: "Petugas akan melanjutkan proses tindak lanjut sesuai dengan laporan yang diterima.",
+    img: "/alur/18-petugas-puskesmas-menerima-laporan.png",
     },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
@@ -554,7 +610,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [14, 18],
         },
          {
           nama: "Laporan Penyakit Potensi KLB/ Wabah Pertusis (Batuk Rejan)",
@@ -562,7 +618,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [16, 18],
         },
          {
           nama: "Laporan Penyakit Potensi KLB/ Wabah Campak",
@@ -570,7 +626,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [13, 18],
         },
          {
           nama: "Laporan Penyakit Potensi KLB/ Wabah Lumpuh Layu (Polio)",
@@ -578,7 +634,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [15, 18],
         },
          {
           nama: "Laporan Keracunan Pangan",
@@ -586,7 +642,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [17, 18],
         },
       ],
     },
@@ -606,25 +662,6 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Program UKS",
           alur: [1, 5],
-        },
-      ],
-    },
-    {
-      id: "vaksin-dengue",
-      nama: "Vaksin Dengue",
-      klaster: "Imunisasi",
-      ikon: "🦟",
-      lokasi: "Poli Vaksinasi",
-      telemed: false,
-      img: "vaksin-dengue.jpg",
-      layanan: [
-        {
-          nama: "Pemberian Vaksin Dengue",
-          ikon: "🦟",
-          tarif: 0,
-          bpjs: true,
-          ket: "Pencegahan DBD",
-          alur: [1, 2, 5],
         },
       ],
     },
@@ -723,7 +760,4 @@ export const EXTRA_INFO = {
   "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita:085927002059",
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
-
-  // Vaksin Dengue
-  "Vaksin Dengue": "Informasi tambahan belum tersedia.",
 };
