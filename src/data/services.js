@@ -188,6 +188,13 @@ export const FLOW_STEPS = {
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian DBD/Cikungunya.",
     img: "/alur/25-pelaporan-kasus-dbd.png",
     },
+    26: {
+    id: 26,
+    title: "Langkah 26",
+    name: "Infografis SKPK",
+    description: "Silahkan melihat infografis SKPK.",
+    img: "/alur/26-alur-skpk.png",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -662,6 +669,18 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
+          jadwal: {
+          tz: "Asia/Jakarta",
+          weekly: {
+           Senin: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Selasa: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Rabu: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Kamis: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Jumat: ["08:00-16:30", "Dilanjut Layanan 24 Jam"],
+           Sabtu: "Layanan 24 Jam",
+           Minggu: "Layanan 24 Jam",
+          },
+      },
           alur: [1, 20, 19],
         },
         {
@@ -670,7 +689,19 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 20,19],
+          jadwal: {
+          tz: "Asia/Jakarta",
+          weekly: {
+           Senin: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Selasa: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Rabu: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Kamis: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
+           Jumat: ["08:00-16:30", "Dilanjut Layanan 24 Jam"],
+           Sabtu: "Layanan 24 Jam",
+           Minggu: "Layanan 24 Jam",
+          },
+      },
+          alur: [26, 1, 20, 19],
         },
         {
           nama: "Laporan Penyakit Potensi KLB/ Wabah Difteri",
