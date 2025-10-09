@@ -774,7 +774,7 @@ export const EXTRA_INFO = {
   "Pemeriksaan IVA": "Informasi tambahan belum tersedia.",
 
   // Tumbang
-  "Pemeriksaan Tumbuh Kembang": "Poli Tumbang tersedia untuk anak usia 0 - 72 bulan.",
+  "Konsultasi Tumbuh Kembang Anak": "Poli Tumbang tersedia untuk anak usia 0 - 72 bulan.",
 
   // MTBS
   "Pemeriksaan Balita Sakit": "Informasi tambahan belum tersedia.",
