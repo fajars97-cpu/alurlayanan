@@ -144,7 +144,7 @@ export const FLOW_STEPS = {
     title: "Langkah 19",
     name: "Keluarga Pasien Menerima Surat Laporan Kematian",
     description: "Layanan selesai, keluarga pasien akan menerima surat laporan kematian dari petugas.",
-    img: "/alur/19-keluarga-pasien-menerima-surat-laporan-kematian.png",
+    img: "/alur/19-keluarga-menerima-surat-laporan-kematian.png",
     },
     20: {
     id: 20,
@@ -180,6 +180,13 @@ export const FLOW_STEPS = {
     name: "Pasien Rujukan Poli Lain",
     description: "Kunjungan pertama, pasien mendapatkan rujukan dari poli lain, pasien dapat menuju poli Tumbang di lantai 3 (di depan tangga).",
     img: "/alur/24-pasien-rujukan-poli-lain.png",
+    },
+    25: {
+    id: 25,
+    title: "Langkah 25",
+    name: "Pelaporan Kasus DBD",
+    description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian DBD/Cikungunya.",
+    img: "/alur/25-pelaporan-kasus-dbd.png",
     },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
@@ -647,7 +654,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [25, 18],
         },
         {
           nama: "Laporan Kematian Jenazah Sudah Dikuburkan",
@@ -811,14 +818,14 @@ export const EXTRA_INFO = {
 
   // Kesling_surveilans
   "Klinik Sanitasi": "Upaya mengintegrasikan pelayanan kesehatan promotif, preventif, dan kuratif, di tingkat puskesmas yang difokuskan pada masalah kesehatan lingkungan untuk mencegah dan menanggulangi penyakit berbasis lingkungan",
-  "Laporan DBD & Cikungunya": "Informasi tambahan belum tersedia.",
+  "Laporan DBD & Cikungunya": "Bila menemukan kejadian DBD / Cikungunya di wilayah Jagakarsa silahkan menghubungi petugas Puskesmas untuk tindak lanjut. No telp pelaporan Wita: 085927002059",
   "Laporan Kematian Jenazah Sudah Dikuburkan": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa",
   "Laporan Kematian Jenazah Belum Dikuburkan": "Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
-  "Laporan Penyakit Potensi KLB/ Wabah Difteri": "Penyakit bakteri yang menyerang tenggorokan dengan gejala demam ringan, sakit tenggorokan, terdapat selaput pada tenggorokan yang bisa membengkak. No telp pelaporan Wita:085927002059",
-  "Laporan Penyakit Potensi KLB/ Wabah Pertusis (Batuk Rejan)": "Penyakit batuk 100 hari akibat bakteri dengan gejala batuk hebat bertahap, disertai suara whoop dan bisa sampai muntah. No telp pelaporan Wita:085927002059",
-  "Laporan Penyakit Potensi KLB/ Wabah Campak": "Penyakit virus yang sangat menular dengan gejala demam tinggi, batuk pilek, mata merah, muncul bintik putih dalam mulut dan ruam merah pada kulit. No telp pelaporan Wita:085927002059",
-  "Laporan Penyakit Potensi KLB/ Wabah Lumpuh Layu (Polio)": "Penyakit virus yang menyerang saraf dan bisa menyebabkan kelumpuhan mendadak yang ditulakan lewat makanan/minuman yang terkontaminasi feses dengan gejala demam, nyeri, lalu kelumpuhan umumnya bagian tungkai. No telp pelaporan Wita:085927002059",
-  "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita:085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Difteri": "Penyakit bakteri yang menyerang tenggorokan dengan gejala demam ringan, sakit tenggorokan, terdapat selaput pada tenggorokan yang bisa membengkak. No telp pelaporan Wita: 085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Pertusis (Batuk Rejan)": "Penyakit batuk 100 hari akibat bakteri dengan gejala batuk hebat bertahap, disertai suara whoop dan bisa sampai muntah. No telp pelaporan Wita: 085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Campak": "Penyakit virus yang sangat menular dengan gejala demam tinggi, batuk pilek, mata merah, muncul bintik putih dalam mulut dan ruam merah pada kulit. No telp pelaporan Wita: 085927002059",
+  "Laporan Penyakit Potensi KLB/ Wabah Lumpuh Layu (Polio)": "Penyakit virus yang menyerang saraf dan bisa menyebabkan kelumpuhan mendadak yang ditulakan lewat makanan/minuman yang terkontaminasi feses dengan gejala demam, nyeri, lalu kelumpuhan umumnya bagian tungkai. No telp pelaporan Wita: 085927002059",
+  "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita: 085927002059",
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
 };
