@@ -95,7 +95,7 @@ function stopFlowAudio() {
 
 /* ===================== Jadwal helpers (scalable) ===================== */
 /**
- * Format dukungan:
+ * Dukungan:
  * - Lama: s.jadwal = { Senin: "08:00–16:00", ... }
  * - Baru: s.jadwal = { tz?, weekly: { Senin: ["08:00-12:00","13:00-16:00"], ... }, exceptions: { "YYYY-MM-DD": "Tutup" | ["09:00-12:00"] } }
  * Overnight "22:00-06:00" ditangani otomatis.
@@ -208,18 +208,16 @@ export function isOpenNow(s, ref = new Date()) {
   return getOpenStatus(s, ref).open;
 }
 
-/* ===== Jadwal aggregator untuk Sidebar (beragam per layanan) ===== */
+/* ===== Jadwal aggregator untuk Sidebar (cek variasi antar layanan) ===== */
 function schedulesForPoli(poli) {
   const list = [];
   if (poli?.jadwal) list.push({ label: "Poli", jadwal: poli.jadwal });
-
   (poli?.layanan || []).forEach((L) => {
     if (L.jadwal) list.push({ label: L.nama, jadwal: L.jadwal });
   });
   return list;
 }
 function weeklyKey(jadwal) {
-  // Kunci untuk mendeteksi "sama atau tidak"
   const { weekly } = normalizeSchedule(jadwal);
   return JSON.stringify(
     DAY_NAMES_ID.reduce((acc, d) => {
@@ -229,9 +227,24 @@ function weeklyKey(jadwal) {
   );
 }
 function poliOpenAny(poli) {
-  // Buka jika jadwal poli atau salah satu layanan sedang buka
   if (isOpenNow({ jadwal: poli?.jadwal })) return true;
   return (poli?.layanan || []).some((L) => isOpenNow({ jadwal: L.jadwal }));
+}
+
+/* ====== Helper UI untuk Option #2 (Accordion per hari) ====== */
+function build7Days(start = new Date()) {
+  const days = [];
+  const base = new Date(start);
+  base.setHours(0, 0, 0, 0);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    days.push(d);
+  }
+  return days;
+}
+function shortTimeLabel(range) {
+  return `${fmtMin(range.from)}–${fmtMin(range.to)}`;
 }
 
 /* ===================== UI kecil ===================== */
@@ -281,10 +294,16 @@ function Sidebar({
   highlightIds = [],
 }) {
   const [expandedId, setExpandedId] = useState(null);
+  const [openDayIdxByPoli, setOpenDayIdxByPoli] = useState({}); // untuk accordion per hari
+
   const toggle = (s) => {
     onPick(s);
     setExpandedId((id) => (id === s.id ? null : s.id));
+    // default buka hari ini di accordion
+    setOpenDayIdxByPoli((m) => ({ ...m, [s.id]: 0 }));
   };
+
+  const today = new Date();
 
   return (
     <aside
@@ -328,13 +347,11 @@ function Sidebar({
         {services.map((s) => {
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
-
-          // OPEN status: poli OR any layanan
           const open = poliOpenAny(s);
 
           // Kumpulkan jadwal poli + layanan
           const schedList = schedulesForPoli(s);
-          // Kelompokkan berdasarkan weekly (untuk cek apakah sama semua)
+          // Kelompokkan berdasar weekly (untuk cek apakah sama semua)
           const groups = new Map();
           schedList.forEach(({ label, jadwal }) => {
             const k = weeklyKey(jadwal);
@@ -342,6 +359,10 @@ function Sidebar({
             groups.get(k).push({ label, jadwal });
           });
           const uniqueSchedules = Array.from(groups.values()); // array of arrays
+
+          // Apakah perlu memakai Option #2? (jadwal beragam & layanan > 1)
+          const useAccordion =
+            uniqueSchedules.length > 1 && (s.layanan || []).length > 1;
 
           return (
             <div key={s.id} className="space-y-2">
@@ -369,7 +390,7 @@ function Sidebar({
                 <div className="mx-2 mb-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
                   <div className="text-white/60 mb-2">Jadwal</div>
 
-                  {/* Jika tidak ada jadwal sama sekali → tampilkan default */}
+                  {/* ========== A. Tidak ada jadwal → fallback default ========== */}
                   {uniqueSchedules.length === 0 && (
                     <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
                       {DAY_NAMES_ID.map((d) => (
@@ -381,7 +402,7 @@ function Sidebar({
                     </div>
                   )}
 
-                  {/* Jika semua layanan + poli punya jadwal yang sama → satu tabel */}
+                  {/* ========== B. Semua sama → tabel mingguan ringkas (tampilan lama) ========== */}
                   {uniqueSchedules.length === 1 && uniqueSchedules[0].length > 0 && (
                     <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
                       {DAY_NAMES_ID.map((d) => (
@@ -395,27 +416,87 @@ function Sidebar({
                     </div>
                   )}
 
-                  {/* Jika jadwal beragam → render per layanan */}
-                  {uniqueSchedules.length > 1 && (
-                    <div className="space-y-3">
-                      <div className="text-xs text-amber-300/90">
-                        Jadwal beragam — lihat per layanan:
-                      </div>
-                      {schedList.map(({ label, jadwal }, i) => (
-                        <div key={i} className="rounded-lg border border-white/10 p-2">
-                          <div className="text-[12px] font-semibold text-white/80 mb-1">
-                            {label}
+                  {/* ========== C. Jadwal beragam & layanan >1 → Accordion per hari (OPSI #2) ========== */}
+                  {useAccordion && (
+                    <div className="space-y-2">
+                      {build7Days(today).map((day, idx) => {
+                        const openIdx = openDayIdxByPoli[s.id] ?? 0;
+                        const isOpen = openIdx === idx;
+
+                        // Bangun daftar layanan yg punya jam pada 'day'
+                        const rows = (s.layanan || [])
+                          .map((L) => {
+                            const ranges = rangesForDate(L.jadwal || {}, day);
+                            return { name: L.nama, ranges };
+                          })
+                          .filter((r) => r.ranges && r.ranges.length);
+
+                        // Label hari
+                        const dayLabel = `${DAY_NAMES_ID[day.getDay()]}, ${pad2(
+                          day.getDate()
+                        )}/${pad2(day.getMonth() + 1)}`;
+
+                        return (
+                          <div key={idx} className="rounded-lg border border-white/10">
+                            <button
+                              className={`w-full flex items-center justify-between px-3 py-2 text-[13px] font-medium ${
+                                isOpen ? "bg-white/7" : "bg-white/5 hover:bg-white/8"
+                              }`}
+                              aria-expanded={isOpen}
+                              onClick={() =>
+                                setOpenDayIdxByPoli((m) => ({ ...m, [s.id]: isOpen ? -1 : idx }))
+                              }
+                            >
+                              <span className="text-white/80">
+                                {idx === 0 ? "Hari ini — " : ""}
+                                {dayLabel}
+                              </span>
+                              <span className="text-white/50">{isOpen ? "▾" : "▸"}</span>
+                            </button>
+
+                            <AnimatePresence initial={false}>
+                              {isOpen && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.18 }}
+                                  className="px-3 pb-2"
+                                >
+                                  {rows.length === 0 ? (
+                                    <div className="text-[12px] text-white/60 py-2">
+                                      Tidak ada layanan hari ini.
+                                    </div>
+                                  ) : (
+                                    <ul className="divide-y divide-white/10">
+                                      {rows.map((r, i) => (
+                                        <li
+                                          key={i}
+                                          className="py-2 flex items-start gap-2 text-[12px]"
+                                        >
+                                          <span className="mt-0.5 text-white/60">•</span>
+                                          <div className="min-w-0">
+                                            <div className="text-white/85 font-semibold">
+                                              {r.name}
+                                            </div>
+                                            <div className="text-white/70">
+                                              {r.ranges.map((rg, j) => (
+                                                <span key={j} className="mr-2">
+                                                  {shortTimeLabel(rg)}
+                                                </span>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
-                          <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
-                            {DAY_NAMES_ID.map((d) => (
-                              <React.Fragment key={d}>
-                                <span className="text-white/50">{d}</span>
-                                <span>{getEffectiveJadwal({ jadwal })[d]}</span>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -712,32 +793,19 @@ function RightPanel({
         Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
       </div>
 
-      {Object.keys(scenarios).length > 1 && (
-        <div className="flex flex-wrap gap-2 -mt-1">
-          {Object.keys(scenarios).map((key) => (
-            <button
-              key={key}
-              onClick={() => {
-                stopFlowAudio();
-                setScenarioKey(key);
-              }}
-              className={`px-3 py-1.5 rounded-lg border text-sm transition ${
-                key === scenarioKey
-                  ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-300"
-                  : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
-              }`}
-              aria-pressed={key === scenarioKey}
-            >
-              {key.replace(/_/g, " ").replace(/\b\w/g, (m) => m.toUpperCase())}
-            </button>
+      <div className="flex flex-wrap gap-2 -mt-1">
+        {Object.keys(sub?.alur ?? {}).length > 1 &&
+          Object.keys(sub.alur).map((key) => (
+            <Chip key={key}>{key.replace(/_/g, " ")}</Chip>
           ))}
-        </div>
-      )}
+      </div>
 
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {flowSteps.map((step, i) => (
-          <FlowCard key={step.id ?? i} step={step} index={i} />
-        ))}
+        {(Array.isArray(sub.alur) ? sub.alur : (sub.alur?.standar || [])).map((id, i) => {
+          const step = FLOW_STEPS[id];
+          if (!step) return null;
+          return <FlowCard key={step.id ?? i} step={step} index={i} />;
+        })}
       </div>
 
       <div className="mt-4 sm:mt-6">
