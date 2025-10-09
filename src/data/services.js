@@ -153,6 +153,34 @@ export const FLOW_STEPS = {
     description: "Silahkan menuju ruang kesehatan lingkungan & surveilans di lantai 3 (dari tangga/lift ke kiri lalu ke kanan, ruangan paling pojok) untuk mendapatkan layanan.",
     img: "/alur/20-menuju-ruang-kesling.png",
     },
+    21: {
+    id: 21,
+    title: "Langkah 21",
+    name: "Pasien Mendapatkan Rujukan Internal",
+    description: "Silahkan menuju poli yang dituju sesuai rujukan internal dari petugas.",
+    img: "/alur/21-rujukan-internal.png",
+    },
+    22: {
+    id: 22,
+    title: "Langkah 22",
+    name: "Pasien Menuju Poli Tumbang",
+    description: "Silahkan menuju ruang tumbuh kembang di lantai 3 (depan tangga).",
+    img: "/alur/22-menuju-poli-tumbang.png",
+    },
+    23: {
+    id: 23,
+    title: "Langkah 23",
+    name: "Layanan Selesai di Poli Tumbang",
+    description: "Layanan selesai, pasien dan keluarga bisa pulang.",
+    img: "/alur/23-pasien-anak-pulang.png",
+    },
+    24: {
+    id: 24,
+    title: "Langkah 24",
+    name: "Pasien Rujukan Poli Lain",
+    description: "Kunjungan pertama, pasien mendapatkan rujukan dari poli lain, pasien dapat menuju poli Tumbang di lantai 3 (di depan tangga).",
+    img: "/alur/24-pasien-rujukan-poli-lain.png",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -371,31 +399,35 @@ export const SERVICES_BY_FACILITY = {
       telemed: false,
       img: "poli-tumbang.png",
       layanan: [
-        {
-          nama: "Konsultasi Tumbuh Kembang Anak",
-          ikon: "📈",
-          tarif: 15000,
-          bpjs: true,
-          ket: "Asesmen perkembangan anak",
-          jadwal: {
-           weekly: {
-            Senin: "Tutup",
-            Selasa: "Tutup",
-            Rabu: "Tutup",
-            Kamis: "08:00-12:00",
-            Jumat: "08:00-12:00",
-            Sabtu: "Tutup",
-            Minggu: "Tutup"
-                  },
-           exceptions: {
-            "2025-12-26": "Tutup",        // natal
-            "2025-12-26": "Tutup", // cuti bersama
-                      }
+    {
+      nama: "Konsultasi Tumbuh Kembang Anak",
+      ikon: "📈",
+      tarif: 15000,
+      bpjs: true,
+      ket: "Asesmen perkembangan anak",
+      jadwal: {
+        tz: "Asia/Jakarta",
+        weekly: {
+          Senin: "Tutup",
+          Selasa: "Tutup",
+          Rabu: "Tutup",
+          Kamis: ["08:00-12:00"], // array atau string dua-duanya oke
+          Jumat: ["08:00-12:00"],
+          Sabtu: "Tutup",
+          Minggu: "Tutup",
         },
-          alur: [1, 5],
+        exceptions: {
+          "2025-12-25": "Tutup", // libur Natal
+          "2025-12-26": "Tutup", // cuti bersama
         },
-      ],
+      },
+      alur: {
+            kunjungan_pertama: [24, 22, 23], // rujukan poli lain
+            kunjungan_lanjutan: [1, 22, 23], // pasien bisa langsung datang ke poli
+            },
     },
+  ],
+},
     {
       id: "mtbs",
       nama: "MTBS",
@@ -707,7 +739,7 @@ export const DOCTORS_BY_POLI = {
   catin: "Bidan Dewi",
   imunisasi: "Perawat Imunisasi",
   "kb-iva": "Bidan Tika",
-  tumbang: "dr. Anak",
+  tumbang: "Yuniar Selowati",
   mtbs: "dr. Balita",
   pkpr: "dr. Remaja",
   lansia: "dr. Lansia",
@@ -742,7 +774,7 @@ export const EXTRA_INFO = {
   "Pemeriksaan IVA": "Informasi tambahan belum tersedia.",
 
   // Tumbang
-  "Pemeriksaan Tumbuh Kembang": "Informasi tambahan belum tersedia.",
+  "Pemeriksaan Tumbuh Kembang": "Poli Tumbang tersedia untuk anak usia 0 - 72 bulan.",
 
   // MTBS
   "Pemeriksaan Balita Sakit": "Informasi tambahan belum tersedia.",
