@@ -669,18 +669,6 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          jadwal: {
-          tz: "Asia/Jakarta",
-          weekly: {
-           Senin: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Selasa: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Rabu: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Kamis: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Jumat: ["08:00-16:30", "Dilanjut Layanan 24 Jam"],
-           Sabtu: "Layanan 24 Jam",
-           Minggu: "Layanan 24 Jam",
-          },
-      },
           alur: [1, 20, 19],
         },
         {
@@ -689,18 +677,6 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          jadwal: {
-          tz: "Asia/Jakarta",
-          weekly: {
-           Senin: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Selasa: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Rabu: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Kamis: ["08:00-16:00", "Dilanjut Layanan 24 Jam"],
-           Jumat: ["08:00-16:30", "Dilanjut Layanan 24 Jam"],
-           Sabtu: "Layanan 24 Jam",
-           Minggu: "Layanan 24 Jam",
-          },
-      },
           alur: [26, 1, 20, 19],
         },
         {
