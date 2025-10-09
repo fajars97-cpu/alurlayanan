@@ -139,6 +139,20 @@ export const FLOW_STEPS = {
     description: "Petugas akan melanjutkan proses tindak lanjut sesuai dengan laporan yang diterima.",
     img: "/alur/18-petugas-puskesmas-menerima-laporan.png",
     },
+    19: {
+    id: 19,
+    title: "Langkah 19",
+    name: "Keluarga Pasien Menerima Surat Laporan Kematian",
+    description: "Layanan selesai, keluarga pasien akan menerima surat laporan kematian dari petugas.",
+    img: "/alur/19-keluarga-pasien-menerima-surat-laporan-kematian.png",
+    },
+    20: {
+    id: 20,
+    title: "Langkah 20",
+    name: "Pasien Menuju Ruang Kesling & Surveilans",
+    description: "Silahkan menuju ruang kesehatan lingkungan & surveilans di lantai 3 (dari tangga/lift ke kiri lalu ke kanan, ruangan paling pojok) untuk mendapatkan layanan.",
+    img: "/alur/20-menuju-ruang-kesling.png",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -363,6 +377,21 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Asesmen perkembangan anak",
+          jadwal: {
+           weekly: {
+            Senin: "Tutup",
+            Selasa: "Tutup",
+            Rabu: "Tutup",
+            Kamis: "08:00-12:00",
+            Jumat: "08:00-12:00",
+            Sabtu: "Tutup",
+            Minggu: "Tutup"
+                  },
+           exceptions: {
+            "2025-12-26": "Tutup",        // natal
+            "2025-12-26": "Tutup", // cuti bersama
+                      }
+        },
           alur: [1, 5],
         },
       ],
@@ -578,7 +607,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [1, 20, 5],
         },
         {
           nama: "Laporan DBD & Cikungunya",
@@ -594,7 +623,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [1, 20, 19],
         },
         {
           nama: "Laporan Kematian Jenazah Belum Dikuburkan",
@@ -602,7 +631,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: false,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 5],
+          alur: [1, 20,19],
         },
         {
           nama: "Laporan Penyakit Potensi KLB/ Wabah Difteri",

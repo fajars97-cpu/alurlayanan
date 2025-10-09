@@ -94,75 +94,195 @@ function stopFlowAudio() {
   } catch {}
 }
 
-/* ===================== Jadwal helpers ===================== */
-const DAY_NAMES_ID = [
-  "Minggu",
-  "Senin",
-  "Selasa",
-  "Rabu",
-  "Kamis",
-  "Jumat",
-  "Sabtu",
-];
+/* ===================== Jadwal helpers (scalable) ===================== */
+/**
+ * Skema data yang didukung (fleksibel & backward-compatible):
+ *
+ * 1) LAMA (tetap didukung):
+ *    s.jadwal = { Senin: "08:00–16:00", Sabtu: "Tutup", ... }
+ *
+ * 2) BARU (direkomendasikan, lebih fleksibel):
+ *    s.jadwal = {
+ *      tz: "Asia/Jakarta",                 // opsional (default "Asia/Jakarta")
+ *      weekly: {                           // jam default mingguan
+ *        Senin: ["08:00-12:00","13:00-16:00"],
+ *        Selasa: "08:00-16:00",            // string atau array keduanya ok
+ *        Rabu: "Tutup",
+ *        ... dst ...
+ *      },
+ *      exceptions: {                       // override tanggal spesifik (YYYY-MM-DD)
+ *        "2025-10-28": "Tutup",            // libur
+ *        "2025-11-01": ["09:00-12:00"],    // jam khusus
+ *      }
+ *    }
+ *
+ *  Catatan: overnight (contoh "22:00-06:00") otomatis dipisah ke dua hari.
+ */
+
+const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const RULE_DEFAULT = {
-  Senin: "08:00–16:00",
-  Selasa: "08:00–16:00",
-  Rabu: "08:00–16:00",
-  Kamis: "08:00–16:00",
-  Jumat: "08:00–16:30",
+  Senin: "08:00-16:00",
+  Selasa: "08:00-16:00",
+  Rabu: "08:00-16:00",
+  Kamis: "08:00-16:00",
+  Jumat: "08:00-16:30",
   Sabtu: "Tutup",
   Minggu: "Tutup",
 };
-function buildRuleJadwal(service) {
-  const id = (service?.id || "").toLowerCase();
-  if (id === "igd")
-    return Object.fromEntries(DAY_NAMES_ID.map((d) => [d, "00:00–24:00"]));
-  if (id.includes("pelayanan-24"))
-    return Object.fromEntries(
-      DAY_NAMES_ID.map((d) => [d, "16:00–24:00, 00:00–06:00"])
-    );
-  return { ...RULE_DEFAULT };
-}
-function getEffectiveJadwal(s) {
-  return s?.jadwal && Object.keys(s.jadwal).length ? s.jadwal : buildRuleJadwal(s);
-}
+
+// --- Utils waktu ---
 const toMin = (s) => {
-  const [h, m] = String(s)
-    .split(":")
-    .map((n) => parseInt(n, 10) || 0);
+  const [h, m] = String(s).trim().split(":").map((n) => parseInt(n, 10) || 0);
   return h * 60 + m;
 };
-function parseRanges(v) {
-  const t = String(v || "");
-  if (t.toLowerCase().includes("tutup")) return [];
-  return t.split(",").map((r) => r.trim().replace(/–|—/g, "-"));
+const pad2 = (n) => (n < 10 ? "0" + n : "" + n);
+const fmtMin = (m) => `${pad2(Math.floor(m / 60))}:${pad2(m % 60)}`;
+
+// Normalize "08:00–16:00" / "08:00-16:00" / "Tutup" → array rentang
+function normalizeRanges(value) {
+  if (value == null) return [];
+  const t = String(value).trim().replace(/–|—/g, "-");
+  if (!t || /tutup/i.test(t)) return [];
+  const parts = Array.isArray(value) ? value : t.split(",").map((r) => r.trim());
+  return parts
+    .map((r) => {
+      const [a, b] = String(r).split("-").map((x) => x.trim());
+      if (!a || !b) return null;
+      return { from: toMin(a), to: toMin(b) };
+    })
+    .filter(Boolean);
 }
-function rangesForToday(j, ref = new Date()) {
-  const d = ref.getDay(),
-    day = DAY_NAMES_ID[d],
-    prev = DAY_NAMES_ID[(d + 6) % 7];
-  const today = parseRanges(j[day]),
-    yesterday = parseRanges(j[prev]);
+
+// Format jadwal “lama” jadi skema “baru”
+function normalizeSchedule(jadwalLike) {
+  if (!jadwalLike || typeof jadwalLike !== "object" || Array.isArray(jadwalLike)) {
+    return { tz: "Asia/Jakarta", weekly: { ...RULE_DEFAULT }, exceptions: {} };
+  }
+  // Jika sudah pakai { weekly, exceptions } → rapikan saja
+  if (jadwalLike.weekly || jadwalLike.exceptions) {
+    return {
+      tz: jadwalLike.tz || "Asia/Jakarta",
+      weekly: { ...RULE_DEFAULT, ...(jadwalLike.weekly || {}) },
+      exceptions: { ...(jadwalLike.exceptions || {}) },
+    };
+  }
+  // Mode lama: object hari → string
+  const weekly = { ...RULE_DEFAULT, ...jadwalLike };
+  return { tz: "Asia/Jakarta", weekly, exceptions: {} };
+}
+
+// Ambil label hari ID dari Date
+const dayNameID = (date) => DAY_NAMES_ID[date.getDay()];
+
+// Ambil daftar rentang menit untuk tanggal tertentu (gabung weekly + exceptions)
+function rangesForDate(schedule, date) {
+  const { weekly, exceptions } = normalizeSchedule(schedule);
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const key = `${y}-${pad2(m)}-${pad2(d)}`;
+
+  // Exceptions tanggal spesifik override penuh
+  if (exceptions[key] != null) {
+    return normalizeRanges(exceptions[key]);
+  }
+  // Weekly default
+  const label = dayNameID(date);
+  return normalizeRanges(weekly[label]);
+}
+
+// Rentang AKTIF untuk “hari ini” (ikutin overnight dari kemarin)
+function rangesForToday(schedule, ref = new Date()) {
+  const today = new Date(ref);
+  const yesterday = new Date(ref);
+  yesterday.setDate(ref.getDate() - 1);
+
+  const todayRanges = rangesForDate(schedule, today);
+  const yRanges = rangesForDate(schedule, yesterday);
+
   const out = [];
-  const push = (r, label) => {
-    const [a, b] = r.split("-").map((s) => s.trim());
-    if (!a || !b) return;
-    const A = toMin(a),
-      B = toMin(b);
-    if (B >= A) out.push({ from: A, to: B });
-    else {
-      if (label === "yesterday") out.push({ from: 0, to: B });
-      else out.push({ from: A, to: 1440 });
+  // Tambahkan bagian overnight dari kemarin (to < from → melewati tengah malam)
+  yRanges.forEach(({ from, to }) => {
+    if (to < from) {
+      // kemarin 22:00-06:00 → untuk hari ini: 00:00-06:00
+      out.push({ from: 0, to });
     }
-  };
-  yesterday.forEach((r) => push(r, "yesterday"));
-  today.forEach((r) => push(r, "today"));
+  });
+  // Tambahkan bagian untuk hari ini
+  todayRanges.forEach(({ from, to }) => {
+    if (to >= from) {
+      out.push({ from, to });
+    } else {
+      // hari ini 22:00-06:00 → untuk hari ini: 22:00-24:00
+      out.push({ from, to: 1440 });
+    }
+  });
   return out;
 }
-function isOpenNow(s, ref = new Date()) {
-  const j = getEffectiveJadwal(s);
+
+// Status buka & kalkulasi perubahan status berikutnya
+function getOpenStatus(service, ref = new Date()) {
+  const schedule = service?.jadwal || {};
+  const ranges = rangesForToday(schedule, ref);
   const now = ref.getHours() * 60 + ref.getMinutes();
-  return rangesForToday(j, ref).some((R) => now >= R.from && now <= R.to);
+
+  let open = false;
+  let nextChange = null; // menit absolut selanjutnya (dari 0..1440), bisa lewat hari (min + 1440)
+
+  for (const r of ranges) {
+    if (now >= r.from && now <= r.to) {
+      open = true;
+      // sedang buka → nextChange = waktu tutup terdekat
+      if (nextChange == null || r.to < nextChange) nextChange = r.to;
+    } else if (now < r.from) {
+      // belum buka → nextChange kandidat waktu buka terdekat
+      if (nextChange == null || r.from < nextChange) nextChange = r.from;
+    }
+  }
+
+  // Jika tidak ada change di sisa hari, cari event hari esok pertama
+  if (nextChange == null) {
+    const tomorrow = new Date(ref);
+    tomorrow.setDate(ref.getDate() + 1);
+    const tRanges = rangesForToday(schedule, tomorrow);
+    if (tRanges.length) nextChange = tRanges[0].from + 1440; // +24 jam
+  }
+
+  const minutesUntilChange = nextChange != null ? nextChange - now : null;
+  return { open, minutesUntilChange, label: formatStatusLabel(open, minutesUntilChange) };
+}
+
+function formatStatusLabel(open, minutesUntilChange) {
+  if (minutesUntilChange == null) return open ? "Buka" : "Tutup";
+  if (minutesUntilChange <= 0) return open ? "Tutup segera" : "Buka sebentar lagi";
+  if (minutesUntilChange < 60) {
+    return open ? `Tutup ${minutesUntilChange} mnt lagi` : `Buka ${minutesUntilChange} mnt lagi`;
+  }
+  const h = Math.floor(minutesUntilChange / 60);
+  const m = minutesUntilChange % 60;
+  const tail = m ? `${h} j ${m} mnt` : `${h} j`;
+  return open ? `Tutup ${tail} lagi` : `Buka ${tail} lagi`;
+}
+
+// API publik yang dipakai UI (kompatibel lama):
+export function getEffectiveJadwal(s) {
+  // Kembalikan weekly yang sudah dinormalisasi untuk ditampilkan di tabel
+  const { weekly } = normalizeSchedule(s?.jadwal || {});
+  // stringify agar konsisten ("Tutup" bila kosong, gabung koma bila array)
+  const out = {};
+  for (const d of DAY_NAMES_ID) {
+    const arr = normalizeRanges(weekly[d]);
+    out[d] = arr.length
+      ? arr.map((r) => `${fmtMin(r.from)}–${fmtMin(r.to)}`).join(", ")
+      : "Tutup";
+  }
+  return out;
+}
+export function isOpenNow(s, ref = new Date()) {
+  return getOpenStatus(s, ref).open;
+}
+export function getOpenBadgeLabel(s, ref = new Date()) {
+  return getOpenStatus(s, ref).label; // contoh: "Buka", "Tutup 45 mnt lagi", dst.
 }
 
 /* ===================== UI kecil ===================== */
