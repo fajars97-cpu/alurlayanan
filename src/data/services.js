@@ -653,7 +653,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Lingkungan & perilaku sehat",
-          alur: [1, 20, 5],
+          alur: [24, 20, 4, 5],
         },
         {
           nama: "Laporan DBD & Cikungunya",
