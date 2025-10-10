@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // === Import data ===
@@ -219,7 +219,6 @@ function schedulesForPoli(poli) {
   return list;
 }
 function weeklyKey(jadwal) {
-  // Kunci untuk mendeteksi "sama atau tidak"
   const { weekly } = normalizeSchedule(jadwal);
   return JSON.stringify(
     DAY_NAMES_ID.reduce((acc, d) => {
@@ -229,9 +228,37 @@ function weeklyKey(jadwal) {
   );
 }
 function poliOpenAny(poli) {
-  // Buka jika jadwal poli atau salah satu layanan sedang buka
   if (isOpenNow({ jadwal: poli?.jadwal })) return true;
   return (poli?.layanan || []).some((L) => isOpenNow({ jadwal: L.jadwal }));
+}
+
+/* ====== Jadwal helpers untuk kartu layanan ====== */
+const TODAY = () => DAY_NAMES_ID[new Date().getDay()];
+function summarizeWeekly(jadwalLike) {
+  const eff = getEffectiveJadwal({ jadwal: jadwalLike });
+  // kelompokkan hari yang memiliki jam sama
+  const entries = DAY_NAMES_ID.map((d) => [d, eff[d]]);
+  const groups = [];
+  let cur = null;
+  entries.forEach(([d, val]) => {
+    if (!cur || cur.val !== val) {
+      cur && groups.push(cur);
+      cur = { from: d, to: d, val };
+    } else {
+      cur.to = d;
+    }
+  });
+  cur && groups.push(cur);
+  const short = (d) => d.slice(0, 3);
+  return groups
+    .map((g) =>
+      g.from === g.to ? `${short(g.from)} ${g.val}` : `${short(g.from)}–${short(g.to)} ${g.val}`
+    )
+    .join("; ");
+}
+function todayText(jadwalLike) {
+  const eff = getEffectiveJadwal({ jadwal: jadwalLike });
+  return eff[TODAY()];
 }
 
 /* ===================== UI kecil ===================== */
@@ -277,6 +304,7 @@ function Sidebar({
   setQuery,
   services,
   onPick,
+  onScrollToServices,
   selected,
   highlightIds = [],
 }) {
@@ -329,19 +357,19 @@ function Sidebar({
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
 
-          // OPEN status: poli OR any layanan
           const open = poliOpenAny(s);
 
-          // Kumpulkan jadwal poli + layanan
           const schedList = schedulesForPoli(s);
-          // Kelompokkan berdasarkan weekly (untuk cek apakah sama semua)
           const groups = new Map();
           schedList.forEach(({ label, jadwal }) => {
             const k = weeklyKey(jadwal);
             if (!groups.has(k)) groups.set(k, []);
             groups.get(k).push({ label, jadwal });
           });
-          const uniqueSchedules = Array.from(groups.values()); // array of arrays
+          const uniqueSchedules = Array.from(groups.values());
+
+          const hasOneService = (s?.layanan || []).length === 1;
+          const singleServiceSchedule = hasOneService && s.layanan[0]?.jadwal;
 
           return (
             <div key={s.id} className="space-y-2">
@@ -369,7 +397,7 @@ function Sidebar({
                 <div className="mx-2 mb-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
                   <div className="text-white/60 mb-2">Jadwal</div>
 
-                  {/* Jika tidak ada jadwal sama sekali → tampilkan default */}
+                  {/* 1) Tidak ada jadwal khusus sama sekali → tampilkan default */}
                   {uniqueSchedules.length === 0 && (
                     <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
                       {DAY_NAMES_ID.map((d) => (
@@ -381,8 +409,8 @@ function Sidebar({
                     </div>
                   )}
 
-                  {/* Jika semua layanan + poli punya jadwal yang sama → satu tabel */}
-                  {uniqueSchedules.length === 1 && uniqueSchedules[0].length > 0 && (
+                  {/* 2) Semua sama → tabel ringkas (lama) */}
+                  {uniqueSchedules.length === 1 && uniqueSchedules[0].length > 0 && !singleServiceSchedule && (
                     <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
                       {DAY_NAMES_ID.map((d) => (
                         <React.Fragment key={d}>
@@ -395,28 +423,31 @@ function Sidebar({
                     </div>
                   )}
 
-                  {/* Jika jadwal beragam → render per layanan */}
-                  {uniqueSchedules.length > 1 && (
-                    <div className="space-y-3">
-                      <div className="text-xs text-amber-300/90">
-                        Jadwal beragam — lihat per layanan:
-                      </div>
-                      {schedList.map(({ label, jadwal }, i) => (
-                        <div key={i} className="rounded-lg border border-white/10 p-2">
-                          <div className="text-[12px] font-semibold text-white/80 mb-1">
-                            {label}
-                          </div>
-                          <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
-                            {DAY_NAMES_ID.map((d) => (
-                              <React.Fragment key={d}>
-                                <span className="text-white/50">{d}</span>
-                                <span>{getEffectiveJadwal({ jadwal })[d]}</span>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
+                  {/* 3) Poli dengan satu layanan yang punya jadwal khusus → tampilkan tabel layanan itu */}
+                  {singleServiceSchedule && (
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
+                      {DAY_NAMES_ID.map((d) => (
+                        <React.Fragment key={d}>
+                          <span className="text-white/50">{d}</span>
+                          <span>{getEffectiveJadwal({ jadwal: singleServiceSchedule })[d]}</span>
+                        </React.Fragment>
                       ))}
                     </div>
+                  )}
+
+                  {/* 4) Banyak layanan dengan jadwal berbeda → tampilkan notice; klik = scroll ke daftar layanan */}
+                  {uniqueSchedules.length > 1 && !singleServiceSchedule && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onPick(s);                 // pastikan poli terpilih
+                        onScrollToServices?.(s.id); // trigger scroll di panel kanan
+                      }}
+                      className="w-full text-left text-[12px] text-amber-300/90 hover:text-amber-200 underline underline-offset-2"
+                      aria-label={`Jadwal beragam untuk ${s.nama}. Klik untuk menuju daftar layanan.`}
+                    >
+                      Jadwal beragam — <span className="font-semibold">cek tiap layanan untuk jadwal</span>
+                    </button>
                   )}
                 </div>
               )}
@@ -458,10 +489,15 @@ function ServiceCard({ s, onPick }) {
 }
 
 /* SubServiceCard */
-function SubServiceCard({ item, onPick }) {
+function SubServiceCard({ item, onPick, parentJadwal }) {
   const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
   const bpjsClass = item.bpjs ? "text-emerald-400" : "text-rose-400";
   const tarifText = `Tarif Umum: Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`;
+
+  const jadwalLayanan = item.jadwal || null;
+  const open = isOpenNow({ jadwal: jadwalLayanan || parentJadwal });
+  const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
+  const weekly = jadwalLayanan ? summarizeWeekly(jadwalLayanan) : null;
 
   return (
     <button
@@ -469,8 +505,9 @@ function SubServiceCard({ item, onPick }) {
       className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 ring-0 hover:ring-1 hover:ring-white/15 transition-all shadow-sm hover:shadow active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-emerald-500"
     >
       <div className="p-4 sm:p-5 space-y-3">
-        <div className="text-[12px] sm:text-[13px] font-semibold tracking-tight">
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
           <span className={bpjsClass}>{bpjsText}</span>
+          <span className="ml-auto"><StatusPill open={open} /></span>
         </div>
         <div className="text-[12px] sm:text-[13px] text-white/70 -mt-2">{tarifText}</div>
         <div className="h-px bg-white/10" />
@@ -485,6 +522,17 @@ function SubServiceCard({ item, onPick }) {
                 {item.ket}
               </div>
             )}
+            {/* Jadwal ringkas per layanan */}
+            <div className="mt-2 text-[12px] sm:text-[13px] text-white/70 leading-snug">
+              {jadwalLayanan ? (
+                <>
+                  <div><span className="text-white/50">Hari ini:</span> {today}</div>
+                  <div className="truncate"><span className="text-white/50">Ringkasan:</span> {weekly}</div>
+                </>
+              ) : (
+                <div className="italic text-white/60">Ikuti jadwal default poli</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -576,8 +624,10 @@ function RightPanel({
   jump,
   setJump,
   searchQuery,
+  scrollReq,
 }) {
   const [sub, setSub] = useState(null);
+  const servicesGridRef = useRef(null);
 
   useEffect(() => setSub(null), [selected]);
   useEffect(() => {
@@ -606,6 +656,15 @@ function RightPanel({
 
   const showSearchResults = searchQuery?.trim()?.length > 0 && subMatches?.length > 0;
 
+  // Scroll request dari Sidebar (klik notice jadwal beragam)
+  useEffect(() => {
+    if (!scrollReq || !selected || sub) return;
+    if (selected.id !== scrollReq.poliId) return;
+    try {
+      servicesGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch {}
+  }, [scrollReq, selected, sub]);
+
   if (!selected || showSearchResults) {
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
@@ -626,6 +685,7 @@ function RightPanel({
                       key={poli.id + "#" + index}
                       item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
                       onPick={() => onPickSub(poli.id, index)}
+                      parentJadwal={poli.jadwal}
                     />
                   ))}
                 </div>
@@ -672,9 +732,14 @@ function RightPanel({
         </div>
 
         <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
-        <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+          ref={servicesGridRef}
+          className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
           {list.length > 0 ? (
-            list.map((it, i) => <SubServiceCard key={i} item={it} onPick={setSub} />)
+            list.map((it, i) => (
+              <SubServiceCard key={i} item={it} onPick={setSub} parentJadwal={selected.jadwal} />
+            ))
           ) : (
             <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
           )}
@@ -775,6 +840,7 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [facility, setFacility] = useState("pkm-jagakarsa");
   const [navOpen, setNavOpen] = useState(false);
+  const [scrollReq, setScrollReq] = useState(null); // { poliId, ts }
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
@@ -902,6 +968,10 @@ export default function App() {
               setSelected(s);
               setNavOpen(false);
             }}
+            onScrollToServices={(poliId) => {
+              setScrollReq({ poliId, ts: Date.now() }); // trigger scroll
+              setNavOpen(false);                         // tutup drawer (mobile)
+            }}
             selected={selected}
             highlightIds={matchPoliIds}
           />
@@ -916,6 +986,7 @@ export default function App() {
           jump={jump}
           setJump={setJump}
           searchQuery={query}
+          scrollReq={scrollReq}
         />
       </div>
 
