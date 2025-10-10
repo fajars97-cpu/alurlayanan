@@ -195,6 +195,13 @@ export const FLOW_STEPS = {
     description: "Silahkan melihat infografis SKPK.",
     img: "/alur/26-alur-skpk.png",
     },
+    27: {
+    id: 27,
+    title: "Langkah 27",
+    name: "Infografis SKPK",
+    description: "Kunjungan pertama, pasien mendapatkan rujukan dari poli lain, pasien dapat menuju ruang Kesehatan Lingkungan di lantai 3 (ruang paling pojok.",
+    img: "/alur/27-pasien-rujukan-poli-lain-kesling.png",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -653,7 +660,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Lingkungan & perilaku sehat",
-          alur: [24, 20, 4, 5],
+          alur: [27, 20, 4, 5],
         },
         {
           nama: "Laporan DBD & Cikungunya",
