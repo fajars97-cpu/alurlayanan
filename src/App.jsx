@@ -235,21 +235,29 @@ function poliOpenAny(poli) {
 /* ====== Jadwal helpers untuk kartu layanan ====== */
 const TODAY = () => DAY_NAMES_ID[new Date().getDay()];
 function summarizeWeekly(jadwalLike) {
+    // Ringkas HANYA hari yang buka (lewati "Tutup")
   const eff = getEffectiveJadwal({ jadwal: jadwalLike });
-  // kelompokkan hari yang memiliki jam sama
-  const entries = DAY_NAMES_ID.map((d) => [d, eff[d]]);
+  const short = (d) => d.slice(0, 3);
+  // Buat daftar hanya hari buka dalam urutan Minggu..Sabtu
+  const openEntries = DAY_NAMES_ID
+    .map((d) => [d, eff[d]])
+    .filter(([, val]) => val && !/^\s*Tutup\s*$/i.test(val));
+  if (openEntries.length === 0) return "Tidak melayani rutin";
+
+  // Kelompokkan hari berurutan yang jamnya sama
   const groups = [];
   let cur = null;
-  entries.forEach(([d, val]) => {
+  openEntries.forEach(([d, val]) => {
     if (!cur || cur.val !== val) {
       cur && groups.push(cur);
       cur = { from: d, to: d, val };
     } else {
+      // lanjutkan range
       cur.to = d;
     }
   });
   cur && groups.push(cur);
-  const short = (d) => d.slice(0, 3);
+
   return groups
     .map((g) =>
       g.from === g.to ? `${short(g.from)} ${g.val}` : `${short(g.from)}–${short(g.to)} ${g.val}`
