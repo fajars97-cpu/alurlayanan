@@ -399,7 +399,7 @@ function Sidebar({
 
                   {/* 1) Tidak ada jadwal khusus sama sekali → tampilkan default */}
                   {uniqueSchedules.length === 0 && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[13px] text-white/70">
                       {DAY_NAMES_ID.map((d) => (
                         <React.Fragment key={d}>
                           <span className="text-white/50">{d}</span>
@@ -511,7 +511,7 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
         </div>
         <div className="text-[12px] sm:text-[13px] text-white/70 -mt-2">{tarifText}</div>
         <div className="h-px bg-white/10" />
-        <div className="flex items-start gap-3 min-h-[92px]">
+        <div className="flex items-start gap-3">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
           <div className="min-w-0 flex-1">
             <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">
@@ -527,7 +527,7 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
               {jadwalLayanan ? (
                 <>
                   <div><span className="text-white/50">Hari ini:</span> {today}</div>
-                  <div className="truncate"><span className="text-white/50">Ringkasan:</span> {weekly}</div>
+                  <div className="break-words"><span className="text-white/50">Ringkasan:</span> {weekly}</div>
                 </>
               ) : (
                 <div className="italic text-white/60">Ikuti jadwal default poli</div>
