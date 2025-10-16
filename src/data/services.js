@@ -202,6 +202,13 @@ export const FLOW_STEPS = {
     description: "Kunjungan pertama, pasien mendapatkan rujukan dari poli lain, pasien dapat menuju ruang Kesehatan Lingkungan di lantai 3 (ruang paling pojok.",
     img: "/alur/27-pasien-rujukan-poli-lain-kesling.png",
     },
+    28: {
+    id: 28,
+    title: "Langkah 28",
+    name: "Menuju IGD",
+    description: "Silahkan menuju layanan 24 jam setelah nama Anda dipanggil (di samping loket).",
+    img: "/alur/28-menuju-igd.png",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -303,7 +310,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 28, 4, 5],
         },
       ],
     },
@@ -334,13 +341,13 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 28, 4, 5],
         },
         {
           nama: "Pemeriksaan Jenazah (24 Jam)",
           ikon: "⚰️",
-          tarif: 0,
-          bpjs: true,
+          tarif: 30000,
+          bpjs: false,
           ket: "Pemeriksaan jenazah Sebelum / Sudah Dikuburkan",
           jadwal: {
             weekly: {
@@ -354,7 +361,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5]
+          alur: [1, 28, 19]
         },
       ],
     },
