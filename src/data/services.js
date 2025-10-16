@@ -291,6 +291,18 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Penanganan kegawatdaruratan",
+          jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
           alur: [1, 5],
         },
       ],
@@ -310,6 +322,18 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Pelayanan Umum 24 Jam",
+          jadwal: {
+            weekly: {
+              Senin:  "16:00-06:00",
+              Selasa: "16:00-06:00",
+              Rabu:   "16:00-06:00",
+              Kamis:  "16:00-06:00",
+              Jumat:  "16:00-06:00",
+              Sabtu:  "16:00-06:00",
+              Minggu: "16:00-06:00",
+            },
+            exceptions: {}
+          },
           alur: [1, 5],
         },
         {
@@ -330,7 +354,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5] // pakai alur ringkas; bisa diubah bila ada SOP khusus
+          alur: [1, 5]
         },
       ],
     },
