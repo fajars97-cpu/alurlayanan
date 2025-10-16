@@ -1,11 +1,3 @@
-// src/data/services.js
-
-/* =========================================================
-   Kamus Langkah Global (reusable & skalabel)
-   - Gunakan angka 1..N sebagai key.
-   - Setiap langkah berisi judul, nama, deskripsi, (opsional) img/audio.
-   - Gambar langkah diambil dari folder /public (gunakan path absolut).
-   ========================================================= */
 export const FLOW_STEPS = {
   1: {
     id: 1,
@@ -251,19 +243,38 @@ export const FLOW_STEPS = {
     description: "Silahkan menuju pos security untuk mengambil nomor antrian dan name tag pasien CKG.",
     img: "/alur/34-pos-security.png",
     },
+    35: {
+    id: 35,
+    title: "Langkah 35",
+    name: "Menuju Imunisasi Ibu Hamil",
+    description: "Setelah dari poli lain/ loket. Silahkan menuju nurse station imunisasi di lantai 3, berikan buku pink dan resi pendaftaran Anda kepada petugas.",
+    img: "/alur/35-menuju-imunisasi-ibu-hamil.png",
+    },
+    36: {
+    id: 36,
+    title: "Langkah 36",
+    name: "Menuju Ruangan Imunisasi",
+    description: "Silahkan masuk ke dalam ruangan imunisasi setelah nama Anda dipanggil.",
+    img: "/alur/36-ibu-hamil-disuntik.png",
+    },
+    37: {
+    id: 37,
+    title: "Langkah 37",
+    name: "Layanan Imunisasi Ibu Hamil Selesai",
+    description: "Layanan telah selesai, pasien bisa pulang dan jangan lupa untuk kontrol kehamilan sesuai jadwal.",
+    img: "/alur/37-layanan-imunisasi-ibu-hamil-selesai.png",
+    },
 };
 
-/* ===================== Daftar Fasilitas ===================== */
+/* ===================== FACILITIES ===================== */
 export const FACILITIES = [
   { id: "pkm-jagakarsa", name: "Puskesmas Jagakarsa" },
-  { id: "pkm-lain", name: "Puskesmas Lain (contoh)" },
+  { id: "pkm-lain",      name: "Puskesmas Lain (contoh)" },
 ];
 
-/* =========================================================
-   Data Poli / Layanan
-   - Tetap ringkas: field `alur` berisi array ID langkah: [1, 6, 5], dst.
-   - Gambar infografis poli diambil dari /public/infografis (lihat App.jsx).
-   ========================================================= */
+/* ===================== SERVICES_BY_FACILITY ===================== */
+/* Salin semua poli/layanan kamu ke sini. Aku sertakan beberapa utama,
+   termasuk pembaruan “Pemeriksaan Jenazah (24 Jam)” → full 24:00. */
 export const SERVICES_BY_FACILITY = {
   "pkm-jagakarsa": [
     {
@@ -652,7 +663,10 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: {
+            rujukan: [35, 36, 37], // rujukan KI
+            langsung: [1, 35, 36, 37], // langsung ke imunisasi
+            },
         },
       ],
     },
@@ -1012,110 +1026,4 @@ export const SERVICES_BY_FACILITY = {
       ],
     },
   ],
-};
-
-/* ===================== Petugas Penanggung Jawab ===================== */
-export const DOCTORS_BY_POLI = {
-  "poli-umum": "dr. Natasha Adjani",
-  "poli-gigi": "drg. Gigi",
-  igd: "dr. IGD",
-  "ki-hamil": "Bidan Ani",
-  "ki-nifas": "Bidan Siti",
-  catin: "Bidan Dewi",
-  imunisasi: "Perawat Imunisasi",
-  "kb-iva": "Bidan Tika",
-  tumbang: "Yuniar Selowati",
-  mtbs: "dr. Balita",
-  pkpr: "dr. Remaja",
-  lansia: "dr. Lansia",
-  ptm: "dr. Penyakit Tidak Menular",
-  pm: "dr. Penyakit Menular",
-  ims: "dr. IMS",
-  ispa: "dr. ISPA",
-  mata: "dr. Mata",
-  gizi: "dr. Gizi",
-  kirana: "Psikolog",
-  "klinik-sanitasi": "Sanitarian",
-  uks: "Petugas UKS",
-  "vaksin-dengue": "Perawat Vaksin",
-  "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
-};
-
-/* ===================== Info Tambahan (contoh) ===================== */
-export const EXTRA_INFO = {
-  // Poli Umum
-  "Pemeriksaan Umum": "Informasi tambahan belum tersedia.",
-  "Kontrol Berkala": "Informasi tambahan belum tersedia.",
-
-  // Poli Gigi
-  "Cabut Gigi": "Informasi tambahan belum tersedia.",
-  "Scaling": "Informasi tambahan belum tersedia.",
-
-  // IGD
-  "Tindakan Darurat": "Informasi tambahan belum tersedia.",
-
-  // Layanan 24 Jam
-  "Pemeriksaan Jenazah (24 Jam)": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
-  // KB & IVA
-  "Konseling KB": "Informasi tambahan belum tersedia.",
-  "Pemeriksaan IVA": "Informasi tambahan belum tersedia.",
-
-  // Imunisasi
-  "Imunisasi HB": "Imunisasi HB adalah vaksin hepatitis B yang diberikan kepada bayi baru lahir, idealnya dalam 24 jam pertama kehidupan (HB0), Usia 2 bulan (HB-1), 3 bulan (HB-2), dan 4 bulan (HB-3). Vaksin ini melindungi bayi dari infeksi virus hepatitis B yang dapat menyebabkan penyakit hati serius.",
-  "Imunisasi DPT": "Imunisasi DPT adalah vaksin yang melindungi terhadap tiga penyakit serius: Difteri, Pertusis (batuk rejan), dan Tetanus. Vaksin ini diberikan pada usia 2 bulan (DPT-1), 3 bulan (DPT-2), dan 4 bulan (DPT-3).",
-  "Imunisasi OPV (Polio Tetes)": "Imunisasi OPV (Oral Polio Vaccine) adalah vaksin yang diberikan secara tetes oral untuk melindungi anak-anak dari penyakit polio, yang dapat menyebabkan kelumpuhan. Vaksin ini diberikan pada bayi usia 1 bulan (OPV-1), 2 bulan (OPV-2), dan 3 bulan (OPV-3), dan 4 bulan (OPV-4).",
-  "Imunisasi PCV": "Imunisasi PCV (Pneumococcal Conjugate Vaccine) adalah vaksin yang melindungi terhadap infeksi bakteri Streptococcus pneumoniae, yang dapat menyebabkan penyakit serius seperti pneumonia, meningitis, dan infeksi darah pada anak-anak. Vaksin ini diberikan pada bayi usia 2 bulan (PCV-1), 3 bulan (PCV-2), dan 12 bulan (PCV-3).",
-  "Imunisasi IPV": "Imunisasi IPV (Inactivated Polio Vaccine) adalah vaksin yang diberikan melalui suntikan untuk melindungi terhadap penyakit polio, yang dapat menyebabkan kelumpuhan. IPV mengandung virus polio yang telah dimatikan sehingga tidak dapat menyebabkan penyakit. Vaksin ini diberikan pada bayi usia 4 bulan (IPV-1) dan 9 bulan (IPV-2).",
-  "Imunisasi Rotavirus": "Imunisasi Rotavirus adalah vaksin yang diberikan untuk melindungi bayi dan anak-anak dari infeksi rotavirus, yang merupakan penyebab utama diare parah pada anak-anak di seluruh dunia. Vaksin ini diberikan pada usia 2 bulan (Rotavirus-1), 3 bulan (Rotavirus-2), dan 4 bulan (Rotavirus-3).",
-  "Imunisasi MR": "Imunisasi MR (Measles-Rubella) adalah vaksin yang melindungi terhadap dua penyakit menular: campak (measles) dan rubella (campak Jerman). Vaksin ini biasanya diberikan dalam dua dosis pada anak-anak pada usia 9 bulan (MR-1) dan 18 bulan (MR-2).",
-  "Imunisasi BCG": "Imunisasi BCG (Bacillus Calmette-Guérin) adalah vaksin yang digunakan untuk melindungi terhadap tuberkulosis (TB), terutama bentuk TB yang parah pada anak-anak, seperti TB meningitis dan TB milier. Vaksin ini diberikan pada bayi usia 1 bulan.",
-  "Imunisasi TD Ibu Hamil": "Imunisasi TD (Tetanus-Diphtheria) untuk ibu hamil adalah vaksin yang diberikan untuk melindungi ibu dan bayi dari tetanus neonatal, yang dapat terjadi jika bayi terinfeksi tetanus saat lahir. Vaksin ini biasanya diberikan pada ibu hamil pada usia kehamilan 20 minggu atau lebih.",
-  // Tumbang
-  "Konsultasi Tumbuh Kembang Anak": "Poli Tumbang tersedia untuk anak usia 0 - 72 bulan.",
-
-  // MTBS
-  "Pemeriksaan Balita Sakit": "Informasi tambahan belum tersedia.",
-
-  // PKPR
-  "Konseling Remaja": "Informasi tambahan belum tersedia.",
-
-  // Lansia
-  "Pemeriksaan Lansia": "Informasi tambahan belum tersedia.",
-
-  // PTM
-  "Pemeriksaan Hipertensi": "Informasi tambahan belum tersedia.",
-
-  // PM (Program Malaria, TB, dll. – sesuaikan dengan data kamu)
-  "Pemeriksaan PM": "Informasi tambahan belum tersedia.",
-
-  // IMS
-  "Pemeriksaan IMS": "Informasi tambahan belum tersedia.",
-
-  // ISPA
-  "Pemeriksaan ISPA": "Informasi tambahan belum tersedia.",
-
-  // Mata
-  "Pemeriksaan Mata": "Informasi tambahan belum tersedia.",
-
-  // Gizi
-  "Konsultasi Gizi": "Informasi tambahan belum tersedia.",
-
-  // Akupresur
-  "Akupresur": "Informasi tambahan belum tersedia.",
-
-  // Kirana
-  "Pemeriksaan Kirana": "Informasi tambahan belum tersedia.",
-
-  // Kesling_surveilans
-  "Klinik Sanitasi": "Upaya mengintegrasikan pelayanan kesehatan promotif, preventif, dan kuratif, di tingkat puskesmas yang difokuskan pada masalah kesehatan lingkungan untuk mencegah dan menanggulangi penyakit berbasis lingkungan",
-  "Laporan DBD & Cikungunya": "Bila menemukan kejadian DBD / Cikungunya di wilayah Jagakarsa silahkan menghubungi petugas Puskesmas untuk tindak lanjut. No telp pelaporan Wita: 085927002059",
-  "Laporan Kematian Jenazah Sudah Dikuburkan": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa",
-  "Laporan Kematian Jenazah Belum Dikuburkan": "Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
-  "Laporan Penyakit Potensi KLB/ Wabah Difteri": "Penyakit bakteri yang menyerang tenggorokan dengan gejala demam ringan, sakit tenggorokan, terdapat selaput pada tenggorokan yang bisa membengkak. No telp pelaporan Wita: 085927002059",
-  "Laporan Penyakit Potensi KLB/ Wabah Pertusis (Batuk Rejan)": "Penyakit batuk 100 hari akibat bakteri dengan gejala batuk hebat bertahap, disertai suara whoop dan bisa sampai muntah. No telp pelaporan Wita: 085927002059",
-  "Laporan Penyakit Potensi KLB/ Wabah Campak": "Penyakit virus yang sangat menular dengan gejala demam tinggi, batuk pilek, mata merah, muncul bintik putih dalam mulut dan ruam merah pada kulit. No telp pelaporan Wita: 085927002059",
-  "Laporan Penyakit Potensi KLB/ Wabah Lumpuh Layu (Polio)": "Penyakit virus yang menyerang saraf dan bisa menyebabkan kelumpuhan mendadak yang ditulakan lewat makanan/minuman yang terkontaminasi feses dengan gejala demam, nyeri, lalu kelumpuhan umumnya bagian tungkai. No telp pelaporan Wita: 085927002059",
-  "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita: 085927002059",
-  // UKS
-  "Pelayanan UKS": "Informasi tambahan belum tersedia.",
 };
