@@ -237,7 +237,20 @@ export const FLOW_STEPS = {
     description: "Layanan selesai, silahkan pulang dan kontrol kembali sesuai jadwal imunisasi berikutnya",
     img: "/alur/32-layanan-imunisasi-selesai.png",
     },
-  // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
+    33: {
+    id: 33,
+    title: "Langkah 33",
+    name: "Menuju Poli CKG",
+    description: "Silahkan menuju meja registrasi Poli CKG di lantai 3 (depan tangga). Persiapkan KTP Anda.",
+    img: "/alur/33-menuju-poli-ckg.png",
+    },
+    34: {
+    id: 34,
+    title: "Langkah 34",
+    name: "Pos Security",
+    description: "Silahkan menuju pos security untuk mengambil nomor antrian dan name tag pasien CKG.",
+    img: "/alur/34-pos-security.png",
+    },
 };
 
 /* ===================== Daftar Fasilitas ===================== */
@@ -621,6 +634,26 @@ export const SERVICES_BY_FACILITY = {
           },
           alur: [1, 29, 30, 31, 32],
         },
+        {
+          nama: "Imunisasi TD Ibu Hamil",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "08:00-12:00",
+              Kamis:  "08:00-12:00",
+              Jumat:  "08:00-12:00",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 29, 30, 31, 32],
+        },
       ],
     },
     {
@@ -960,21 +993,21 @@ export const SERVICES_BY_FACILITY = {
       ],
     },
     {
-      id: "uks",
-      nama: "UKS",
-      klaster: "Sekolah",
-      ikon: "🏫",
-      lokasi: "Lintas Sekolah",
+      id: "ckg",
+      nama: "Cek Kesehatan Gratis",
+      klaster: "Pelayanan Medik",
+      ikon: "🩺",
+      lokasi: "Lantai 3",
       telemed: false,
-      img: "uks.jpg",
+      img: "poli-ckg.png",
       layanan: [
         {
-          nama: "Usaha Kesehatan Sekolah",
-          ikon: "🏫",
+          nama: "Cek Kesehatan Gratis",
+          ikon: "🩺",
           tarif: 0,
           bpjs: true,
-          ket: "Program UKS",
-          alur: [1, 5],
+          ket: "Program CKG",
+          alur: [34, 33, 5],
         },
       ],
     },
@@ -1036,6 +1069,7 @@ export const EXTRA_INFO = {
   "Imunisasi Rotavirus": "Imunisasi Rotavirus adalah vaksin yang diberikan untuk melindungi bayi dan anak-anak dari infeksi rotavirus, yang merupakan penyebab utama diare parah pada anak-anak di seluruh dunia. Vaksin ini diberikan pada usia 2 bulan (Rotavirus-1), 3 bulan (Rotavirus-2), dan 4 bulan (Rotavirus-3).",
   "Imunisasi MR": "Imunisasi MR (Measles-Rubella) adalah vaksin yang melindungi terhadap dua penyakit menular: campak (measles) dan rubella (campak Jerman). Vaksin ini biasanya diberikan dalam dua dosis pada anak-anak pada usia 9 bulan (MR-1) dan 18 bulan (MR-2).",
   "Imunisasi BCG": "Imunisasi BCG (Bacillus Calmette-Guérin) adalah vaksin yang digunakan untuk melindungi terhadap tuberkulosis (TB), terutama bentuk TB yang parah pada anak-anak, seperti TB meningitis dan TB milier. Vaksin ini diberikan pada bayi usia 1 bulan.",
+  "Imunisasi TD Ibu Hamil": "Imunisasi TD (Tetanus-Diphtheria) untuk ibu hamil adalah vaksin yang diberikan untuk melindungi ibu dan bayi dari tetanus neonatal, yang dapat terjadi jika bayi terinfeksi tetanus saat lahir. Vaksin ini biasanya diberikan pada ibu hamil pada usia kehamilan 20 minggu atau lebih.",
   // Tumbang
   "Konsultasi Tumbuh Kembang Anak": "Poli Tumbang tersedia untuk anak usia 0 - 72 bulan.",
 
