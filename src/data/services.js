@@ -434,11 +434,163 @@ export const SERVICES_BY_FACILITY = {
       img: "poli-imunisasi.png",
       layanan: [
         {
-          nama: "Imunisasi Dasar & Lanjutan",
+          nama: "Imunisasi HB0",
           ikon: "💉",
           tarif: 0,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "Tutup",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi DPT",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "Tutup",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi OPV (Polio Tetes)",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "08:00-12:00",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi PCV",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "Tutup",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi IPV",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "Tutup",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi Rotavirus",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-12:00",
+              Selasa: "08:00-12:00",
+              Rabu:   "Tutup",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi MR",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "Tutup",
+              Selasa: "08:00-12:00",
+              Rabu:   "Tutup",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5],
+        },
+        {
+          nama: "Imunisasi BCG",
+          ikon: "💉",
+          tarif: 0,
+          bpjs: true,
+          ket: "Sesuai jadwal nasional",
+          jadwal: {
+            weekly: {
+              Senin:  "Tutup",
+              Selasa: "Tutup",
+              Rabu:   "08:00-12:00",
+              Kamis:  "Tutup",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
           alur: [1, 5],
         },
       ],
@@ -841,10 +993,21 @@ export const EXTRA_INFO = {
   // IGD
   "Tindakan Darurat": "Informasi tambahan belum tersedia.",
 
+  // Layanan 24 Jam
+  "Pemeriksaan Jenazah (24 Jam)": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
   // KB & IVA
   "Konseling KB": "Informasi tambahan belum tersedia.",
   "Pemeriksaan IVA": "Informasi tambahan belum tersedia.",
 
+  // Imunisasi
+  "Imunisasi HB": "Imunisasi HB adalah vaksin hepatitis B yang diberikan kepada bayi baru lahir, idealnya dalam 24 jam pertama kehidupan (HB0), Usia 2 bulan (HB-1), 3 bulan (HB-2), dan 4 bulan (HB-3). Vaksin ini melindungi bayi dari infeksi virus hepatitis B yang dapat menyebabkan penyakit hati serius.",
+  "Imunisasi DPT": "Imunisasi DPT adalah vaksin yang melindungi terhadap tiga penyakit serius: Difteri, Pertusis (batuk rejan), dan Tetanus. Vaksin ini diberikan pada usia 2 bulan (DPT-1), 3 bulan (DPT-2), dan 4 bulan (DPT-3).",
+  "Imunisasi OPV (Polio Tetes)": "Imunisasi OPV (Oral Polio Vaccine) adalah vaksin yang diberikan secara tetes oral untuk melindungi anak-anak dari penyakit polio, yang dapat menyebabkan kelumpuhan. Vaksin ini diberikan pada bayi usia 1 bulan (OPV-1), 2 bulan (OPV-2), dan 3 bulan (OPV-3), dan 4 bulan (OPV-4).",
+  "Imunisasi PCV": "Imunisasi PCV (Pneumococcal Conjugate Vaccine) adalah vaksin yang melindungi terhadap infeksi bakteri Streptococcus pneumoniae, yang dapat menyebabkan penyakit serius seperti pneumonia, meningitis, dan infeksi darah pada anak-anak. Vaksin ini diberikan pada bayi usia 2 bulan (PCV-1), 3 bulan (PCV-2), dan 12 bulan (PCV-3).",
+  "Imunisasi IPV": "Imunisasi IPV (Inactivated Polio Vaccine) adalah vaksin yang diberikan melalui suntikan untuk melindungi terhadap penyakit polio, yang dapat menyebabkan kelumpuhan. IPV mengandung virus polio yang telah dimatikan sehingga tidak dapat menyebabkan penyakit. Vaksin ini diberikan pada bayi usia 4 bulan (IPV-1) dan 9 bulan (IPV-2).",
+  "Imunisasi Rotavirus": "Imunisasi Rotavirus adalah vaksin yang diberikan untuk melindungi bayi dan anak-anak dari infeksi rotavirus, yang merupakan penyebab utama diare parah pada anak-anak di seluruh dunia. Vaksin ini diberikan pada usia 2 bulan (Rotavirus-1), 3 bulan (Rotavirus-2), dan 4 bulan (Rotavirus-3).",
+  "Imunisasi MR": "Imunisasi MR (Measles-Rubella) adalah vaksin yang melindungi terhadap dua penyakit menular: campak (measles) dan rubella (campak Jerman). Vaksin ini biasanya diberikan dalam dua dosis pada anak-anak pada usia 9 bulan (MR-1) dan 18 bulan (MR-2).",
+  "Imunisasi BCG": "Imunisasi BCG (Bacillus Calmette-Guérin) adalah vaksin yang digunakan untuk melindungi terhadap tuberkulosis (TB), terutama bentuk TB yang parah pada anak-anak, seperti TB meningitis dan TB milier. Vaksin ini diberikan pada bayi usia 1 bulan.",
   // Tumbang
   "Konsultasi Tumbuh Kembang Anak": "Poli Tumbang tersedia untuk anak usia 0 - 72 bulan.",
 
