@@ -209,6 +209,34 @@ export const FLOW_STEPS = {
     description: "Silahkan menuju layanan 24 jam setelah nama Anda dipanggil (di samping loket).",
     img: "/alur/28-menuju-igd.png",
     },
+    29: {
+    id: 29,
+    title: "Langkah 29",
+    name: "Menuju Nurse Station Imunisasi Lantai 3",
+    description: "Silahkan menuju nurse station imunisasi di lantai 3 (di depan tangga) dan serahkan resi pendaftaran dan buku pink",
+    img: "/alur/29-menuju-nurse-station-imunisasi.png",
+    },
+    30: {
+    id: 30,
+    title: "Langkah 30",
+    name: "Menimbang Bayi",
+    description: "Setelah nama dipanggil, bayi ditimbang dan diukur panjang badannya oleh petugas",
+    img: "/alur/30-bayi-ditimbang.png",
+    },
+    31: {
+    id: 31,
+    title: "Langkah 31",
+    name: "Imunisasi Bayi",
+    description: "Setelah nama dipanggil, silahkan masuk ke dalam ruang imunisasi untuk mendapatkan imunisasi",
+    img: "/alur/31-imunisasi-bayi.png",
+    },
+    32: {
+    id: 32,
+    title: "Langkah 32",
+    name: "Imunisasi Selesai",
+    description: "Layanan selesai, silahkan pulang dan kontrol kembali sesuai jadwal imunisasi berikutnya",
+    img: "/alur/32-layanan-imunisasi-selesai.png",
+    },
   // Tambahkan langkah baru (9, 10, dst.) tanpa mengubah struktur layanan.
 };
 
@@ -434,7 +462,7 @@ export const SERVICES_BY_FACILITY = {
       img: "poli-imunisasi.png",
       layanan: [
         {
-          nama: "Imunisasi HB0",
+          nama: "Imunisasi HB",
           ikon: "💉",
           tarif: 0,
           bpjs: true,
@@ -451,7 +479,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi DPT",
@@ -471,7 +499,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi OPV (Polio Tetes)",
@@ -491,7 +519,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi PCV",
@@ -511,7 +539,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi IPV",
@@ -531,7 +559,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi Rotavirus",
@@ -551,7 +579,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi MR",
@@ -571,7 +599,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi BCG",
@@ -591,7 +619,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 5],
+          alur: [1, 29, 30, 31, 32],
         },
       ],
     },
