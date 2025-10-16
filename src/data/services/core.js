@@ -264,6 +264,27 @@ export const FLOW_STEPS = {
     description: "Layanan telah selesai, pasien bisa pulang dan jangan lupa untuk kontrol kehamilan sesuai jadwal.",
     img: "/alur/37-layanan-imunisasi-ibu-hamil-selesai.png",
     },
+     38: {
+    id: 38,
+    title: "Langkah 38",
+    name: "Menuju Ruangan Pemeriksaan Kesehatan Haji",
+    description: "Silahkan menuju ruangan pemeriksaan kesehatan haji di lantai 2 (dari tangga/ lift belok kiri), ketuk, dan berikan resi pendaftaran kepada petugas, ikuti instruksi petugas.",
+    img: "/alur/38-menuju-poli-haji.png",
+    },
+    39: {
+    id: 39,
+    title: "Langkah 39",
+    name: "Pemeriksaan Haji",
+    description: "Silahkan masuk ke dalam ruangan pemeriksaan kesehatan haji, bila nama Anda telah dipanggil dan ikuti instruksi petugas.",
+    img: "/alur/39-pemeriksaan-haji.png",
+    },
+    40: {
+    id: 40,
+    title: "Langkah 40",
+    name: "Layanan Pemeriksaan Kesehatan Haji Selesai",
+    description: "Layanan pemeriksaan kesehatan calon jamaah haji telah selesai, silahkan menuju rumah sakit rujukan untuk pemeriksaan lebih lanjut. Jika ingin kembali lagi ke Puskesmas setelah pemeriksaan di Rumah Sakit, silahkan langsung menuju ruangan haji tanpa perlu datang ke loket.",
+    img: "/alur/40-layanan-haji-selesai.png",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -864,8 +885,6 @@ export const SERVICES_BY_FACILITY = {
         },
       ],
     },
-
-    // 🔹 Lainnya
     {
       id: "mata",
       nama: "Mata",
@@ -878,10 +897,45 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pemeriksaan Mata",
           ikon: "👁️",
-          tarif: 0,
-          bpjs: true,
-          ket: "Visus, refraksi dasar",
+          tarif: 15000,
+          bpjs: false,
+          ket: "Visus, refraksi dasar, pinhole",
+          jadwal: {
+          tz: "Asia/Jakarta",
+          weekly: {
+           Senin: "Tutup",
+           Selasa: ["08:00-12:00"],
+           Rabu: "Tutup",
+           Kamis: ["08:00-12:00"],
+           Jumat: "Tutup",
+           Sabtu: "Tutup",
+           Minggu: "Tutup",
+           },
+           exceptions: {
+          "2025-12-25": "Tutup", // libur Natal
+          "2025-12-26": "Tutup", // cuti bersama
+           },
+         },
           alur: [1, 5],
+        },
+      ],
+    },
+    {
+      id: "haji",
+      nama: "Haji",
+      klaster: "Pelayanan Medik",
+      ikon: "🕋",
+      lokasi: "Poli Haji",
+      telemed: false,
+      img: "poli-haji.png",
+      layanan: [
+        {
+          nama: "Pemeriksaan Haji",
+          ikon: "🕋",
+          tarif: 15000,
+          bpjs: false,
+          ket: "Pemeriksaan kesehatan calon jamaah haji",
+          alur: [1, 38, 39, 40],
         },
       ],
     },
