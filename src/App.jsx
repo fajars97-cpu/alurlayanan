@@ -535,7 +535,7 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
               {jadwalLayanan ? (
                 <>
                   <div><span className="text-white/50">Hari ini:</span> {today}</div>
-                  <div className="break-words"><span className="text-white/50">Ringkasan:</span> {weekly}</div>
+                  <div className="break-words"><span className="text-white/50">Jadwal Buka:</span> {weekly}</div>
                 </>
               ) : (
                 <div className="italic text-white/60">Ikuti jadwal default poli</div>

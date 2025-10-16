@@ -312,6 +312,26 @@ export const SERVICES_BY_FACILITY = {
           ket: "Pelayanan Umum 24 Jam",
           alur: [1, 5],
         },
+        {
+          nama: "Pemeriksaan Jenazah (24 Jam)",
+          ikon: "⚰️",
+          tarif: 0,
+          bpjs: true,
+          ket: "Pemeriksaan jenazah Sebelum / Sudah Dikuburkan",
+          jadwal: {
+            weekly: {
+              Senin:  "16:00-06:00",
+              Selasa: "16:00-06:00",
+              Rabu:   "16:00-06:00",
+              Kamis:  "16:00-06:00",
+              Jumat:  "16:00-06:00",
+              Sabtu:  "16:00-06:00",
+              Minggu: "16:00-06:00",
+            },
+            exceptions: {}
+          },
+          alur: [1, 5] // pakai alur ringkas; bisa diubah bila ada SOP khusus
+        },
       ],
     },
 
