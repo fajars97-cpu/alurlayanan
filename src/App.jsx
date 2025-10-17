@@ -822,19 +822,86 @@ function RightPanel({
             <p className="mb-2">
               <strong>Detail layanan:</strong> {sub.nama}
             </p>
-            {(() => {
-              const extra = sub.info ?? EXTRA_INFO[sub.nama];
-              if (extra) return <p>{linkify(extra)}</p>;
-              return (
-                <>
-                  <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-                  <p className="mt-2">
-                    Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
-                    instruksi khusus untuk layanan <em>{sub.nama}</em>.
-                  </p>
-                </>
-              );
-            })()}
+           {(() => {
+  const extra = sub.info ?? EXTRA_INFO[sub.nama];
+
+  // helper path → manfaatkan asset() yang sudah ada di file
+  const toSrc = (p) => {
+    if (!p) return null;
+    if (/^https?:\/\//.test(p)) return p;          // URL absolut
+    const clean = String(p).replace(/^\/+/, "");    // buang leading slash
+    return asset(clean);                            // gabung BASE_URL + path
+  };
+
+  if (!extra) {
+    return (
+      <>
+        <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+        <p className="mt-2">
+          Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
+          instruksi khusus untuk layanan <em>{sub.nama}</em>.
+        </p>
+      </>
+    );
+  }
+
+  // 1) STRING → tetap seperti semula
+  if (typeof extra === "string") {
+    return <p>{linkify(extra)}</p>;
+  }
+
+  // 2) ARRAY (campuran string dan {img, alt})
+  if (Array.isArray(extra)) {
+    return (
+      <div className="space-y-3">
+        {extra.map((item, i) => {
+          if (typeof item === "string") {
+            return <p key={`txt-${i}`}>{linkify(item)}</p>;
+          }
+          if (item && typeof item === "object" && item.img) {
+            return (
+              <img
+                key={`img-${i}`}
+                src={toSrc(item.img)}
+                alt={item.alt || sub.nama}
+                className="w-full rounded-xl border border-white/10"
+                onError={onInfoError}
+                loading="lazy"
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
+    );
+  }
+
+  // 3) OBJECT { text, images }
+  if (extra && typeof extra === "object") {
+    const { text, images } = extra;
+    return (
+      <div className="space-y-3">
+        {text ? <p>{linkify(text)}</p> : null}
+        {Array.isArray(images) && images.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {images.map((src, i) => (
+              <img
+                key={`img2-${i}`}
+                src={toSrc(src)}
+                alt={sub.nama}
+                className="w-full rounded-xl border border-white/10"
+                onError={onInfoError}
+                loading="lazy"
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  return null;
+})()}
           </div>
         </InfoCard>
       </div>

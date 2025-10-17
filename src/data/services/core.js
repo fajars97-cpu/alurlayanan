@@ -1091,7 +1091,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Ruang Bersalin",
           ikon: "🤱",
-          tarif: 700000-9000000,
+          tarif: 700000-900000,
           bpjs: true,
           ket: "Ruang Bersalin",
           alur: [34, 33, 5],
