@@ -109,8 +109,14 @@ export const EXTRA_INFO = {
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
   //RB
   "Ruang Bersalin": [
-    "Pelayanan dimulai pukul 16:00 hingga 06:00 (overnight).",
-    { img: "/infografis/igd.jpg", alt: "Ruang Bersalin Anggrek" },
-    { img: "/infografis/poli-catin.png", alt: "Ruang Bersalin Mawar" },
+    "Pelayanan dimulai 24 jam, setiap hari.",
+    "Bidan yang bertugas di Ruang Bersalin adalah bidan profesional dan berpengalaman.",
+    "Fasilitas lengkap untuk mendukung proses persalinan yang aman dan nyaman.",
+    "Jam besuk untuk keluarga adalah setiap hari pukul 17.00 - 18.00 WIB selain itu ibu hanya diizinkan didampingi 1 orang keluarga selama proses persalinan.",
+    "Pastikan membawa perlengkapan pribadi yang diperlukan selama di ruang bersalin.",
+    { img: "/infografis/rb1.jpg", alt: "Ruang Bersalin" },
+    { img: "/infografis/rb2.jpg", alt: "Ruang Bersalin" },
+    { img: "/infografis/rb3.jpg", alt: "Ruang Bersalin" },
+    { img: "/infografis/rb4.jpg", alt: "Ruang Bersalin" },
   ],
 };
