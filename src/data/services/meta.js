@@ -27,6 +27,7 @@ export const DOCTORS_BY_POLI = {
   uks: "Petugas UKS",
   "vaksin-dengue": "Perawat Vaksin",
   "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
+  "RB": "Bidan",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -106,4 +107,10 @@ export const EXTRA_INFO = {
   "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita: 085927002059",
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
+  //RB
+  "Ruang Bersalin": [
+    "Pelayanan dimulai pukul 16:00 hingga 06:00 (overnight).",
+    { img: "/infografis/igd.jpg", alt: "Ruang Bersalin Anggrek" },
+    { img: "/infografis/poli-catin.png", alt: "Ruang Bersalin Mawar" },
+  ],
 };

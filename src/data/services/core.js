@@ -1079,5 +1079,24 @@ export const SERVICES_BY_FACILITY = {
         },
       ],
     },
+    {
+      id: "RB",
+      nama: "Ruang Bersalin",
+      klaster: "Pelayanan Medik",
+      ikon: "🤱",
+      lokasi: "Lantai 1",
+      telemed: false,
+      img: "rb.png",
+      layanan: [
+        {
+          nama: "Ruang Bersalin",
+          ikon: "🤱",
+          tarif: 700000-9000000,
+          bpjs: true,
+          ket: "Ruang Bersalin",
+          alur: [34, 33, 5],
+        },
+      ],
+    },
   ],
 };
