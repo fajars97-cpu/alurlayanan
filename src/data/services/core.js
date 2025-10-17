@@ -5,7 +5,7 @@ export const FLOW_STEPS = {
     name: "Daftar / Loket",
     description:
       "Silahkan mendaftar di loket/pendaftaran. Serahkan identitas atau kartu BPJS bila ada.",
-    img: "/alur/1-menuju-loket.jpg",
+    img: "/alur/1-menuju-loket.png",
     audio: "/voices/alur-loket.mp3", // audio tetap didefinisikan di data
   },
   2: {
@@ -14,7 +14,7 @@ export const FLOW_STEPS = {
     name: "Menuju Kasir",
     description:
       "Silahkan menuju kasir lantai 3 untuk membayar biaya administrasi/ layanan.",
-    img: "/alur/2-menuju-kasir.jpg",
+    img: "/alur/2-menuju-kasir.png",
   },
   3: {
     id: 3,
@@ -1086,14 +1086,27 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🤱",
       lokasi: "Lantai 1",
       telemed: false,
-      img: "rb.png",
+      img: "ruang-bersalin.png",
+      
       layanan: [
         {
           nama: "Ruang Bersalin",
           ikon: "🤱",
-          tarif: 700000-900000,
+          tarif: "700.000-900.000",
           bpjs: true,
           ket: "Ruang Bersalin",
+           jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
           alur: [34, 33, 5],
         },
       ],
