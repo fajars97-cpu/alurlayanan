@@ -464,7 +464,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "KI Nifas",
       klaster: "Kebidanan",
       ikon: "🍼",
-      lokasi: "Poli KIA",
+      lokasi: "Poli Nifas",
       telemed: false,
       img: "ki-nifas.png",
       layanan: [
@@ -474,7 +474,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Pemantauan masa nifas",
-          alur: [1, 5],
+          alur: [1, 41, 42, 4, 5],
         },
       ],
     },
@@ -1092,7 +1092,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Ruang Bersalin",
           ikon: "🤱",
-          tarif: "700.000 s.d. 900.000",
+          tarif: [700000, 900000],
           bpjs: true,
           ket: "Ruang Bersalin",
            jadwal: {

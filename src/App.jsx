@@ -1,6 +1,7 @@
 // src/App.jsx
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import SurveyPopup from "./components/SurveyPopup.jsx";
 
 // === Import data ===
 import {
@@ -290,8 +291,8 @@ function Pill({ children, tone = "emerald" }) {
   );
 }
 function PricePill({ tarif }) {
-  const n = Number(tarif || 0);
-  return n === 0 ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">Rp {n.toLocaleString("id-ID")}</Pill>;
+  const label = formatTarifID(tarif);
+  return label === "Gratis" ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">{label}</Pill>;
 }
 
 function formatTarifID(t) {
@@ -1092,6 +1093,12 @@ export default function App() {
           scrollReq={scrollReq}
         />
       </div>
+
+      <SurveyPopup
+        formUrl="https://forms.gle/8phAGQay9pj7vh1CA"
+        delayMs={60000}
+        cooldownDays={14}
+      />
 
       <footer className="py-6 text-center text-white/50 text-sm">
         © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
