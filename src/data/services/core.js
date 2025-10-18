@@ -28,7 +28,7 @@ export const FLOW_STEPS = {
     title: "Langkah 4",
     name: "Menuju Farmasi",
     description:
-      "Ambil obat sesuai resep di unit farmasi lantai 1. Ikuti petunjuk penggunaan obat.",
+      "Ambil obat/suplemen sesuai resep di unit farmasi lantai 1. Ikuti instruksi petugas farmasi.",
     img: "/alur/4-menuju-farmasi.png",
   },
   5: {
@@ -285,6 +285,27 @@ export const FLOW_STEPS = {
     description: "Layanan pemeriksaan kesehatan calon jamaah haji telah selesai, silahkan menuju rumah sakit rujukan untuk pemeriksaan lebih lanjut. Jika ingin kembali lagi ke Puskesmas setelah pemeriksaan di Rumah Sakit, silahkan langsung menuju ruangan haji tanpa perlu datang ke loket.",
     img: "/alur/40-layanan-haji-selesai.png",
     },
+    41: {
+    id: 41,
+    title: "Langkah 41",
+    name: "Menuju Ruang Nifas",
+    description: "Silahkan menuju ruang nifas di lantai 1 (melewati ruang bersalin), ketuk, dan berikan resi pendaftaran kepada petugas, ikuti instruksi petugas.",
+    img: "/alur/41-menuju-ruang-nifas.png",
+    },
+    42: {
+    id: 42,
+    title: "Langkah 42",
+    name: "Melakukan Pemeriksaan Nifas",
+    description: "Silahkan melakukan pemeriksaan nifas di ruang nifas di lantai 1 (melewati ruang bersalin), ikuti instruksi petugas.",
+    img: "/alur/42-pemeriksaan-nifas.png",
+    },
+    43: {
+    id: 43,
+    title: "Langkah 43",
+    name: "Pemeriksaan Nifas Selesai",
+    description: "Pemeriksaan nifas telah selesai, jangan lupa untuk kontrol nifas sesuai jadwal/ arahan petugas.",
+    img: "/alur/43-pemeriksaan-nifas-selesai.png",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -471,9 +492,41 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pemeriksaan Ibu Nifas",
           ikon: "🍼",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Pemantauan masa nifas",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-15:00",
+              Selasa: "08:00-15:00",
+              Rabu:   "08:00-15:00",
+              Kamis:  "08:00-15:00",
+              Jumat:  "08:00-15:00",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [1, 41, 42, 4, 5],
+        },
+        {
+          nama: "Tindik/ Piercing",
+          ikon: "👂",
+          tarif: 45000,
+          bpjs: false,
+          ket: "Tindik anting telinga bayi",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-15:00",
+              Selasa: "08:00-15:00",
+              Rabu:   "08:00-15:00",
+              Kamis:  "08:00-15:00",
+              Jumat:  "08:00-15:00",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
           alur: [1, 41, 42, 4, 5],
         },
       ],
