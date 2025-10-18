@@ -13,7 +13,7 @@ export const FLOW_STEPS = {
     title: "Langkah 2",
     name: "Menuju Kasir",
     description:
-      "Silahkan menuju kasir lantai 3 untuk membayar biaya administrasi/ layanan.",
+      "Silahkan menuju kasir lantai 2 atau 3 untuk membayar biaya administrasi/layanan.",
     img: "/alur/2-menuju-kasir.png",
   },
   3: {
@@ -297,7 +297,7 @@ export const FLOW_STEPS = {
     title: "Langkah 42",
     name: "Melakukan Pemeriksaan Nifas",
     description: "Silahkan melakukan pemeriksaan nifas di ruang nifas di lantai 1 (melewati ruang bersalin), ikuti instruksi petugas.",
-    img: "/alur/42-pemeriksaan-nifas.png",
+    img: "/alur/42-pemeriksaan-ibu-nifas.png",
     },
     43: {
     id: 43,
@@ -305,6 +305,27 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Nifas Selesai",
     description: "Pemeriksaan nifas telah selesai, jangan lupa untuk kontrol nifas sesuai jadwal/ arahan petugas.",
     img: "/alur/43-pemeriksaan-nifas-selesai.png",
+    },
+    44: {
+    id: 44,
+    title: "Langkah 44",
+    name: "Menuju Ruang Bersalin",
+    description: "Silahkan menuju ruang bersalin di lantai 1, ketuk, dan berikan resi pendaftaran kepada petugas, ikuti instruksi petugas.",
+    img: "/alur/44-menuju-ruang-bersalin.png",
+    },
+    45: {
+    id: 45,
+    title: "Langkah 45",
+    name: "Proses Persalinan",
+    description: "Silahkan ikuti arahan petugas selama proses persalinan.",
+    img: "/alur/45-proses-persalinan.png",
+    },
+    46: {
+    id: 46,
+    title: "Langkah 46",
+    name: "Layanan Persalinan Selesai",
+    description: "Layanan persalinan telah selesai, silahkan ikuti arahan petugas untuk perawatan ibu dan bayi selanjutnya.",
+    img: "/alur/46-layanan-persalinan-selesai.png",
     },
 };
 
@@ -1160,7 +1181,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [34, 33, 5],
+          alur: [1, 44, 45, 46],
         },
       ],
     },
