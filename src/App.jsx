@@ -293,6 +293,30 @@ function PricePill({ tarif }) {
   const n = Number(tarif || 0);
   return n === 0 ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">Rp {n.toLocaleString("id-ID")}</Pill>;
 }
+
+function formatTarifID(t) {
+  if (t == null) return "Tidak tersedia";
+  // Range dalam array [min, max]
+  if (Array.isArray(t) && t.length === 2) {
+    const [a, b] = t.map(Number);
+    if (Number.isFinite(a) && Number.isFinite(b)) {
+      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
+    }
+  }
+  // Range dalam object { min, max } (opsional kalau mau pakai bentuk ini juga)
+  if (t && typeof t === "object" && "min" in t && "max" in t) {
+    const a = Number(t.min), b = Number(t.max);
+    if (Number.isFinite(a) && Number.isFinite(b)) {
+      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
+    }
+  }
+  // Single number
+  const n = Number(t);
+  if (Number.isFinite(n)) return n === 0 ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`;
+  // Fallback string
+  return String(t);
+}
+
 const StatusPill = ({ open }) => (
   <span
     className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
@@ -500,7 +524,7 @@ function ServiceCard({ s, onPick }) {
 function SubServiceCard({ item, onPick, parentJadwal }) {
   const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
   const bpjsClass = item.bpjs ? "text-emerald-400" : "text-rose-400";
-  const tarifText = `Tarif Umum: Rp ${Number(item.tarif || 0).toLocaleString("id-ID")}`;
+  const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
 
   const jadwalLayanan = item.jadwal || null;
   const open = isOpenNow({ jadwal: jadwalLayanan || parentJadwal });
