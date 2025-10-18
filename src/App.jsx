@@ -860,14 +860,18 @@ function RightPanel({
           }
           if (item && typeof item === "object" && item.img) {
             return (
-              <img
-                key={`img-${i}`}
-                src={toSrc(item.img)}
-                alt={item.alt || sub.nama}
-                className="w-full rounded-xl border border-white/10"
-                onError={onInfoError}
-                loading="lazy"
-              />
+              <div key={`img-${i}`} className="space-y-1">
+             <img
+                  src={toSrc(item.img)}
+                  alt={item.alt || sub.nama}
+                  className="w-full rounded-xl border border-white/10"
+                  onError={onInfoError}
+                  loading="lazy"
+                />
+  {item.alt && (
+    <div className="text-[12px] text-white/60 leading-snug">{item.alt}</div>
+  )}
+</div>
             );
           }
           return null;

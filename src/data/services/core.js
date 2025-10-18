@@ -1092,7 +1092,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Ruang Bersalin",
           ikon: "🤱",
-          tarif: "700.000-900.000",
+          tarif: "700.000 s.d. 900.000",
           bpjs: true,
           ket: "Ruang Bersalin",
            jadwal: {
