@@ -27,7 +27,8 @@ export const DOCTORS_BY_POLI = {
   uks: "Petugas UKS",
   "vaksin-dengue": "Perawat Vaksin",
   "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
-  "RB": "Bidan",
+  "RB": "Bidan Ika Nurmalasari, A.Md. Keb.",
+  ckg: "dr. Rakhmawaty",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -89,8 +90,8 @@ export const EXTRA_INFO = {
   // Gizi
   "Konsultasi Gizi": "Informasi tambahan belum tersedia.",
 
-  // Akupresur
-  "Akupresur": "Informasi tambahan belum tersedia.",
+  // KI Nifas
+  "Pemeriksaan Nifas": "Kunjungan nifas 2 (3-7 hari setelah persalinan), kunjungan nifas 3 (7-28 hari setelah persalinan), kunjungan nifas 4 (29-42 hari setelah persalinan) dilakukan di ruang nifas lantai 1, ikuti instruksi petugas.",
 
   // Kirana
   "Pemeriksaan Kirana": "Informasi tambahan belum tersedia.",
@@ -107,6 +108,9 @@ export const EXTRA_INFO = {
   "Laporan Keracunan Pangan": "Keracunan yang terjadi pada >2 orang dalam waktu hampir bersamaan, mengonsumsi makanan/minuman yang sama, dan mengalami gejala yang mirip seperti mual, muntah, diare, sakit perut. No telp pelaporan Wita: 085927002059",
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
+
+  // CKG
+  "Pemeriksaan CKG": "Pemeriksaan Kesehatan Gratis (CKG) adalah program pemerintah untuk mendeteksi dini faktor risiko penyakit tidak menular seperti hipertensi, diabetes, kolesterol tinggi, dan obesitas pada masyarakat usia 15 tahun ke atas. Pemeriksaan ini meliputi pengukuran tekanan darah, gula darah, kolesterol (sesuai faktor risiko), pemriksaan indeks massa tubuh (IMT),dan pemeriksaan lain sesuai faktor risiko dan paket pemeriksaan sesuai usia, yang disertai konseling kesehatan untuk mengelola faktor risiko penyakit yang ditemukan. Pasien disarankan untuk melakukan puasa dari pukul 10 malam dan datang pagi ke Puskesmas untuk CKG agar tidak menunggu pemeriksaan laboratorium yang terlalu lama.",
   //RB
   "Ruang Bersalin": [
     "Pelayanan dimulai 24 jam, setiap hari.",

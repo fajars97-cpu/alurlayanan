@@ -37,7 +37,7 @@ export const FLOW_STEPS = {
     name: "Selesai / Pulang",
     description:
       "Layanan selesai. Pasien boleh pulang atau mendapat instruksi kontrol berikutnya.",
-    img: "/alur/5-selesai.jpg",
+    img: "/alur/5-selesai.png",
   },
   6: {
     id: 6,
@@ -327,6 +327,55 @@ export const FLOW_STEPS = {
     description: "Layanan persalinan telah selesai, silahkan ikuti arahan petugas untuk perawatan ibu dan bayi selanjutnya.",
     img: "/alur/46-layanan-persalinan-selesai.png",
     },
+    47: {
+    id: 47,
+    title: "Langkah 47",
+    name: "Menuju Ruang Pemeriksaaan CKG",
+    description: "Silahkan menuju ruang pemeriksaan CKG di lantai 3 (dibalik nurse station), yang bertempat di ruang sanitasi, silahkan memasuki ruangan pemeriksaan jika nama Anda telah dipanggil.",
+    img: "/alur/47-menuju-ruang-pemeriksaan-ckg.png",
+    },
+    48: {
+    id: 48,
+    title: "Langkah 48",
+    name: "Pemeriksaan CKG",
+    description: "Silahkan melakukan pemeriksaan CKG di ruang pemeriksaan CKG, ikuti instruksi petugas.",
+    img: "/alur/48-melakukan-pemeriksaan-ckg.png",
+    },
+    49: {
+    id: 49,
+    title: "Langkah 49",
+    name: "Pemeriksaan darah di Lab",
+    description: "Silahkan menuju laboratorium di lantai 3 untuk pengambilan sampel darah, taruh kertas antrian di box yang tersedia, tunggu panggilan.",
+    img: "/alur/49-menuju-lab-ckg.png",
+    },
+    50: {
+    id: 50,
+    title: "Langkah 50",
+    name: "Pemeriksaan darah di Lab",
+    description: "Silahkan masuk ke dalam ruang pengambilan darah di laboratorium setelah nama Anda dipanggil, ikuti instruksi petugas.",
+    img: "/alur/50-cek-lab-ckg.png",
+    },
+    51: {
+    id: 51,
+    title: "Langkah 51",
+    name: "Pemeriksaan CKG Selesai",
+    description: "Pemeriksaan CKG telah selesai, jangan lupa untuk kontrol kembali sesuai jadwal/ arahan petugas.",
+    img: "/alur/51-layanan-ckg-selesai.png",
+    },
+    52: {
+    id: 52,
+    title: "Langkah 52",
+    name: "Pemeriksaan Refraksi Mata",
+    description: "Silahkan melakukan pemeriksaan refraksi mata di ruang pemeriksaan mata, ikuti instruksi petugas.",
+    img: "/alur/52-pemeriksaan-mata.png",
+    },
+    53: {
+    id: 53,
+    title: "Langkah 53",
+    name: "Baca Hasil Pemeriksaan Darah CKG",
+    description: "Silahkan menuju ruang pemeriksaan CKG di lantai 3 (dibalik nurse station), yang bertempat di ruang sanitasi, silahkan ketuk dan berikan hasil pemeriksaan darah Anda kepada petugas.",
+    img: "/alur/53-baca-hasil-ckg.png",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -528,7 +577,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 41, 42, 4, 5],
+          alur: [1, 41, 42, 4, 43],
         },
         {
           nama: "Tindik/ Piercing",
@@ -1149,7 +1198,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Program CKG",
-          alur: [34, 33, 5],
+          alur: [34, 33, 47, 48, 49, 50, 53, 51],
         },
       ],
     },
