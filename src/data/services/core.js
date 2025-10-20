@@ -396,7 +396,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🩺",
       lokasi: "Lantai 1 — Ruang 101",
       telemed: true,
-      img: "poli-umum.png",
+      img: "poli-umum.webp",
       layanan: [
         {
           nama: "Pemeriksaan Dokter Umum",
@@ -427,7 +427,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🦷",
       lokasi: "Lantai 1 — Ruang 103",
       telemed: false,
-      img: "poli-gigi.jpg",
+      img: "poli-gigi.webp",
       layanan: [
         {
           nama: "Cabut Gigi",
@@ -454,7 +454,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🚑",
       lokasi: "Lantai Dasar — IGD",
       telemed: false,
-      img: "igd.jpg",
+      img: "igd.webp",
       layanan: [
         {
           nama: "Tindakan Darurat",
@@ -485,7 +485,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🚑",
       lokasi: "Lantai Dasar — IGD",
       telemed: false,
-      img: "igd.jpg",
+      img: "igd.webp",
       layanan: [
         {
           nama: "Layanan 24 jam",
@@ -538,7 +538,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🤰",
       lokasi: "Poli KIA",
       telemed: false,
-      img: "ki-hamil.png",
+      img: "ki-hamil.webp",
       layanan: [
         {
           nama: "Pemeriksaan Ibu Hamil",
@@ -557,7 +557,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🍼",
       lokasi: "Poli Nifas",
       telemed: false,
-      img: "ki-nifas.png",
+      img: "ki-nifas.webp",
       layanan: [
         {
           nama: "Pemeriksaan Ibu Nifas",
@@ -608,7 +608,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "💍",
       lokasi: "Poli KIA",
       telemed: false,
-      img: "poli-catin.png",
+      img: "poli-catin.webp",
       layanan: [
         {
           nama: "Pemeriksaan Calon Pengantin",
@@ -627,7 +627,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "💉",
       lokasi: "Ruang Imunisasi",
       telemed: false,
-      img: "poli-imunisasi.png",
+      img: "poli-imunisasi.webp",
       layanan: [
         {
           nama: "Imunisasi HB",
@@ -821,7 +821,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "👩‍⚕️",
       lokasi: "Poli KIA",
       telemed: false,
-      img: "poli-kb.png",
+      img: "poli-kb.webp",
       layanan: [
         {
           nama: "Konseling KB & IVA",
@@ -840,7 +840,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧒",
       lokasi: "Poli Anak",
       telemed: false,
-      img: "poli-tumbang.png",
+      img: "poli-tumbang.webp",
       layanan: [
     {
       nama: "Konsultasi Tumbuh Kembang Anak",
@@ -878,7 +878,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "👶",
       lokasi: "Poli Anak",
       telemed: false,
-      img: "poli-mtbs.png",
+      img: "poli-mtbs.webp",
       layanan: [
         {
           nama: "Manajemen Terpadu Balita Sakit",
@@ -899,7 +899,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🎒",
       lokasi: "Poli Remaja",
       telemed: false,
-      img: "poli-pkpr.png",
+      img: "poli-pkpr.webp",
       layanan: [
         {
           nama: "Pelayanan Kesehatan Peduli Remaja",
@@ -918,7 +918,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧓",
       lokasi: "Poli Lansia",
       telemed: false,
-      img: "poli-lansia.png",
+      img: "poli-lansia.webp",
       layanan: [
         {
           nama: "Pelayanan Kesehatan Lansia",
@@ -939,7 +939,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "❤️‍🩹",
       lokasi: "Poli PTM",
       telemed: false,
-      img: "poli-ptm.png",
+      img: "poli-ptm.webp",
       layanan: [
         {
           nama: "Konsultasi PTM",
@@ -958,7 +958,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧫",
       lokasi: "Poli PM",
       telemed: false,
-      img: "poli-pm.png",
+      img: "poli-pm.webp",
       layanan: [
         {
           nama: "Konsultasi Penyakit Menular",
@@ -977,7 +977,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "⚕️",
       lokasi: "Poli IMS",
       telemed: false,
-      img: "poli-ims.png",
+      img: "poli-ims.webp",
       layanan: [
         {
           nama: "Infeksi Menular Seksual",
@@ -996,7 +996,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🫁",
       lokasi: "Poli ISPA",
       telemed: false,
-      img: "poli-pm.png",
+      img: "poli-pm.webp",
       layanan: [
         {
           nama: "Infeksi Saluran Pernafasan Akut",
@@ -1015,7 +1015,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "👁️",
       lokasi: "Poli Mata",
       telemed: false,
-      img: "poli-mata.png",
+      img: "poli-mata.webp",
       layanan: [
         {
           nama: "Pemeriksaan Mata",
@@ -1050,7 +1050,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🕋",
       lokasi: "Poli Haji",
       telemed: false,
-      img: "poli-haji.png",
+      img: "poli-haji.webp",
       layanan: [
         {
           nama: "Pemeriksaan Haji",
@@ -1069,7 +1069,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🥗",
       lokasi: "Poli Gizi",
       telemed: true,
-      img: "poli-gizi.png",
+      img: "poli-gizi.webp",
       layanan: [
         {
           nama: "Konseling Gizi",
@@ -1088,7 +1088,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧠",
       lokasi: "Unit Konseling",
       telemed: true,
-      img: "poli-kirana.png",
+      img: "poli-kirana.webp",
       layanan: [
         {
           nama: "Konseling Psikososial",
@@ -1107,7 +1107,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🧼",
       lokasi: "Kesehatan Lingkungan & Surveilans",
       telemed: false,
-      img: "kesehatan-lingkungan.png",
+      img: "kesehatan-lingkungan.webp",
       layanan: [
         {
           nama: "Klinik Sanitasi",
@@ -1190,7 +1190,7 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🩺",
       lokasi: "Lantai 3",
       telemed: false,
-      img: "poli-ckg.png",
+      img: "poli-ckg.webp",
       layanan: [
         {
           nama: "Cek Kesehatan Gratis",
