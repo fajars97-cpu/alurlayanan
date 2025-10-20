@@ -1,56 +1,16 @@
-import { useEffect, useState } from "react";
-
-/** Baca preferensi awal: localStorage → sistem */
-function getInitial() {
-  try {
-    const ls = localStorage.getItem("theme");
-    if (ls === "light" || ls === "dark") return ls;
-  } catch {}
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-/** Terapkan ke <html> + simpan ke localStorage */
-function applyTheme(next) {
-  const root = document.documentElement; // <html>
-  if (next === "dark") root.classList.add("dark");
-  else root.classList.remove("dark");
-  try {
-    localStorage.setItem("theme", next);
-  } catch {}
-}
-
 export default function ThemeToggle({ className = "" }) {
-  const [theme, setTheme] = useState(getInitial);
+  function toggle() {
+    const root = document.documentElement;
+    const nextIsDark = !root.classList.contains("dark");
+    root.classList.toggle("dark", nextIsDark);
+    try {
+      localStorage.setItem("theme", nextIsDark ? "dark" : "light");
+    } catch {}
+  }
 
-  // apply saat mount dan ketika theme berubah
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
-
-  // Kalau user BELUM mengatur (tidak ada localStorage), ikuti sistem secara live
-  useEffect(() => {
-    const ls = localStorage.getItem("theme");
-    if (ls === "light" || ls === "dark") return; // user override → jangan ikut sistem
-
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      const next = mq.matches ? "dark" : "light";
-      setTheme(next);        // state
-      applyTheme(next);      // jaga konsistensi
-    };
-    // listener modern
-    mq.addEventListener?.("change", onChange);
-    // fallback browser lama
-    mq.addListener?.(onChange);
-
-    return () => {
-      mq.removeEventListener?.("change", onChange);
-      mq.removeListener?.(onChange);
-    };
-  }, []);
-
-  const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
-  const isDark = theme === "dark";
+  const isDark =
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark");
 
   return (
     <button
