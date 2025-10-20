@@ -34,7 +34,11 @@ export const DOCTORS_BY_POLI = {
 /* ===================== Info Tambahan (contoh) ===================== */
 export const EXTRA_INFO = {
   // Poli Umum
-  "Pemeriksaan Umum": "Informasi tambahan belum tersedia.",
+  "Pemeriksaan Umum": [
+    "Silahkan memilih fasilitas kesehatan rujukan tingkat lanjut sesuai kebutuhan Anda.",
+    { img: "/infografis/fkrtl.webp", alt: "Fasilitas Kesehatan Rujukan Tingkat Lanjut" },
+  ],
+
   "Kontrol Berkala": "Informasi tambahan belum tersedia.",
 
   // Poli Gigi
