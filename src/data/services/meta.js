@@ -38,7 +38,6 @@ export const EXTRA_INFO = {
     "Silahkan memilih fasilitas kesehatan rujukan tingkat lanjut sesuai kebutuhan Anda.",
     { img: "/infografis/fkrtl.webp", alt: "Fasilitas Kesehatan Rujukan Tingkat Lanjut" },
   ],
-
   "Kontrol Berkala": "Informasi tambahan belum tersedia.",
 
   // Poli Gigi
@@ -89,7 +88,7 @@ export const EXTRA_INFO = {
   "Pemeriksaan ISPA": "Informasi tambahan belum tersedia.",
 
   // Mata
-  "Pemeriksaan Mata": "Informasi tambahan belum tersedia.",
+  "Pemeriksaan Mata": "Pemeriksaan refraksi mata, pinhole, dan koreksi lensa. Bila ditemukan kelainan mata yang memerlukan penanganan lebih lanjut, pasien akan dirujuk ke dokter spesialis mata di rumah sakit rujukan.",
 
   // Gizi
   "Konsultasi Gizi": "Informasi tambahan belum tersedia.",
