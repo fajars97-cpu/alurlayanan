@@ -2,6 +2,7 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
+import ThemeToggle from "./components/ThemeToggle.jsx";
 
 // === Import data ===
 import {
@@ -1011,7 +1012,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-b 
+                  from-white via-slate-50 to-slate-100 text-slate-900
+                  dark:from-slate-900 dark:via-slate-950 dark:to-black dark:text-white">
       <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
           <button
@@ -1026,7 +1029,7 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
-            <div className="font-semibold">Penampil Jadwal & Tarif Layanan</div>
+            <div className="font-semibold">Informasi Layanan Puskesmas Jagakarsa</div>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
@@ -1042,6 +1045,9 @@ export default function App() {
                 </option>
               ))}
             </select>
+
+            <ThemeToggle />
+
           </div>
         </div>
       </header>

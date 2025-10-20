@@ -4,8 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Puskesmas Jadwal</title>
-    <script type="module" crossorigin src="/alurlayanan/assets/index-YmSANmXL.js"></script>
-    <link rel="stylesheet" crossorigin href="/alurlayanan/assets/index-CjOePQy1.css">
+
+    <!-- Anti-FOUC: set tema sebelum CSS/JS dimuat -->
+    <script>
+      (function () {
+        try {
+          const ls = localStorage.getItem("theme");
+          const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const useDark = ls ? (ls === "dark") : systemDark;
+          if (useDark) document.documentElement.classList.add("dark");
+          else document.documentElement.classList.remove("dark");
+        } catch (e) {
+          // jika browser memblok localStorage, fallback ke sistem
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            document.documentElement.classList.add("dark");
+          }
+        }
+      })();
+    </script>
+    <!-- Opsional, bantu browser pilih palet -->
+    <meta name="color-scheme" content="light dark" />
+    <script type="module" crossorigin src="/alurlayanan/assets/index-ByFXcg6m.js"></script>
+    <link rel="stylesheet" crossorigin href="/alurlayanan/assets/index-C4II2KP6.css">
   </head>
   <body>
     <div id="root"></div>
