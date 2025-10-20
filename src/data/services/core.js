@@ -397,6 +397,13 @@ export const FLOW_STEPS = {
     description: "Pemeriksaan telah selsai, pasien dan keluarga bisa pulang.",
     img: "/alur/56-selesai-bapak-anak-laki.png",
     },
+    57: {
+    id: 57,
+    title: "Langkah 57",
+    name: "Proses Tindik",
+    description: "Silahkkan ikuti arahan petugas selama proses tindik.",
+    img: "/alur/57-proses-tindik.png",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -618,7 +625,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 41, 42, 4, 5],
+          alur: [1, 41, 57, 4, 5],
         },
       ],
     },
