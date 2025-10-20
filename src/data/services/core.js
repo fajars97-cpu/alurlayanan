@@ -394,7 +394,7 @@ export const FLOW_STEPS = {
     id: 56,
     title: "Langkah 56",
     name: "Pemeriksaan Selesai Anak Laki-Laki",
-    description: "Pemeriksaan telah selsai, pasien dan keluarga bisa pulang.",
+    description: "Pemeriksaan telah selesai, pasien dan keluarga bisa pulang.",
     img: "/alur/56-selesai-bapak-anak-laki.png",
     },
     57: {
@@ -403,6 +403,27 @@ export const FLOW_STEPS = {
     name: "Proses Tindik",
     description: "Silahkkan ikuti arahan petugas selama proses tindik.",
     img: "/alur/57-proses-tindik.png",
+    },
+    58: {
+    id: 58,
+    title: "Langkah 58",
+    name: "Menuju Ruang Pemeriksaan Lansia",
+    description: "Silahkan menuju ruang pemeriksaan lansia di lantai 1 di IGD (samping loket), silahkan memasuki ruangan pemeriksaan jika nama Anda telah dipanggil.",
+    img: "/alur/58-menuju-ruang-pemeriksaan-lansia.webp",
+    },
+    59: {
+    id: 59,
+    title: "Langkah 59",
+    name: "Pemeriksaan Lansia",
+    description: "Silahkan masuk ke dalam ruang pemeriksaan lansia setelah nama Anda dipanggil, ikuti instruksi petugas",
+    img: "/alur/59-pemeriksaan-lansia.png",
+    },
+    60: {
+    id: 60,
+    title: "Langkah 60",
+    name: "Layanan Pemeriksaan Lansia Selesai",
+    description: "Layanan pemeriksaan lansia telah selesai, silahkan pulang dan jangan lupa untuk kontrol lansia sesuai jadwal/ arahan petugas.",
+    img: "/alur/60-lansia-pulang.png",
     },
 };
 
@@ -954,7 +975,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Skrining & kontrol",
-          alur: [1, 5],
+          alur: [1, , 58 , 59, 4, 60],
         },
       ],
     },
