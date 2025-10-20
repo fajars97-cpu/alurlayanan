@@ -57,7 +57,7 @@ function linkify(text) {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-emerald-400 underline hover:text-emerald-300"
+          className="text-emerald-600 underline hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
         >
           {url}
         </a>
@@ -237,7 +237,7 @@ function poliOpenAny(poli) {
 /* ====== Jadwal helpers untuk kartu layanan ====== */
 const TODAY = () => DAY_NAMES_ID[new Date().getDay()];
 function summarizeWeekly(jadwalLike) {
-    // Ringkas HANYA hari yang buka (lewati "Tutup")
+  // Ringkas HANYA hari yang buka (lewati "Tutup")
   const eff = getEffectiveJadwal({ jadwal: jadwalLike });
   const short = (d) => d.slice(0, 3);
   // Buat daftar hanya hari buka dalam urutan Minggu..Sabtu
@@ -273,15 +273,15 @@ function todayText(jadwalLike) {
 
 /* ===================== UI kecil ===================== */
 const Chip = ({ children }) => (
-  <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 whitespace-nowrap">
+  <span className="text-xs px-2 py-1 rounded-full bg-slate-200/70 border border-black/10 text-slate-800 whitespace-nowrap dark:bg-white/8 dark:border-white/10 dark:text-white/80">
     {children}
   </span>
 );
 function Pill({ children, tone = "emerald" }) {
   const tones = {
-    emerald: "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30",
-    sky: "bg-sky-500/15     text-sky-300     ring-1 ring-sky-400/30",
-    slate: "bg-white/8        text-white/80    ring-1 ring-white/12",
+    emerald: "bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-600/20 dark:text-emerald-300 dark:ring-emerald-400/30",
+    sky: "bg-sky-500/15     text-sky-700     ring-1 ring-sky-600/20     dark:text-sky-300     dark:ring-sky-400/30",
+    slate: "bg-slate-200/70   text-slate-800   ring-1 ring-black/10       dark:bg-white/8        dark:text-white/80 dark:ring-white/12",
   };
   return (
     <span
@@ -291,40 +291,34 @@ function Pill({ children, tone = "emerald" }) {
     </span>
   );
 }
-function PricePill({ tarif }) {
-  const label = formatTarifID(tarif);
-  return label === "Gratis" ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">{label}</Pill>;
-}
-
 function formatTarifID(t) {
   if (t == null) return "Tidak tersedia";
-  // Range dalam array [min, max]
   if (Array.isArray(t) && t.length === 2) {
     const [a, b] = t.map(Number);
     if (Number.isFinite(a) && Number.isFinite(b)) {
       return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
     }
   }
-  // Range dalam object { min, max } (opsional kalau mau pakai bentuk ini juga)
   if (t && typeof t === "object" && "min" in t && "max" in t) {
     const a = Number(t.min), b = Number(t.max);
     if (Number.isFinite(a) && Number.isFinite(b)) {
       return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
     }
   }
-  // Single number
   const n = Number(t);
   if (Number.isFinite(n)) return n === 0 ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`;
-  // Fallback string
   return String(t);
 }
-
+function PricePill({ tarif }) {
+  const label = formatTarifID(tarif);
+  return label === "Gratis" ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">{label}</Pill>;
+}
 const StatusPill = ({ open }) => (
   <span
     className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
       open
-        ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300"
-        : "bg-rose-500/10 border-rose-400/30 text-rose-300"
+        ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-700 dark:text-emerald-300"
+        : "bg-rose-500/10 border-rose-400/30 text-rose-700 dark:text-rose-300"
     }`}
   >
     {open ? "Buka" : "Tutup"}
@@ -350,47 +344,51 @@ function Sidebar({
 
   return (
     <aside
-      className={`
+      className="
         w-full md:w-80 shrink-0
-        bg-slate-950/70 backdrop-blur border-r border-white/10
+        bg-white/70 dark:bg-slate-950/70 backdrop-blur
+        border-r border-black/5 dark:border-white/10
         flex flex-col
         h-full md:h-[calc(100svh-56px)]
-      `}
+        transition-colors duration-300
+      "
     >
-      <div className="p-4 flex items-center gap-2 border-b border-white/10">
+      <div className="p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10">
         <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
-        <div className="font-semibold truncate">Jadwal & Tarif</div>
+        <div className="font-semibold truncate text-slate-900 dark:text-white">Jadwal & Tarif</div>
       </div>
 
-      <div className="px-4 pt-3 text-xs text-white/60">
-        Fasilitas: <span className="text-white/90 font-medium">{facilityName}</span>
+      <div className="px-4 pt-3 text-xs text-slate-700 dark:text-white/70">
+        Fasilitas: <span className="text-slate-900 font-medium dark:text-white">{facilityName}</span>
       </div>
 
       <div className="p-4 space-y-3">
-        <label className="text-xs uppercase text-white/50">Pencarian</label>
+        <label className="text-xs uppercase text-slate-600 dark:text-white/50">Pencarian</label>
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cari 'umum', 'gigi', 'cabut gigi' ..."
-          className="w-full h-11 px-3 rounded-xl bg-white/5 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
+          className="w-full h-11 px-3 rounded-xl
+          bg-white text-slate-900 border border-black/10
+          dark:bg-white/5 dark:text-white dark:border-white/10
+          outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
         />
       </div>
 
       <div
-        className={`
+        className="
           px-4 pb-2 space-y-2
           overflow-y-auto overscroll-contain
           [scrollbar-width:thin]
           md:max-h-[28rem]
           flex-1
-        `}
+        "
       >
-        <div className="text-xs uppercase text-white/50 mb-2">Daftar Poli</div>
+        <div className="text-xs uppercase text-slate-600 dark:text-white/50 mb-2">Daftar Poli</div>
 
         {services.map((s) => {
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
-
           const open = poliOpenAny(s);
 
           const schedList = schedulesForPoli(s);
@@ -409,34 +407,34 @@ function Sidebar({
             <div key={s.id} className="space-y-2">
               <button
                 onClick={() => toggle(s)}
-                className={`group w-full text-left p-3 rounded-xl border transition hover:bg-white/5 ${
-                  selected?.id === s.id
-                    ? "border-emerald-500/60 bg-emerald-500/10"
-                    : hl
-                    ? "border-emerald-400 bg-emerald-400/10"
-                    : "border-white/10"
-                }`}
+                className={`group w-full text-left p-3 rounded-xl border transition
+                ${selected?.id === s.id
+                  ? "bg-emerald-500/10 border-emerald-500/60"
+                  : hl
+                  ? "bg-emerald-400/10 border-emerald-400/50"
+                  : "bg-slate-100/70 border-black/10 dark:bg-white/5 dark:border-white/10"}
+                hover:bg-slate-200/80 dark:hover:bg-white/8`}
               >
                 <div className="flex items-center gap-3">
                   <div className="text-lg">{s.ikon}</div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-medium truncate">{s.nama}</div>
-                    <div className="text-xs text-white/60 truncate">{s.klaster}</div>
+                    <div className="font-medium truncate text-slate-900 dark:text-white">{s.nama}</div>
+                    <div className="text-xs text-slate-600 dark:text-white/60 truncate">{s.klaster}</div>
                   </div>
                   <StatusPill open={open} />
                 </div>
               </button>
 
               {active && (
-                <div className="mx-2 mb-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
-                  <div className="text-white/60 mb-2">Jadwal</div>
+                <div className="mx-2 mb-2 rounded-xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 p-3 text-sm">
+                  <div className="text-slate-700 dark:text-white/60 mb-2">Jadwal</div>
 
                   {/* 1) Tidak ada jadwal khusus sama sekali → tampilkan default */}
                   {uniqueSchedules.length === 0 && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[13px] text-white/70">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[13px] text-slate-800 dark:text-white/70">
                       {DAY_NAMES_ID.map((d) => (
                         <React.Fragment key={d}>
-                          <span className="text-white/50">{d}</span>
+                          <span className="text-slate-500 dark:text-white/50">{d}</span>
                           <span>{getEffectiveJadwal({})[d]}</span>
                         </React.Fragment>
                       ))}
@@ -445,10 +443,10 @@ function Sidebar({
 
                   {/* 2) Semua sama → tabel ringkas (lama) */}
                   {uniqueSchedules.length === 1 && uniqueSchedules[0].length > 0 && !singleServiceSchedule && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-slate-800 dark:text-white/70">
                       {DAY_NAMES_ID.map((d) => (
                         <React.Fragment key={d}>
-                          <span className="text-white/50">{d}</span>
+                          <span className="text-slate-500 dark:text-white/50">{d}</span>
                           <span>
                             {getEffectiveJadwal({ jadwal: uniqueSchedules[0][0].jadwal })[d]}
                           </span>
@@ -459,10 +457,10 @@ function Sidebar({
 
                   {/* 3) Poli dengan satu layanan yang punya jadwal khusus → tampilkan tabel layanan itu */}
                   {singleServiceSchedule && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-white/70">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-slate-800 dark:text-white/70">
                       {DAY_NAMES_ID.map((d) => (
                         <React.Fragment key={d}>
-                          <span className="text-white/50">{d}</span>
+                          <span className="text-slate-500 dark:text-white/50">{d}</span>
                           <span>{getEffectiveJadwal({ jadwal: singleServiceSchedule })[d]}</span>
                         </React.Fragment>
                       ))}
@@ -477,7 +475,7 @@ function Sidebar({
                         onPick(s);                 // pastikan poli terpilih
                         onScrollToServices?.(s.id); // trigger scroll di panel kanan
                       }}
-                      className="w-full text-left text-[12px] text-amber-300/90 hover:text-amber-200 underline underline-offset-2"
+                      className="w-full text-left text-[12px] text-amber-700 hover:text-amber-600 underline underline-offset-2 dark:text-amber-300 dark:hover:text-amber-200"
                       aria-label={`Jadwal beragam untuk ${s.nama}. Klik untuk menuju daftar layanan.`}
                     >
                       Jadwal beragam — <span className="font-semibold">cek tiap layanan untuk jadwal</span>
@@ -498,9 +496,13 @@ function ServiceCard({ s, onPick }) {
   return (
     <button
       onClick={() => onPick(s)}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 active:scale-[.98] transition text-left touch-manipulation"
+      className="group relative overflow-hidden rounded-2xl border
+      border-black/10 dark:border-white/10
+      bg-slate-100/70 dark:bg-white/5
+      hover:bg-slate-200/80 dark:hover:bg-white/10
+      active:scale-[.98] transition text-left touch-manipulation"
     >
-      <div className="w-full bg-slate-900/40">
+      <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="h-36 sm:h-44 md:h-48 lg:h-52 grid place-items-center p-2 sm:p-3">
           <img
             src={resolveInfografis(s)}
@@ -514,9 +516,9 @@ function ServiceCard({ s, onPick }) {
       <div className="p-3">
         <div className="flex items-center gap-2">
           <div className="text-xl">{s.ikon}</div>
-          <div className="font-semibold truncate">{s.nama}</div>
+          <div className="font-semibold truncate text-slate-900 dark:text-white">{s.nama}</div>
         </div>
-        <div className="text-xs text-white/60 mt-1 truncate">{s.klaster}</div>
+        <div className="text-xs text-slate-600 mt-1 truncate dark:text-white/60">{s.klaster}</div>
       </div>
     </button>
   );
@@ -525,7 +527,7 @@ function ServiceCard({ s, onPick }) {
 /* SubServiceCard */
 function SubServiceCard({ item, onPick, parentJadwal }) {
   const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
-  const bpjsClass = item.bpjs ? "text-emerald-400" : "text-rose-400";
+  const bpjsClass = item.bpjs ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
 
   const jadwalLayanan = item.jadwal || null;
@@ -536,35 +538,45 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
   return (
     <button
       onClick={() => onPick(item)}
-      className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 ring-0 hover:ring-1 hover:ring-white/15 transition-all shadow-sm hover:shadow active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      className="relative w-full text-left rounded-2xl border
+      border-black/10 dark:border-white/10
+      bg-slate-100/70 dark:bg-white/5
+      hover:bg-slate-200/80 dark:hover:bg-white/8
+      ring-0 hover:ring-1 hover:ring-black/10 dark:hover:ring-white/15
+      transition-all shadow-sm hover:shadow active:scale-[.99]
+      focus:outline-none focus:ring-2 focus:ring-emerald-500"
     >
       <div className="p-4 sm:p-5 space-y-3">
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
           <span className={bpjsClass}>{bpjsText}</span>
           <span className="ml-auto"><StatusPill open={open} /></span>
         </div>
-        <div className="text-[12px] sm:text-[13px] text-white/70 -mt-2">{tarifText}</div>
-        <div className="h-px bg-white/10" />
+        <div className="text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">{tarifText}</div>
+        <div className="h-px bg-black/10 dark:bg-white/10" />
         <div className="flex items-start gap-3">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
           <div className="min-w-0 flex-1">
-            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-white">
+            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-slate-900 dark:text-white">
               {item.nama}
             </div>
             {item.ket && (
-              <div className="text-[13px] sm:text-sm text-white/70 mt-1 line-clamp-3">
+              <div className="text-[13px] sm:text-sm text-slate-600 dark:text-white/70 mt-1 line-clamp-3">
                 {item.ket}
               </div>
             )}
             {/* Jadwal ringkas per layanan */}
-            <div className="mt-2 text-[12px] sm:text-[13px] text-white/70 leading-snug">
+            <div className="mt-2 text-[12px] sm:text-[13px] leading-snug">
               {jadwalLayanan ? (
                 <>
-                  <div><span className="text-white/50">Hari ini:</span> {today}</div>
-                  <div className="break-words"><span className="text-white/50">Jadwal Buka:</span> {weekly}</div>
+                  <div className="text-slate-700 dark:text-white/70">
+                    <span className="text-slate-600 dark:text-white/50">Hari Ini:</span> {today}
+                  </div>
+                  <div className="break-words text-slate-700 dark:text-white/70">
+                    <span className="text-slate-600 dark:text-white/50">Jadwal Buka:</span> {weekly}
+                  </div>
                 </>
               ) : (
-                <div className="italic text-white/60">Ikuti jadwal default poli</div>
+                <div className="italic text-slate-600 dark:text-white/60">Ikuti jadwal default poli</div>
               )}
             </div>
           </div>
@@ -612,10 +624,10 @@ function FlowCard({ step, index }) {
     <button
       type="button"
       onClick={playNarration}
-      className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden text-left hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      className="rounded-2xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 overflow-hidden text-left hover:bg-slate-200/80 dark:hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
       aria-label={`Langkah ${index + 1} — ketuk untuk narasi, ketuk cepat 2x untuk ulang`}
     >
-      <div className="px-3 pt-2 text-[11px] text-white/50">Langkah {index + 1}</div>
+      <div className="px-3 pt-2 text-[11px] text-slate-600 dark:text-white/50">Langkah {index + 1}</div>
       <div className="p-2 sm:p-3 flex items-center justify-center">
         {src ? (
           <img
@@ -625,13 +637,13 @@ function FlowCard({ step, index }) {
             className="block max-w-full max-h-[12rem] md:max-h-[14rem] object-contain"
           />
         ) : (
-          <div className="w-full aspect-[4/3] grid place-items-center text-white/30 text-sm">—</div>
+          <div className="w-full aspect-[4/3] grid place-items-center text-slate-400 dark:text-white/30 text-sm">—</div>
         )}
       </div>
       {(step?.name || step?.description) && (
         <div className="px-3 pb-3">
-          {step?.name && <div className="text-sm font-semibold text-white">{step.name}</div>}
-          {step?.description && <p className="text-xs text-white/70 mt-1">{step.description}</p>}
+          {step?.name && <div className="text-sm font-semibold text-slate-900 dark:text-white">{step.name}</div>}
+          {step?.description && <p className="text-xs text-slate-700 dark:text-white/70 mt-1">{step.description}</p>}
         </div>
       )}
     </button>
@@ -641,9 +653,11 @@ function FlowCard({ step, index }) {
 /* ===================== Info Card ===================== */
 function InfoCard({ title, children }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-      <div className="text-sm uppercase tracking-wide text-white/60 mb-2">{title}</div>
-      <div className="prose prose-invert max-w-none text-sm leading-relaxed">{children}</div>
+    <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 p-4 sm:p-5 transition-colors duration-300">
+      <div className="text-sm uppercase tracking-wide text-slate-600 dark:text-white/60 mb-2">{title}</div>
+      <div className="prose max-w-none text-slate-800 dark:prose-invert dark:text-slate-300 text-sm leading-relaxed">
+        {children}
+      </div>
     </div>
   );
 }
@@ -708,11 +722,11 @@ function RightPanel({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.2 }}
           >
             {showSearchResults ? (
               <section className="mb-6">
-                <div className="mb-2 text-white/70">Hasil Pelayanan</div>
+                <div className="mb-2 text-slate-700 dark:text-white/70">Hasil Pelayanan</div>
                 <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
                     <SubServiceCard
@@ -726,7 +740,7 @@ function RightPanel({
               </section>
             ) : (
               <>
-                <div className="mb-3 text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
+                <div className="mb-3 text-slate-700 dark:text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filtered.map((s) => (
                     <ServiceCard key={s.id} s={s} onPick={setSelected} />
@@ -750,7 +764,7 @@ function RightPanel({
               stopFlowAudio();
               setSelected(null);
             }}
-            className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
+            className="px-3 py-2.5 rounded-xl bg-slate-200/70 border border-black/10 hover:bg-slate-200/90 dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20 transition-colors"
           >
             ← Kembali
           </button>
@@ -758,14 +772,14 @@ function RightPanel({
 
         <div className="flex items-center gap-3">
           <div className="text-2xl">{selected.ikon}</div>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{selected.nama}</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">{selected.nama}</h2>
           <div className="ml-auto flex gap-2">
             <Chip>{selected.klaster}</Chip>
             {selected.telemed && <Chip>Telemed</Chip>}
           </div>
         </div>
 
-        <div className="mb-1 text-white/70">Jenis Layanan — {selected.nama}</div>
+        <div className="mb-1 text-slate-700 dark:text-white/70">Jenis Layanan — {selected.nama}</div>
         <div
           ref={servicesGridRef}
           className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
@@ -775,7 +789,7 @@ function RightPanel({
               <SubServiceCard key={i} item={it} onPick={setSub} parentJadwal={selected.jadwal} />
             ))
           ) : (
-            <div className="text-white/60">Belum ada jenis layanan terdaftar.</div>
+            <div className="text-slate-600 dark:text-white/60">Belum ada jenis layanan terdaftar.</div>
           )}
         </div>
       </div>
@@ -790,7 +804,7 @@ function RightPanel({
             stopFlowAudio();
             setSub(null);
           }}
-          className="px-3 py-2.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20"
+          className="px-3 py-2.5 rounded-xl bg-slate-200/70 border border-black/10 hover:bg-slate-200/90 dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20 transition-colors"
         >
           ← Kembali
         </button>
@@ -798,7 +812,7 @@ function RightPanel({
 
       <div className="flex items-center gap-3">
         <div className="text-2xl">{selected.ikon}</div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">
           {selected.nama} — {sub.nama}
         </h2>
         <div className="ml-auto flex gap-2">
@@ -807,7 +821,7 @@ function RightPanel({
         </div>
       </div>
 
-      <div className="text-white/70">
+      <div className="text-slate-700 dark:text-white/70">
         Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
       </div>
 
@@ -822,8 +836,8 @@ function RightPanel({
               }}
               className={`px-3 py-1.5 rounded-lg border text-sm transition ${
                 key === scenarioKey
-                  ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-300"
-                  : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+                  ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-700 dark:text-emerald-300"
+                  : "bg-slate-200/70 border-black/10 text-slate-800 hover:bg-slate-200/90 dark:bg-white/5 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/10"
               }`}
               aria-pressed={key === scenarioKey}
             >
@@ -841,102 +855,128 @@ function RightPanel({
 
       <div className="mt-4 sm:mt-6">
         <InfoCard title="Petugas Penanggung Jawab">
-          <div className="font-semibold text-white mb-1">
+          <div className="font-semibold text-slate-900 dark:text-white mb-1">
             {DOCTORS_BY_POLI[selected.id] ?? "—"}
           </div>
-          <div className="text-white/70">
+          <div className="text-slate-700 dark:text-white/70">
             <p className="mb-2">
               <strong>Detail layanan:</strong> {sub.nama}
             </p>
-           {(() => {
-  const extra = sub.info ?? EXTRA_INFO[sub.nama];
+            {(() => {
+              const extra = sub.info ?? EXTRA_INFO[sub.nama];
 
-  // helper path → manfaatkan asset() yang sudah ada di file
-  const toSrc = (p) => {
-    if (!p) return null;
-    if (/^https?:\/\//.test(p)) return p;          // URL absolut
-    const clean = String(p).replace(/^\/+/, "");    // buang leading slash
-    return asset(clean);                            // gabung BASE_URL + path
-  };
+              const toSrc = (p) => {
+                if (!p) return null;
+                if (/^https?:\/\//.test(p)) return p;
+                const clean = String(p).replace(/^\/+/, "");
+                return asset(clean);
+              };
 
-  if (!extra) {
-    return (
-      <>
-        <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-        <p className="mt-2">
-          Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
-          instruksi khusus untuk layanan <em>{sub.nama}</em>.
-        </p>
-      </>
-    );
-  }
+              if (!extra) {
+                return (
+                  <>
+                    <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+                    <p className="mt-2">
+                      Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
+                      instruksi khusus untuk layanan <em>{sub.nama}</em>.
+                    </p>
+                  </>
+                );
+              }
 
-  // 1) STRING → tetap seperti semula
-  if (typeof extra === "string") {
-    return <p>{linkify(extra)}</p>;
-  }
+              if (typeof extra === "string") {
+                return <p>{linkify(extra)}</p>;
+              }
 
-  // 2) ARRAY (campuran string dan {img, alt})
-  if (Array.isArray(extra)) {
-    return (
-      <div className="space-y-3">
-        {extra.map((item, i) => {
-          if (typeof item === "string") {
-            return <p key={`txt-${i}`}>{linkify(item)}</p>;
-          }
-          if (item && typeof item === "object" && item.img) {
-            return (
-              <div key={`img-${i}`} className="space-y-1">
-             <img
-                  src={toSrc(item.img)}
-                  alt={item.alt || sub.nama}
-                  className="w-full rounded-xl border border-white/10"
-                  onError={onInfoError}
-                  loading="lazy"
-                />
-  {item.alt && (
-    <div className="text-[12px] text-white/60 leading-snug">{item.alt}</div>
-  )}
-</div>
-            );
-          }
-          return null;
-        })}
-      </div>
-    );
-  }
+              if (Array.isArray(extra)) {
+                return (
+                  <div className="space-y-3">
+                    {extra.map((item, i) => {
+                      if (typeof item === "string") {
+                        return <p key={`txt-${i}`}>{linkify(item)}</p>;
+                      }
+                      if (item && typeof item === "object" && item.img) {
+                        return (
+                          <div key={`img-${i}`} className="space-y-1">
+                            <img
+                              src={toSrc(item.img)}
+                              alt={item.alt || sub.nama}
+                              className="w-full rounded-xl border border-black/10 dark:border-white/10"
+                              onError={onInfoError}
+                              loading="lazy"
+                            />
+                            {item.alt && (
+                              <div className="text-[12px] text-slate-600 dark:text-white/60 leading-snug">
+                                {item.alt}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                );
+              }
 
-  // 3) OBJECT { text, images }
-  if (extra && typeof extra === "object") {
-    const { text, images } = extra;
-    return (
-      <div className="space-y-3">
-        {text ? <p>{linkify(text)}</p> : null}
-        {Array.isArray(images) && images.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {images.map((src, i) => (
-              <img
-                key={`img2-${i}`}
-                src={toSrc(src)}
-                alt={sub.nama}
-                className="w-full rounded-xl border border-white/10"
-                onError={onInfoError}
-                loading="lazy"
-              />
-            ))}
-          </div>
-        ) : null}
-      </div>
-    );
-  }
+              if (extra && typeof extra === "object") {
+                const { text, images } = extra;
+                return (
+                  <div className="space-y-3">
+                    {text ? <p>{linkify(text)}</p> : null}
+                    {Array.isArray(images) && images.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {images.map((src, i) => (
+                          <img
+                            key={`img2-${i}`}
+                            src={toSrc(src)}
+                            alt={sub.nama}
+                            className="w-full rounded-xl border border-black/10 dark:border-white/10"
+                            onError={onInfoError}
+                            loading="lazy"
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              }
 
-  return null;
-})()}
+              return null;
+            })()}
           </div>
         </InfoCard>
       </div>
     </div>
   );
+}
+
+/* ===================== Hook kecil untuk deteksi tema (animated) ===================== */
+function useThemeKey() {
+  const get = () =>
+    (typeof document !== "undefined" && document.documentElement.classList.contains("dark"))
+      ? "dark"
+      : "light";
+  const [key, setKey] = useState(get());
+
+  useEffect(() => {
+    // Amati perubahan class pada <html>
+    const obs = new MutationObserver(() => setKey(get()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    // Storage (kalau tab lain mengganti tema)
+    const onStorage = (e) => {
+      if (e.key === "theme") setKey(get());
+    };
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      obs.disconnect();
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  return key;
 }
 
 /* ===================== App Root ===================== */
@@ -946,6 +986,9 @@ export default function App() {
   const [facility, setFacility] = useState("pkm-jagakarsa");
   const [navOpen, setNavOpen] = useState(false);
   const [scrollReq, setScrollReq] = useState(null); // { poliId, ts }
+  const [jump, setJump] = useState(null);
+
+  const themeKey = useThemeKey(); // ← kunci animasi tema
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
@@ -987,7 +1030,6 @@ export default function App() {
     [filtered, query, subResults, SERVICES_CURRENT]
   );
 
-  const [jump, setJump] = useState(null);
   function handlePickSub(poliId, idx) {
     const p = SERVICES_CURRENT.find((x) => x.id === poliId);
     if (!p) return;
@@ -1012,103 +1054,130 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b 
-                  from-white via-slate-50 to-slate-100 text-slate-900
-                  dark:from-slate-900 dark:via-slate-950 dark:to-black dark:text-white">
-      <header className="sticky top-0 z-30 backdrop-blur bg-slate-900/70 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
-          <button
-            className="md:hidden inline-flex items-center justify-center size-9 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10"
-            aria-label="Buka menu"
-            onClick={() => setNavOpen(true)}
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
-            <div className="font-semibold">Informasi Layanan Puskesmas Jagakarsa</div>
-          </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <label className="text-xs text-white/60 hidden sm:block">Fasilitas</label>
-            <select
-              value={facility}
-              onChange={(e) => setFacility(e.target.value)}
-              className="h-9 rounded-lg bg-slate-800 text-white border border-white/10 px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 appearance-none"
+    <AnimatePresence mode="wait">
+      {/* motion wrapper untuk cross-fade saat tema berubah */}
+      <motion.div
+        key={themeKey}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.18 }}
+        className="
+          min-h-screen
+          text-slate-900 dark:text-white
+          bg-gradient-to-b
+          from-white via-slate-50 to-slate-100
+          dark:from-slate-900 dark:via-slate-950 dark:to-black
+          transition-colors duration-300
+        "
+      >
+        <header className="
+          sticky top-0 z-30 backdrop-blur
+          bg-white/70 dark:bg-slate-900/70
+          border-b border-black/5 dark:border-white/10
+          transition-colors duration-300
+        ">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
+            <button
+              className="md:hidden inline-flex items-center justify-center size-9 rounded-xl
+              border border-black/10 dark:border-white/10
+              bg-white/60 dark:bg-white/5
+              hover:bg-slate-200/80 dark:hover:bg-white/10"
+              aria-label="Buka menu"
+              onClick={() => setNavOpen(true)}
             >
-              {FACILITIES.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.name}
-                </option>
-              ))}
-            </select>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
 
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
+              <div className="font-semibold">Informasi Layanan Puskesmas Jagakarsa</div>
+            </div>
 
+            <div className="ml-auto flex items-center gap-2">
+              <label className="text-xs text-slate-600 dark:text-white/60 hidden sm:block">Fasilitas</label>
+              <select
+                value={facility}
+                onChange={(e) => setFacility(e.target.value)}
+                className="
+                  h-9 rounded-lg px-2 text-sm outline-none
+                  bg-white text-slate-900 border border-black/10
+                  dark:bg-slate-800 dark:text-white dark:border-white/10
+                  focus:ring-2 focus:ring-emerald-500
+                  appearance-none
+                "
+              >
+                {FACILITIES.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+              <ThemeToggle />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
-        {navOpen && (
-          <button
-            aria-label="Tutup menu"
-            onClick={() => setNavOpen(false)}
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
-          />
-        )}
+        <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
+          {navOpen && (
+            <button
+              aria-label="Tutup menu"
+              onClick={() => setNavOpen(false)}
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+            />
+          )}
 
-        <div
-          className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
-          transition-transform md:transition-none
-          ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
-          h-[100dvh] overflow-y-auto overscroll-contain`}
-          role="dialog"
-          aria-modal="true"
-        >
-          <Sidebar
-            facilityName={facilityName}
-            query={query}
-            setQuery={setQuery}
-            services={sidebarList}
-            onPick={(s) => {
-              setSelected(s);
-              setNavOpen(false);
-            }}
-            onScrollToServices={(poliId) => {
-              setScrollReq({ poliId, ts: Date.now() }); // trigger scroll
-              setNavOpen(false);                         // tutup drawer (mobile)
-            }}
+          <div
+            className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
+              transition-transform md:transition-none
+              ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
+              h-[100dvh] overflow-y-auto overscroll-contain`}
+            role="dialog"
+            aria-modal="true"
+          >
+            <Sidebar
+              facilityName={facilityName}
+              query={query}
+              setQuery={setQuery}
+              services={sidebarList}
+              onPick={(s) => {
+                setSelected(s);
+                setNavOpen(false);
+              }}
+              onScrollToServices={(poliId) => {
+                setScrollReq({ poliId, ts: Date.now() }); // trigger scroll
+                setNavOpen(false);                         // tutup drawer (mobile)
+              }}
+              selected={selected}
+              highlightIds={matchPoliIds}
+            />
+          </div>
+
+          <RightPanel
             selected={selected}
-            highlightIds={matchPoliIds}
+            setSelected={setSelected}
+            filtered={filtered}
+            subMatches={subResults}
+            onPickSub={handlePickSub}
+            jump={jump}
+            setJump={setJump}
+            searchQuery={query}
+            scrollReq={scrollReq}
           />
         </div>
 
-        <RightPanel
-          selected={selected}
-          setSelected={setSelected}
-          filtered={filtered}
-          subMatches={subResults}
-          onPickSub={handlePickSub}
-          jump={jump}
-          setJump={setJump}
-          searchQuery={query}
-          scrollReq={scrollReq}
+        <SurveyPopup
+          formUrl="https://forms.gle/72k85XkYQTQZRfq38"
+          delayMs={40000}
+          cooldownDays={14}
         />
-      </div>
 
-      <SurveyPopup
-        formUrl="https://forms.gle/8phAGQay9pj7vh1CA"
-        delayMs={60000}
-        cooldownDays={14}
-      />
-
-      <footer className="py-6 text-center text-white/50 text-sm">
-        © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
-      </footer>
-    </div>
+        <footer className="py-6 text-center text-slate-600 dark:text-white/50 text-sm">
+          © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
+        </footer>
+      </motion.div>
+    </AnimatePresence>
   );
 }
