@@ -9,6 +9,7 @@ function getInitialTheme() {
 export default function ThemeToggle({ className = "" }) {
   const [theme, setTheme] = useState(getInitialTheme);
 
+  // Terapkan tema + simpan ke localStorage
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "dark") root.classList.add("dark");
@@ -16,8 +17,18 @@ export default function ThemeToggle({ className = "" }) {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  // Sinkron ke perubahan tema sistem HANYA jika user belum memilih sendiri
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => {
+      const ls = localStorage.getItem("theme");
+      if (!ls) setTheme(mq.matches ? "dark" : "light");
+    };
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
+  }, []);
 
+  const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
   const isDark = theme === "dark";
 
   return (
@@ -36,13 +47,3 @@ export default function ThemeToggle({ className = "" }) {
     </button>
   );
 }
-
-useEffect(() => {
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  const handler = () => {
-    const ls = localStorage.getItem("theme");
-    if (!ls) setTheme(mq.matches ? "dark" : "light");
-  };
-  mq.addEventListener?.("change", handler);
-  return () => mq.removeEventListener?.("change", handler);
-}, []);
