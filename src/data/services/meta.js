@@ -114,7 +114,12 @@ export const EXTRA_INFO = {
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
 
   // CKG
-  "Cek Kesehatan Gratis": "Pemeriksaan Kesehatan Gratis (CKG) adalah program pemerintah untuk mendeteksi dini faktor risiko penyakit tidak menular seperti hipertensi, diabetes, kolesterol tinggi, dan obesitas pada masyarakat usia 15 tahun ke atas. Pemeriksaan ini meliputi pengukuran tekanan darah, gula darah, kolesterol (sesuai faktor risiko), pemriksaan indeks massa tubuh (IMT),dan pemeriksaan lain sesuai faktor risiko dan paket pemeriksaan sesuai usia, yang disertai konseling kesehatan untuk mengelola faktor risiko penyakit yang ditemukan. Pasien disarankan untuk melakukan puasa dari pukul 10 malam dan datang pagi ke Puskesmas untuk CKG agar tidak menunggu pemeriksaan laboratorium yang terlalu lama.",
+  "Cek Kesehatan Gratis": [
+    "Pemeriksaan Kesehatan Gratis (CKG) adalah program pemerintah untuk mendeteksi dini faktor risiko penyakit tidak menular seperti hipertensi, diabetes, kolesterol tinggi, dan obesitas pada masyarakat usia 15 tahun ke atas 1 kali setahun.",
+    "Pemeriksaan ini meliputi pengukuran tekanan darah, gula darah, kolesterol (sesuai faktor risiko), pemriksaan indeks massa tubuh (IMT),dan pemeriksaan lain sesuai faktor risiko dan paket pemeriksaan sesuai usia, yang disertai konseling kesehatan untuk mengelola faktor risiko penyakit yang ditemukan",
+    "Pasien disarankan untuk melakukan puasa 8-12 jam dari pukul 10 malam dan datang pagi ke Puskesmas untuk CKG agar tidak melewatai batas puasa",
+    "Jangan lupa ajak keluarga Anda atau teman Anda untuk ikut serta dalam program CKG ini",
+  ],
   //RB
   "Ruang Bersalin": [
     "Pelayanan dimulai 24 jam, setiap hari.",
