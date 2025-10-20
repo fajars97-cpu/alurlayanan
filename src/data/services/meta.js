@@ -34,7 +34,7 @@ export const DOCTORS_BY_POLI = {
 /* ===================== Info Tambahan (contoh) ===================== */
 export const EXTRA_INFO = {
   // Poli Umum
-  "Pemeriksaan Umum": [
+  "Pemeriksaan Dokter Umum": [
     "Silahkan memilih fasilitas kesehatan rujukan tingkat lanjut sesuai kebutuhan Anda.",
     { img: "/infografis/fkrtl.webp", alt: "Fasilitas Kesehatan Rujukan Tingkat Lanjut" },
   ],
