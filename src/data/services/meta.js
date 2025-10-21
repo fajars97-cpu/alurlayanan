@@ -5,25 +5,25 @@
    Contoh awal — silakan lanjutkan/ubah sesuai data di services.js kamu. */
 export const DOCTORS_BY_POLI = {
   "poli-umum": "dr. Natasha Adjani",
-  "poli-gigi": "drg. Gigi",
-  igd: "dr. IGD",
-  "ki-hamil": "Bidan Ani",
-  "ki-nifas": "Bidan Siti",
-  catin: "Bidan Dewi",
+  "poli-gigi": "drg. Liza Noah Febriana Marpaung",
+  igd: "dr. Ranu Brata Kusuma",
+  "ki-hamil": "dr. Anisah Rahma",
+  "ki-nifas": "Bidan Ika Nurmalasari, A.Md. Keb.",
+  catin: "dr. Rebekka Sitorus",
   imunisasi: "Dewi Sartika Gea, A.Md. Keb.",
-  "kb-iva": "Bidan Tika",
+  "kb-iva": "dr. Nurul Chaerani dan Bidan Marini Jagasa",
   tumbang: "Yuniar Selowati",
-  mtbs: "dr. Balita",
-  pkpr: "dr. Remaja",
-  lansia: "dr. Lansia",
-  ptm: "dr. Penyakit Tidak Menular",
-  pm: "dr. Penyakit Menular",
-  ims: "dr. IMS",
+  mtbs: "dr. Anita Kurniasih",
+  pkpr: "dr. Ensan Galuh Pertiwi",
+  lansia: "dr. Fitri Astuti Aditama",
+  ptm: "dr. Azzahra Azmi",
+  pm: "dr. Uli Siger",
+  ims: "dr. Asrie Rahayu",
   ispa: "dr. ISPA",
-  mata: "dr. Mata",
-  gizi: "dr. Gizi",
-  kirana: "Psikolog",
-  "klinik-sanitasi": "Sanitarian",
+  mata: "dr. Asrie Rahayu",
+  gizi: "dr. Dewi Wulansari",
+  kirana: "dr. Ine Dianawati Kusuma",
+  "klinik-sanitasi": "Resya Karnioca, S.Tr.Kes.",
   uks: "Petugas UKS",
   "vaksin-dengue": "Perawat Vaksin",
   "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
@@ -49,9 +49,15 @@ export const EXTRA_INFO = {
 
   // Layanan 24 Jam
   "Pemeriksaan Jenazah (24 Jam)": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
+ 
   // KB & IVA
-  "Konseling KB": "Informasi tambahan belum tersedia.",
-  "Pemeriksaan IVA": "Informasi tambahan belum tersedia.",
+  "Konsultasi KB": "Konsultasi KB.",
+  "Suntik KB": "Mohon untuk membawa kartu peserta KB saat kontrol.",
+  "Pil KB": ["Mohon untuk membawa kartu peserta KB saat kontrol.",
+  "Saat ini hanya tersedia pil kombinasi yang tidak dianjurkan untuk ibu hamil."],
+  "IUD/Spiral": "IUD adalah alat kontrasepsi terbuat dari plastik yang fleksibel dipasang dalam rahim, dengan menjepit kedua saluran yang menghasilkan indung telur sehingga tidak terjadi pembuahan.",
+  "IVA Test + HPV DNA": ["Test IVA dan HPV DNA dapat dilakukan pada pasien belum/ sudah menikah namun aktif secara seksual.", "Tidak diperkenankan berhubungan H-1 dan tidak sedang haid untuk test IVA dan HPV DNA.", "Batas usia test adalah 69 tahun."],
+  "Implant/ Susuk" : ["Implant adalah alat kontrasepsi yang dipasang di bawah lapisan kulit subkutan pada lengan atas bagian samping dalam.", "Mohon untuk membawa kartu peserta KB saat kontrol."],
 
   // Imunisasi
   "Imunisasi HB": "Imunisasi HB adalah vaksin hepatitis B yang diberikan kepada bayi baru lahir, idealnya dalam 24 jam pertama kehidupan (HB0), Usia 2 bulan (HB-1), 3 bulan (HB-2), dan 4 bulan (HB-3). Vaksin ini melindungi bayi dari infeksi virus hepatitis B yang dapat menyebabkan penyakit hati serius.",
@@ -93,6 +99,8 @@ export const EXTRA_INFO = {
   // Gizi
   "Konsultasi Gizi": "Informasi tambahan belum tersedia.",
 
+  // KI Hamil
+  "Pemeriksaan Ibu Hamil": "Kunjungan kehamilan 1 (6-8 minggu), kunjungan kehamilan 2 (10-12 minggu), kunjungan kehamilan 3 (16 minggu), kunjungan kehamilan 4 (20 minggu), kunjungan kehamilan 5 (24 minggu), kunjungan kehamilan 6 (28 minggu), kunjungan kehamilan 7 (32 minggu), kunjungan kehamilan 8 (36 minggu), kunjungan kehamilan 9 (37-41 minggu) dilakukan di ruang KI hamil lantai 2, ikuti instruksi petugas.",
   // KI Nifas
   "Pemeriksaan Nifas": "Kunjungan nifas 2 (3-7 hari setelah persalinan), kunjungan nifas 3 (7-28 hari setelah persalinan), kunjungan nifas 4 (29-42 hari setelah persalinan) dilakukan di ruang nifas lantai 1, ikuti instruksi petugas.",
 
