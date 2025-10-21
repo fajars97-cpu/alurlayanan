@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 
-// === Data aggregator (sesuai struktur Anda) ===
+// === Data (sesuai struktur lama) ===
 import {
   FACILITIES,
   SERVICES_BY_FACILITY,
@@ -11,23 +11,22 @@ import {
   FLOW_STEPS,
 } from "./data/services";
 
-/* =========================================================
-   PATH & ASSET HELPERS
-========================================================= */
+/* ===================== BASE URL (untuk GitHub Pages) ===================== */
 const BASE = import.meta.env.BASE_URL ?? "/";
-const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`; // pastikan BASE_URL (GitHub Pages)
-const DIR_INFO = `${BASE}infografis`;
+const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
 
+/* ===================== Fallback gambar ===================== */
 const INFO_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="22" text-anchor="middle" dominant-baseline="middle">Infografis tidak ditemukan</text></svg>';
 const FLOW_FALLBACK =
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle">Gambar alur tidak ditemukan</text></svg>';
 
 const resolveInfografis = (service) => {
+  // mengikuti kebiasaan lama (public/infografis/<id>.jpg atau override s.img)
   const file = (service?.img ?? `${service?.id ?? "missing"}.jpg`).toString();
   if (/^https?:\/\//.test(file)) return file;
   if (file.startsWith("/")) return asset(file);
-  return `${DIR_INFO}/${file}`;
+  return asset(`infografis/${file}`);
 };
 const onInfoError = (e) => {
   e.currentTarget.onerror = null;
@@ -38,9 +37,7 @@ const onFlowError = (e) => {
   e.currentTarget.src = FLOW_FALLBACK;
 };
 
-/* =========================================================
-   TEXT HELPERS
-========================================================= */
+/* ===================== Linkify ===================== */
 const URL_RE = /((https?:\/\/|www\.)[^\s)]+|bit\.ly\/[^\s)]+)/gi;
 function linkify(text) {
   if (!text) return text;
@@ -71,9 +68,7 @@ function linkify(text) {
   return nodes;
 }
 
-/* =========================================================
-   JADWAL HELPERS (dipertahankan)
-========================================================= */
+/* ===================== Jadwal (util lama dipertahankan) ===================== */
 const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const RULE_DEFAULT = {
   Senin: "08:00-16:00",
@@ -166,33 +161,69 @@ function getOpenStatus(service, ref = new Date()) {
   const minutesUntilChange = nextChange != null ? nextChange - now : null;
   return { open, minutesUntilChange };
 }
-export function getEffectiveJadwal(s) {
-  const { weekly } = normalizeSchedule(s?.jadwal || {});
-  const out = {};
-  for (const d of DAY_NAMES_ID) {
-    const arr = normalizeRanges(weekly[d]);
-    out[d] = arr.length
-      ? arr.map((r) => `${fmtMin(r.from)}–${fmtMin(r.to)}`).join(", ")
-      : "Tutup";
-  }
-  return out;
-}
 export function isOpenNow(s, ref = new Date()) {
   return getOpenStatus(s, ref).open;
 }
 
-/* =========================================================
-   SMALL UI PRIMITIVES
-========================================================= */
+/* ===================== Price ===================== */
+function formatTarifID(t) {
+  if (t == null) return "Tidak tersedia";
+  if (Array.isArray(t) && t.length === 2) {
+    const [a, b] = t.map(Number);
+    if (Number.isFinite(a) && Number.isFinite(b)) {
+      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
+    }
+  }
+  if (t && typeof t === "object" && "min" in t && "max" in t) {
+    const a = Number(t.min),
+      b = Number(t.max);
+    if (Number.isFinite(a) && Number.isFinite(b)) {
+      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
+    }
+  }
+  const n = Number(t);
+  if (Number.isFinite(n)) return n === 0 ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`;
+  return String(t);
+}
 const Chip = ({ children }) => (
   <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight bg-slate-200/70 text-slate-800 ring-1 ring-black/10 dark:bg-white/8 dark:text-white/80 dark:ring-white/12">
     {children}
   </span>
 );
 
-/* =========================================================
-   SIDEBAR (sticky)
-========================================================= */
+/* ===================== Audio helper (alur) ===================== */
+function getFlowAudio() {
+  if (!window.__flowAudio) {
+    const a = new Audio();
+    a.preload = "none";
+    window.__flowAudio = a;
+    window.__flowAudioKey = null;
+  }
+  return window.__flowAudio;
+}
+function stopFlowAudio() {
+  const a = getFlowAudio();
+  try {
+    a.pause();
+    a.currentTime = 0;
+  } catch {}
+}
+
+/* ===================== FLOOR HELPERS (BARU) ===================== */
+function getFloorNumber(lokasi) {
+  if (!lokasi) return null;
+  const m = String(lokasi).match(/(?:lantai|lt)\s*(\d+)/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+function floorBorderClass(lokasi) {
+  const n = getFloorNumber(lokasi);
+  if (n === 1) return "border-violet-400/60 hover:border-violet-300/80";
+  if (n === 2) return "border-sky-400/60 hover:border-sky-300/80";
+  if (n === 3) return "border-emerald-400/60 hover:border-emerald-300/80";
+  return "border-white/10 hover:border-white/20";
+}
+
+/* ===================== Sidebar (coding lama, sticky) ===================== */
 function Sidebar({ facilityName, query, setQuery, services, onPick }) {
   return (
     <aside
@@ -226,10 +257,12 @@ function Sidebar({ facilityName, query, setQuery, services, onPick }) {
         aria-label="Daftar poli"
       >
         <div className="text-xs uppercase text-white/50 mb-2 px-1">Daftar Poli</div>
+
         {services.map((s) => {
           const open =
             (s?.layanan || []).some((l) => isOpenNow({ jadwal: l.jadwal || s.jadwal })) ||
             isOpenNow({ jadwal: s.jadwal });
+
           return (
             <button
               key={s.id}
@@ -262,32 +295,16 @@ function Sidebar({ facilityName, query, setQuery, services, onPick }) {
   );
 }
 
-/* =========================================================
-   FLOOR HELPERS (urutan & border warna)
-========================================================= */
-function getFloorNumber(lokasi) {
-  if (!lokasi) return null;
-  const m = String(lokasi).match(/(?:lantai|lt)\s*(\d+)/i);
-  return m ? parseInt(m[1], 10) : null;
-}
-function floorBorderClass(lokasi) {
-  const n = getFloorNumber(lokasi);
-  if (n === 1) return "border-violet-400/60 hover:border-violet-300/80";
-  if (n === 2) return "border-sky-400/60 hover:border-sky-300/80";
-  if (n === 3) return "border-emerald-400/60 hover:border-emerald-300/80";
-  return "border-white/10 hover:border-white/20";
-}
-
-/* =========================================================
-   KARTU POLI (grid default)
-========================================================= */
+/* ===================== Kartu poli (grid default) ===================== */
 function ServiceCard({ s, onPick }) {
   return (
     <button
       onClick={() => onPick(s)}
-      className={`group relative overflow-hidden rounded-2xl border bg-slate-100/5 dark:bg-white/5 hover:bg-white/10 active:scale-[.98] transition text-left touch-manipulation ${floorBorderClass(
-        s.lokasi
-      )}`}
+      className={`group relative overflow-hidden rounded-2xl border
+      bg-slate-100/70 dark:bg-white/5
+      hover:bg-slate-200/80 dark:hover:bg-white/10
+      active:scale-[.98] transition text-left touch-manipulation
+      ${floorBorderClass(s.lokasi)}`}
     >
       <div className="w-full bg-slate-200/10 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="h-36 sm:h-44 md:h-48 lg:h-52 grid place-items-center p-2 sm:p-3">
@@ -313,26 +330,7 @@ function ServiceCard({ s, onPick }) {
   );
 }
 
-/* =========================================================
-   FLOW (alur langkah)
-========================================================= */
-function getFlowAudio() {
-  if (!window.__flowAudio) {
-    const a = new Audio();
-    a.preload = "none";
-    window.__flowAudio = a;
-    window.__flowAudioKey = null;
-  }
-  return window.__flowAudio;
-}
-function stopFlowAudio() {
-  const a = getFlowAudio();
-  try {
-    a.pause();
-    a.currentTime = 0;
-  } catch {}
-}
-
+/* ===================== Flow Card (alur) ===================== */
 function FlowCard({ step, index }) {
   const src = step?.img ? (/^https?:\/\//.test(step.img) ? step.img : asset(step.img.replace(/^\//, ""))) : null;
   let lastTap = 0;
@@ -391,19 +389,16 @@ function FlowCard({ step, index }) {
           />
         )}
       </div>
-      {step?.name && (
-        <div className="px-3 pb-2 text-[12px] text-white/80">{step.name}</div>
-      )}
+      {step?.name && <div className="px-3 pb-2 text-[12px] text-white/80">{step.name}</div>}
     </button>
   );
 }
 
-/* =========================================================
-   EXTRA INFO
-========================================================= */
+/* ===================== Extra Info ===================== */
 function ExtraInfoSection({ title }) {
   const info = EXTRA_INFO?.[title];
   if (!info) return null;
+
   const render = (node, idx) => {
     if (!node) return null;
     if (typeof node === "string") return <p key={idx}>{linkify(node)}</p>;
@@ -441,52 +436,16 @@ function ExtraInfoSection({ title }) {
     }
     return null;
   };
+
   return (
-    <section aria-labelledby="extra-info-title" className="space-y-2">
-      <h3 id="extra-info-title" className="font-semibold text-white">Informasi Tambahan</h3>
+    <section className="space-y-2">
+      <h3 className="font-semibold text-white">Informasi Tambahan</h3>
       <div className="prose prose-sm dark:prose-invert max-w-none">{render(info, 0)}</div>
     </section>
   );
 }
 
-/* =========================================================
-   PRICE
-========================================================= */
-function formatTarifID(t) {
-  if (t == null) return "Tidak tersedia";
-  if (Array.isArray(t) && t.length === 2) {
-    const [a, b] = t.map(Number);
-    if (Number.isFinite(a) && Number.isFinite(b)) {
-      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
-    }
-  }
-  if (t && typeof t === "object" && "min" in t && "max" in t) {
-    const a = Number(t.min),
-      b = Number(t.max);
-    if (Number.isFinite(a) && Number.isFinite(b)) {
-      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
-    }
-  }
-  const n = Number(t);
-  if (Number.isFinite(n)) return n === 0 ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`;
-  return String(t);
-}
-function PricePill({ tarif }) {
-  const label = formatTarifID(tarif);
-  return label === "Gratis" ? (
-    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30">
-      Gratis
-    </span>
-  ) : (
-    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/15 text-sky-300 ring-1 ring-sky-400/30">
-      {label}
-    </span>
-  );
-}
-
-/* =========================================================
-   DETAIL PANEL (layanan)
-========================================================= */
+/* ===================== Detail Panel Layanan ===================== */
 function DetailPanel({ poli, layanan, onBack }) {
   const refTop = useRef(null);
   useEffect(() => {
@@ -495,12 +454,11 @@ function DetailPanel({ poli, layanan, onBack }) {
 
   const dokter = DOCTORS_BY_POLI?.[poli?.id] || null;
 
-  function stepsFor(l) {
-    if (!l?.alur) return [];
-    const ids = Array.isArray(l.alur) ? l.alur : Object.values(l.alur || {}).flat();
+  const steps = useMemo(() => {
+    if (!layanan?.alur) return [];
+    const ids = Array.isArray(layanan.alur) ? layanan.alur : Object.values(layanan.alur || {}).flat();
     return ids.map((id) => FLOW_STEPS?.[id]).filter(Boolean);
-  }
-  const steps = stepsFor(layanan);
+  }, [layanan]);
 
   return (
     <section aria-label={`Detail layanan ${layanan?.nama}`} className="space-y-4" tabIndex={-1} ref={refTop}>
@@ -528,7 +486,7 @@ function DetailPanel({ poli, layanan, onBack }) {
           ) : (
             <div className="grid sm:grid-cols-2 gap-3">
               {steps.map((st, i) => (
-                <FlowCard key={st.id ?? i} step={st} index={i} />
+                <FlowCard key={st?.id ?? i} step={st} index={i} />
               ))}
             </div>
           )}
@@ -540,7 +498,7 @@ function DetailPanel({ poli, layanan, onBack }) {
             <div className="rounded-xl border border-white/10 p-3 bg-white/5 space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-white/70">Tarif:</span>
-                <PricePill tarif={layanan?.tarif} />
+                <Chip>{formatTarifID(layanan?.tarif)}</Chip>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-white/70">BPJS:</span>
@@ -569,9 +527,7 @@ function DetailPanel({ poli, layanan, onBack }) {
   );
 }
 
-/* =========================================================
-   APP
-========================================================= */
+/* ===================== APP ===================== */
 export default function App() {
   const [facility, setFacility] = useState("pkm-jagakarsa");
   const [query, setQuery] = useState("");
@@ -579,20 +535,20 @@ export default function App() {
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
 
-  // STATE flow lama:
-  const [selected, setSelected] = useState(null); // poli terpilih
+  // Flow lama: selected poli → daftar layanan; selectedServiceIdx → detail
+  const [selected, setSelected] = useState(null);
   const [selectedServiceIdx, setSelectedServiceIdx] = useState(null);
 
-  // Reset ketika pencarian aktif
+  // Reset saat mencari
   useEffect(() => {
-    if (query.trim().length > 0) {
+    if (query.trim()) {
       setSelected(null);
       setSelectedServiceIdx(null);
       stopFlowAudio();
     }
   }, [query]);
 
-  // Filter + URUTKAN per lantai (1→2→3), lalu nama
+  // Filter + sort poli (BARU: urut lantai)
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = SERVICES_CURRENT.filter(
@@ -602,11 +558,11 @@ export default function App() {
       const fa = getFloorNumber(a.lokasi) ?? 999;
       const fb = getFloorNumber(b.lokasi) ?? 999;
       if (fa !== fb) return fa - fb;
-      return a.nama.localeCompare(b.nama);
+      return a.nama.localeCompare(b.nama, "id");
     });
   }, [SERVICES_CURRENT, query]);
 
-  // Hasil pencarian sub-layanan (prioritas nama layanan → poli)
+  // Sub hasil: cari pada layanan (prioritas nama layanan → poli)
   const subResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
@@ -625,6 +581,19 @@ export default function App() {
     }
     return res;
   }, [SERVICES_CURRENT, query]);
+
+  const sidebarList = useMemo(() => {
+    const sortByFloor = (arr) =>
+      arr.slice().sort((a, b) => {
+        const fa = getFloorNumber(a.lokasi) ?? 999;
+        const fb = getFloorNumber(b.lokasi) ?? 999;
+        if (fa !== fb) return fa - fb;
+        return a.nama.localeCompare(b.nama, "id");
+      });
+    return filtered.length === 0 && query && subResults.length > 0
+      ? sortByFloor(SERVICES_CURRENT)
+      : filtered;
+  }, [filtered, query, subResults, SERVICES_CURRENT]);
 
   function handlePickSub(poliId, idx) {
     const p = SERVICES_CURRENT.find((x) => x.id === poliId);
@@ -651,12 +620,7 @@ export default function App() {
             <select
               value={facility}
               onChange={(e) => setFacility(e.target.value)}
-              className="
-                h-9 rounded-lg px-2 text-sm outline-none
-                bg-white/10 text-white border border-white/10
-                focus:ring-2 focus:ring-emerald-500
-                appearance-none
-              "
+              className="h-9 rounded-lg px-2 text-sm outline-none bg-white/10 text-white border border-white/10 focus:ring-2 focus:ring-emerald-500 appearance-none"
             >
               {FACILITIES.map((f) => (
                 <option key={f.id} value={f.id}>{f.name}</option>
@@ -666,14 +630,14 @@ export default function App() {
         </div>
       </header>
 
-      {/* GRID 2 kolom */}
+      {/* Grid dua kolom – kanan fleksibel, sejajar dengan sidebar */}
       <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,minmax(0,1fr)] gap-6 items-start">
-        {/* Sidebar kiri */}
+        {/* Sidebar */}
         <Sidebar
           facilityName={facilityName}
           query={query}
           setQuery={setQuery}
-          services={filtered.length === 0 && query && subResults.length > 0 ? SERVICES_CURRENT : filtered}
+          services={sidebarList}
           onPick={(s) => {
             setSelected(s);
             setSelectedServiceIdx(null);
@@ -681,14 +645,13 @@ export default function App() {
           }}
         />
 
-        {/* Kolom kanan */}
+        {/* Panel kanan */}
         <section aria-label="Konten utama" className="space-y-4 self-start">
-          {/* === GRID POLI (DEFAULT VIEW) === */}
+          {/* GRID POLI (default) */}
           {!selected && (
             <div className="space-y-4">
               <div className="text-sm text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
 
-              {/* Hasil sub-layanan saat mencari */}
               {query && subResults.length > 0 && (
                 <div className="rounded-2xl border border-white/10 p-3 bg-white/5">
                   <div className="text-xs uppercase text-white/60 mb-2">Hasil yang berkaitan</div>
@@ -710,7 +673,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Grid poli */}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filtered.map((s) => (
                   <ServiceCard key={s.id} s={s} onPick={(p) => setSelected(p)} />
@@ -719,7 +681,7 @@ export default function App() {
             </div>
           )}
 
-          {/* === DAFTAR LAYANAN DI POLI TERPILIH === */}
+          {/* DAFTAR LAYANAN */}
           {selected && (
             <section aria-label={`Detail ${selected.nama}`} className="space-y-4">
               <div className="flex items-center justify-between gap-3">
@@ -793,7 +755,7 @@ export default function App() {
                 )}
               </div>
 
-              {/* === DETAIL LAYANAN (JIKA DIPILIH) === */}
+              {/* DETAIL LAYANAN */}
               {selectedServiceIdx != null && selected.layanan?.[selectedServiceIdx] && (
                 <DetailPanel
                   poli={selected}
