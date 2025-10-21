@@ -1275,7 +1275,6 @@ export const SERVICES_BY_FACILITY = {
       ikon: "🤱",
       lokasi: "Lantai 1",
       img: "ruang-bersalin.webp",
-      
       layanan: [
         {
           nama: "Ruang Bersalin",

@@ -560,15 +560,17 @@ export default function App() {
           <nav aria-label="Toolbar" className="flex items-center gap-2">
             <label className="text-xs text-white/70 mr-2">Fasilitas</label>
             <select
-              value={facility}
-              onChange={(e) => setFacility(e.target.value)}
-              className="
-                  h-9 rounded-lg px-2 text-sm outline-none
-                  bg-white/10 text-white border border-white/10
-                  focus:ring-2 focus:ring-emerald-500
-                  appearance-none
-                "
-            >
+            value={facility}
+            onChange={(e) => setFacility(e.target.value)}
+            className="
+            h-9 rounded-lg px-2 text-sm outline-none
+           text-white border border-white/20
+           bg-[#111827] hover:bg-[#111827] focus:bg-[#111827]
+           focus:ring-2 focus:ring-emerald-500
+           appearance-none
+           "
+          style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
+           >
               {FACILITIES.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name}
@@ -587,7 +589,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,1fr] gap-4">
+      <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,1fr] gap-4 items-start">
         {/* Sidebar */}
         <div
           className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
@@ -612,7 +614,7 @@ export default function App() {
         </div>
 
         {/* Panel kanan */}
-        <section aria-label="Konten utama" className="space-y-4">
+        <section aria-label="Konten utama" className="space-y-4 self-start">
           {/* Grid Poli (default view) */}
           {!selected && (
             <div className="space-y-4">
