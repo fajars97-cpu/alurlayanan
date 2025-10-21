@@ -205,7 +205,9 @@ const Chip = ({ children }) => (
 function Sidebar({ facilityName, query, setQuery, services, onPick }) {
   return (
     <aside
-      className="w-full md:w-80 shrink-0 bg-[#0d1220] dark:bg-[#0d1220] border-r border-white/10 flex flex-col h-full md:h-[calc(100svh-56px)]"
+    className="w-full md:w-80 shrink-0 bg-[#0d1220] border-r border-white/10 flex flex-col
+              md:sticky md:top-14 self-start
+              md:h-[calc(100svh-56px)]"
       aria-label="Navigasi poli dan pencarian"
     >
       <div className="p-4 flex items-center gap-2 border-b border-white/10">
@@ -230,7 +232,7 @@ function Sidebar({ facilityName, query, setQuery, services, onPick }) {
       </div>
 
       <div
-        className="px-3 pb-3 space-y-2 overflow-y-auto overscroll-contain [scrollbar-width:thin] md:max-h-[28rem] flex-1"
+        className="px-3 pb-3 space-y-2 overflow-y-auto overscroll-contain [scrollbar-width:thin] flex-1"
         role="list"
         aria-label="Daftar poli"
       >
@@ -653,7 +655,7 @@ export default function App() {
                       <Chip>{isOpenNow({ jadwal: selected.jadwal }) ? "Sedang buka" : "Sedang tutup"}</Chip>
                     </div>
                   </div>
-                  <div className="order-1 md:order-2 bg-slate-900/40 grid place-items-center p-2">
+                  <div className="order-1 md:order-2 bg-slate-900/40 flex items-start justify-center p-2">
                     <img
                       src={resolveInfografis(selected)}
                       onError={onInfoError}
