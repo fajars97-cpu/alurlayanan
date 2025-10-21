@@ -417,6 +417,7 @@ function Sidebar({
         flex flex-col
         h-full md:h-[calc(100svh-56px)]
         transition-colors duration-300
+        rounded-none
       "
     >
       <div className="p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10">
@@ -1199,15 +1200,15 @@ export default function App() {
             <button
               aria-label="Tutup menu"
               onClick={() => setNavOpen(false)}
-              className="fixed inset-x-0 top-14 bottom-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
             />
           )}
 
           <div
-            className={`fixed z-50 left-0 top-14 bottom-0 w-80 md:w-auto md:static md:z-auto
+            className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
               transition-transform md:transition-none
               ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
-              h-[calc(100svh-56px)] overflow-y-auto overscroll-contain`}
+              h-[100svh] overflow-y-auto overscroll-contain`}
             role="dialog"
             aria-modal="true"
             onTouchStart={onDrawerTouchStart}
