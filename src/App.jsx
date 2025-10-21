@@ -338,6 +338,59 @@ const StatusPill = ({ open }) => (
   </span>
 );
 
+/* ===================== Drawer (NEW) ===================== */
+function Drawer({ open, onClose, children }) {
+  // Lock scroll saat drawer terbuka
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Overlay penuh: tap untuk menutup */}
+          <motion.div
+            key="overlay"
+            className="fixed inset-0 z-[9997] bg-black/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+          />
+          {/* Panel drawer dengan swipe-left close */}
+          <motion.aside
+            key="drawer"
+            className="fixed inset-y-0 left-0 z-[9998] w-[86%] max-w-[22rem]
+                       bg-white/80 dark:bg-slate-950/80 backdrop-blur
+                       border-r border-black/10 dark:border-white/10"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "tween", duration: 0.22 }}
+            drag="x"
+            dragConstraints={{ left: -80, right: 0 }}
+            dragElastic={0.04}
+            onDragEnd={(_, info) => {
+              const swipedFar = info.offset.x <= -80;
+              const swipedFast = info.velocity.x < -500;
+              if (swipedFar || swipedFast) onClose();
+            }}
+          >
+            {/* handle geser yang lebar di sisi kanan */}
+            <div className="absolute right-0 top-0 h-full w-4 cursor-ew-resize touch-pan-x" />
+            {children}
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+
 /* ===================== Sidebar ===================== */
 function Sidebar({
   facilityName,
@@ -994,6 +1047,27 @@ export default function App() {
   const [jump, setJump] = useState(null);
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const openDrawer = () => setDrawerOpen(true);
+  const closeDrawer = () => setDrawerOpen(false);
+ const swipeRef = useRef({ x0: 0, x: 0, t0: 0 });
+  function onDrawerTouchStart(e) {
+    const x = e.touches?.[0]?.clientX ?? 0;
+    swipeRef.current = { x0: x, x, t0: Date.now() };
+  }
+  function onDrawerTouchMove(e) {
+    const x = e.touches?.[0]?.clientX ?? 0;
+    swipeRef.current.x = x;
+  }
+  function onDrawerTouchEnd() {
+    const { x0, x, t0 } = swipeRef.current;
+    const dx = x - x0;          // negatif = geser ke kiri
+    const dt = Math.max(1, Date.now() - t0);
+    const v = dx / dt;          // px per ms
+    const farEnough = dx <= -60;   // jarak minimal 60px ke kiri
+    const fastEnough = v < -0.5;   // atau cukup cepat
+    if (farEnough || fastEnough) setNavOpen(false);
+  }
 
   useEffect(() => {
     if (query.trim().length > 0) {
@@ -1133,10 +1207,22 @@ export default function App() {
             className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
               transition-transform md:transition-none
               ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
-              h-[100dvh] overflow-y-auto overscroll-contain`}
+              h-[100dvh] overflow-y-auto overscroll-contain relative`}
             role="dialog"
             aria-modal="true"
+            onTouchStart={onDrawerTouchStart}
+            onTouchMove={onDrawerTouchMove}
+            onTouchEnd={onDrawerTouchEnd}
           >
+            {/* NEW: area handle di tepi kanan agar mudah diseret/geser */}
+            <div
+              className="absolute right-0 top-0 h-full w-4 md:hidden touch-pan-x"
+              onTouchStart={onDrawerTouchStart}
+              onTouchMove={onDrawerTouchMove}
+              onTouchEnd={onDrawerTouchEnd}
+              aria-hidden="true"
+            />
+            
             <Sidebar
               facilityName={facilityName}
               query={query}
