@@ -444,7 +444,6 @@ export const SERVICES_BY_FACILITY = {
       klaster: "Pelayanan Medik",
       ikon: "🩺",
       lokasi: "Lantai 2",
-      telemed: true,
       img: "poli-umum.webp",
       layanan: [
         {
@@ -474,8 +473,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Poli Gigi",
       klaster: "Pelayanan Medik",
       ikon: "🦷",
-      lokasi: "Lantai 1 — Ruang 103",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-gigi.webp",
       layanan: [
         {
@@ -501,8 +499,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "IGD",
       klaster: "Gawat Darurat",
       ikon: "🚑",
-      lokasi: "Lantai Dasar — IGD",
-      telemed: false,
+      lokasi: "Lantai 1",
       img: "igd.webp",
       layanan: [
         {
@@ -532,8 +529,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Pelayanan 24 Jam",
       klaster: "Layanan Medik",
       ikon: "🚑",
-      lokasi: "Lantai Dasar — IGD",
-      telemed: false,
+      lokasi: "Lantai 1",
       img: "igd.webp",
       layanan: [
         {
@@ -585,8 +581,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "KI Hamil",
       klaster: "Kebidanan",
       ikon: "🤰",
-      lokasi: "Poli KIA",
-      telemed: false,
+      lokasi: "Lantai 3",
       img: "ki-hamil.webp",
       layanan: [
         {
@@ -604,8 +599,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "KI Nifas",
       klaster: "Kebidanan",
       ikon: "🍼",
-      lokasi: "Poli Nifas",
-      telemed: false,
+      lokasi: "Lantai 1",
       img: "ki-nifas.webp",
       layanan: [
         {
@@ -655,8 +649,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Catin",
       klaster: "Kebidanan",
       ikon: "💍",
-      lokasi: "Poli KIA",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-catin.webp",
       layanan: [
         {
@@ -674,8 +667,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Imunisasi",
       klaster: "Anak",
       ikon: "💉",
-      lokasi: "Ruang Imunisasi",
-      telemed: false,
+      lokasi: "Lantai 3",
       img: "poli-imunisasi.webp",
       layanan: [
         {
@@ -868,8 +860,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "KB & IVA",
       klaster: "Kebidanan",
       ikon: "👩‍⚕️",
-      lokasi: "Poli KIA",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-kb.webp",
       layanan: [
         {
@@ -927,8 +918,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Tumbang",
       klaster: "Anak",
       ikon: "🧒",
-      lokasi: "Poli Anak",
-      telemed: false,
+      lokasi: "Lantai 3",
       img: "poli-tumbang.webp",
       layanan: [
     {
@@ -965,8 +955,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "MTBS",
       klaster: "Anak",
       ikon: "👶",
-      lokasi: "Poli Anak",
-      telemed: false,
+      lokasi: "Lantai 3",
       img: "poli-mtbs.webp",
       layanan: [
         {
@@ -986,8 +975,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "PKPR",
       klaster: "Remaja",
       ikon: "🎒",
-      lokasi: "Poli Remaja",
-      telemed: false,
+      lokasi: "Lantai 3",
       img: "poli-pkpr.webp",
       layanan: [
         {
@@ -1005,8 +993,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Lansia",
       klaster: "Lansia",
       ikon: "🧓",
-      lokasi: "Poli Lansia",
-      telemed: false,
+      lokasi: "Lantai 1",
       img: "poli-lansia.webp",
       layanan: [
         {
@@ -1026,8 +1013,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "PTM",
       klaster: "Penyakit Tidak Menular",
       ikon: "❤️‍🩹",
-      lokasi: "Poli PTM",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-ptm.webp",
       layanan: [
         {
@@ -1045,8 +1031,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "PM",
       klaster: "Penyakit Menular",
       ikon: "🧫",
-      lokasi: "Poli PM",
-      telemed: false,
+      lokasi: "Lantai 1",
       img: "poli-pm.webp",
       layanan: [
         {
@@ -1064,8 +1049,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "IMS",
       klaster: "Penyakit Menular",
       ikon: "⚕️",
-      lokasi: "Poli IMS",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-ims.webp",
       layanan: [
         {
@@ -1083,8 +1067,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "ISPA",
       klaster: "Penyakit Menular",
       ikon: "🫁",
-      lokasi: "Poli ISPA",
-      telemed: false,
+      lokasi: "Lantai 1",
       img: "poli-pm.webp",
       layanan: [
         {
@@ -1102,8 +1085,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Mata",
       klaster: "Pelayanan Medik",
       ikon: "👁️",
-      lokasi: "Poli Mata",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-mata.webp",
       layanan: [
         {
@@ -1137,8 +1119,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Haji",
       klaster: "Pelayanan Medik",
       ikon: "🕋",
-      lokasi: "Poli Haji",
-      telemed: false,
+      lokasi: "Lantai 2",
       img: "poli-haji.webp",
       layanan: [
         {
@@ -1156,8 +1137,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Konsultasi Gizi",
       klaster: "Gizi",
       ikon: "🥗",
-      lokasi: "Poli Gizi",
-      telemed: true,
+      lokasi: "Lantai 3",
       img: "poli-gizi.webp",
       layanan: [
         {
@@ -1175,8 +1155,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "KIRANA Konseling",
       klaster: "Konseling",
       ikon: "🧠",
-      lokasi: "Unit Konseling",
-      telemed: true,
+      lokasi: "Lantai 2",
       img: "poli-kirana.webp",
       layanan: [
         {
@@ -1194,8 +1173,7 @@ export const SERVICES_BY_FACILITY = {
       nama: "Kesehatan Lingkungan & Surveilans",
       klaster: "Kesling & Surveilans",
       ikon: "🧼",
-      lokasi: "Kesehatan Lingkungan & Surveilans",
-      telemed: false,
+      lokasi: "Lantai 3",
       img: "kesehatan-lingkungan.webp",
       layanan: [
         {
@@ -1278,7 +1256,6 @@ export const SERVICES_BY_FACILITY = {
       klaster: "Pelayanan Medik",
       ikon: "🩺",
       lokasi: "Lantai 3",
-      telemed: false,
       img: "poli-ckg.webp",
       layanan: [
         {
@@ -1297,7 +1274,6 @@ export const SERVICES_BY_FACILITY = {
       klaster: "Pelayanan Medik",
       ikon: "🤱",
       lokasi: "Lantai 1",
-      telemed: false,
       img: "ruang-bersalin.webp",
       
       layanan: [

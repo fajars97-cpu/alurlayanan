@@ -2,7 +2,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
-import ThemeToggle from "./components/ThemeToggle.jsx";
 
 // === Import data ===
 import {
@@ -33,14 +32,30 @@ const onInfoError = (e) => {
 };
 
 /* ===================== Alur Layanan helpers ===================== */
-const resolveFlowImg = (img) => {
-  if (!img) return null;
-  if (/^https?:\/\//.test(img)) return img;
-  const p = img.startsWith("/") ? img.slice(1) : img;
-  return asset(p);
+const FLOW_FALLBACK =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
+const onFlowError = (e) => {
+  e.currentTarget.onerror = null;
+  e.currentTarget.src = FLOW_FALLBACK;
 };
+function getFlowAudio() {
+  if (!window.__flowAudio) {
+    const a = new Audio();
+    a.preload = "none";
+    window.__flowAudio = a;
+    window.__flowAudioKey = null;
+  }
+  return window.__flowAudio;
+}
+function stopFlowAudio() {
+  const a = getFlowAudio();
+  try {
+    a.pause();
+    a.currentTime = 0;
+  } catch {}
+}
 
-// --- Auto-link URL di dalam teks (https, http, www., bit.ly) ---
+/* ===================== Linkify url ===================== */
 const URL_RE = /((https?:\/\/|www\.)[^\s)]+|bit\.ly\/[^\s)]+)/gi;
 function linkify(text) {
   if (!text) return text;
@@ -71,37 +86,7 @@ function linkify(text) {
   return nodes;
 }
 
-/* ===================== Flow fallback & audio ===================== */
-const FLOW_FALLBACK =
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
-const onFlowError = (e) => {
-  e.currentTarget.onerror = null;
-  e.currentTarget.src = FLOW_FALLBACK;
-};
-function getFlowAudio() {
-  if (!window.__flowAudio) {
-    const a = new Audio();
-    a.preload = "none";
-    window.__flowAudio = a;
-    window.__flowAudioKey = null;
-  }
-  return window.__flowAudio;
-}
-function stopFlowAudio() {
-  const a = getFlowAudio();
-  try {
-    a.pause();
-    a.currentTime = 0;
-  } catch {}
-}
-
-/* ===================== Jadwal helpers (scalable) ===================== */
-/**
- * Format dukungan:
- * - Lama: s.jadwal = { Senin: "08:00–16:00", ... }
- * - Baru: s.jadwal = { tz?, weekly: { Senin: ["08:00-12:00","13:00-16:00"], ... }, exceptions: { "YYYY-MM-DD": "Tutup" | ["09:00-12:00"] } }
- * Overnight "22:00-06:00" ditangani otomatis.
- */
+/* ===================== Jadwal helpers (ringkas dari baseline) ===================== */
 const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const RULE_DEFAULT = {
   Senin: "08:00-16:00",
@@ -118,7 +103,6 @@ const toMin = (s) => {
 };
 const pad2 = (n) => (n < 10 ? "0" + n : "" + n);
 const fmtMin = (m) => `${pad2(Math.floor(m / 60))}:${pad2(m % 60)}`;
-
 function normalizeRanges(value) {
   if (value == null) return [];
   const t = String(value).trim().replace(/–|—/g, "-");
@@ -210,280 +194,78 @@ export function isOpenNow(s, ref = new Date()) {
   return getOpenStatus(s, ref).open;
 }
 
-/* ===== Jadwal aggregator untuk Sidebar (beragam per layanan) ===== */
-function schedulesForPoli(poli) {
-  const list = [];
-  if (poli?.jadwal) list.push({ label: "Poli", jadwal: poli.jadwal });
-
-  (poli?.layanan || []).forEach((L) => {
-    if (L.jadwal) list.push({ label: L.nama, jadwal: L.jadwal });
-  });
-  return list;
-}
-function weeklyKey(jadwal) {
-  const { weekly } = normalizeSchedule(jadwal);
-  return JSON.stringify(
-    DAY_NAMES_ID.reduce((acc, d) => {
-      acc[d] = (normalizeRanges(weekly[d]) || []).map((r) => [r.from, r.to]);
-      return acc;
-    }, {})
-  );
-}
-function poliOpenAny(poli) {
-  if (isOpenNow({ jadwal: poli?.jadwal })) return true;
-  return (poli?.layanan || []).some((L) => isOpenNow({ jadwal: L.jadwal }));
-}
-
-/* ====== Jadwal helpers untuk kartu layanan ====== */
-const TODAY = () => DAY_NAMES_ID[new Date().getDay()];
-function summarizeWeekly(jadwalLike) {
-  // Ringkas HANYA hari yang buka (lewati "Tutup")
-  const eff = getEffectiveJadwal({ jadwal: jadwalLike });
-  const short = (d) => d.slice(0, 3);
-  // Buat daftar hanya hari buka dalam urutan Minggu..Sabtu
-  const openEntries = DAY_NAMES_ID
-    .map((d) => [d, eff[d]])
-    .filter(([, val]) => val && !/^\s*Tutup\s*$/i.test(val));
-  if (openEntries.length === 0) return "Tidak melayani rutin";
-
-  // Kelompokkan hari berurutan yang jamnya sama
-  const groups = [];
-  let cur = null;
-  openEntries.forEach(([d, val]) => {
-    if (!cur || cur.val !== val) {
-      cur && groups.push(cur);
-      cur = { from: d, to: d, val };
-    } else {
-      // lanjutkan range
-      cur.to = d;
-    }
-  });
-  cur && groups.push(cur);
-
-  return groups
-    .map((g) =>
-      g.from === g.to ? `${short(g.from)} ${g.val}` : `${short(g.from)}–${short(g.to)} ${g.val}`
-    )
-    .join("; ");
-}
-function todayText(jadwalLike) {
-  const eff = getEffectiveJadwal({ jadwal: jadwalLike });
-  return eff[TODAY()];
-}
-
 /* ===================== UI kecil ===================== */
 const Chip = ({ children }) => (
-  <span className="text-xs px-2 py-1 rounded-full bg-slate-200/70 border border-black/10 text-slate-800 whitespace-nowrap dark:bg-white/8 dark:border-white/10 dark:text-white/80">
+  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight bg-slate-200/70 text-slate-800 ring-1 ring-black/10 dark:bg-white/8 dark:text-white/80 dark:ring-white/12">
     {children}
-  </span>
-);
-function Pill({ children, tone = "emerald" }) {
-  const tones = {
-    emerald: "bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-600/20 dark:text-emerald-300 dark:ring-emerald-400/30",
-    sky: "bg-sky-500/15     text-sky-700     ring-1 ring-sky-600/20     dark:text-sky-300     dark:ring-sky-400/30",
-    slate: "bg-slate-200/70   text-slate-800   ring-1 ring-black/10       dark:bg-white/8        dark:text-white/80 dark:ring-white/12",
-  };
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight ${tones[tone]}`}
-    >
-      {children}
-    </span>
-  );
-}
-function formatTarifID(t) {
-  if (t == null) return "Tidak tersedia";
-  if (Array.isArray(t) && t.length === 2) {
-    const [a, b] = t.map(Number);
-    if (Number.isFinite(a) && Number.isFinite(b)) {
-      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
-    }
-  }
-  if (t && typeof t === "object" && "min" in t && "max" in t) {
-    const a = Number(t.min), b = Number(t.max);
-    if (Number.isFinite(a) && Number.isFinite(b)) {
-      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
-    }
-  }
-  const n = Number(t);
-  if (Number.isFinite(n)) return n === 0 ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`;
-  return String(t);
-}
-function PricePill({ tarif }) {
-  const label = formatTarifID(tarif);
-  return label === "Gratis" ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">{label}</Pill>;
-}
-const StatusPill = ({ open }) => (
-  <span
-    className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
-      open
-        ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-700 dark:text-emerald-300"
-        : "bg-rose-500/10 border-rose-400/30 text-rose-700 dark:text-rose-300"
-    }`}
-  >
-    {open ? "Buka" : "Tutup"}
   </span>
 );
 
 /* ===================== Sidebar ===================== */
-function Sidebar({
-  facilityName,
-  query,
-  setQuery,
-  services,
-  onPick,
-  onScrollToServices,
-  selected,
-  highlightIds = [],
-}) {
-  const [expandedId, setExpandedId] = useState(null);
-  const toggle = (s) => {
-    onPick(s);
-    setExpandedId((id) => (id === s.id ? null : s.id));
-  };
-
+function Sidebar({ facilityName, query, setQuery, services, onPick }) {
   return (
     <aside
-      className="
-        w-full md:w-80 shrink-0
-        bg-white/70 dark:bg-slate-950/70 backdrop-blur
-        border-r border-black/5 dark:border-white/10
-        flex flex-col
-        h-full md:h-[calc(100svh-56px)]
-        transition-colors duration-300
-      "
+      className="w-full md:w-80 shrink-0 bg-[#0d1220] dark:bg-[#0d1220] border-r border-white/10 flex flex-col h-full md:h-[calc(100svh-56px)]"
+      aria-label="Navigasi poli dan pencarian"
     >
-      <div className="p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10">
-        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
-        <div className="font-semibold truncate text-slate-900 dark:text-white">Jadwal & Tarif</div>
+      <div className="p-4 flex items-center gap-2 border-b border-white/10">
+        <div aria-hidden className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
+        <h2 className="font-semibold truncate text-white">Jadwal & Tarif</h2>
       </div>
 
-      <div className="px-4 pt-3 text-xs text-slate-700 dark:text-white/70">
-        Fasilitas: <span className="text-slate-900 font-medium dark:text-white">{facilityName}</span>
+      <div className="px-4 pt-3 text-xs text-white/70">
+        Fasilitas: <span className="text-white font-medium">{facilityName}</span>
       </div>
 
       <div className="p-4 space-y-3">
-        <label className="text-xs uppercase text-slate-600 dark:text-white/50">Pencarian</label>
+        <label htmlFor="search" className="text-xs uppercase text-white/50">Pencarian</label>
         <input
+          id="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cari 'umum', 'gigi', 'cabut gigi' ..."
-          className="w-full h-11 px-3 rounded-xl
-          bg-white text-slate-900 border border-black/10
-          dark:bg-white/5 dark:text-white dark:border-white/10
-          outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
+          className="w-full h-11 px-3 rounded-xl bg-white/10 text-white border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
+          aria-label="Cari layanan atau nama poli"
         />
       </div>
 
       <div
-        className="
-          px-4 pb-2 space-y-2
-          overflow-y-auto overscroll-contain
-          [scrollbar-width:thin]
-          md:max-h-[28rem]
-          flex-1
-        "
+        className="px-3 pb-3 space-y-2 overflow-y-auto overscroll-contain [scrollbar-width:thin] md:max-h-[28rem] flex-1"
+        role="list"
+        aria-label="Daftar poli"
       >
-        <div className="text-xs uppercase text-slate-600 dark:text-white/50 mb-2">Daftar Poli</div>
+        <div className="text-xs uppercase text-white/50 mb-2 px-1">Daftar Poli</div>
 
         {services.map((s) => {
-          const active = expandedId === s.id;
-          const hl = highlightIds.includes(s.id);
-          const open = poliOpenAny(s);
-
-          const schedList = schedulesForPoli(s);
-          const groups = new Map();
-          schedList.forEach(({ label, jadwal }) => {
-            const k = weeklyKey(jadwal);
-            if (!groups.has(k)) groups.set(k, []);
-            groups.get(k).push({ label, jadwal });
-          });
-          const uniqueSchedules = Array.from(groups.values());
-
-          const hasOneService = (s?.layanan || []).length === 1;
-          const singleServiceSchedule = hasOneService && s.layanan[0]?.jadwal;
+          const open =
+            (s?.layanan || []).some((l) => isOpenNow({ jadwal: l.jadwal || s.jadwal })) ||
+            isOpenNow({ jadwal: s.jadwal });
 
           return (
-            <div key={s.id} className="space-y-2">
-              <button
-                onClick={() => toggle(s)}
-                className={`group w-full text-left p-3 rounded-xl border transition
-                ${selected?.id === s.id
-                  ? "bg-emerald-500/10 border-emerald-500/60"
-                  : hl
-                  ? "bg-emerald-400/10 border-emerald-400/50"
-                  : "bg-slate-100/70 border-black/10 dark:bg-white/5 dark:border-white/10"}
-                hover:bg-slate-200/80 dark:hover:bg-white/8`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="text-lg">{s.ikon}</div>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium truncate text-slate-900 dark:text-white">{s.nama}</div>
-                    <div className="text-xs text-slate-600 dark:text-white/60 truncate">{s.klaster}</div>
-                  </div>
-                  <StatusPill open={open} />
+            <button
+              key={s.id}
+              onClick={() => onPick(s)}
+              className="group w-full text-left p-3 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-lg" aria-hidden>
+                  {s.ikon}
                 </div>
-              </button>
-
-              {active && (
-                <div className="mx-2 mb-2 rounded-xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 p-3 text-sm">
-                  <div className="text-slate-700 dark:text-white/60 mb-2">Jadwal</div>
-
-                  {/* 1) Tidak ada jadwal khusus sama sekali → tampilkan default */}
-                  {uniqueSchedules.length === 0 && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[13px] text-slate-800 dark:text-white/70">
-                      {DAY_NAMES_ID.map((d) => (
-                        <React.Fragment key={d}>
-                          <span className="text-slate-500 dark:text-white/50">{d}</span>
-                          <span>{getEffectiveJadwal({})[d]}</span>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 2) Semua sama → tabel ringkas (lama) */}
-                  {uniqueSchedules.length === 1 && uniqueSchedules[0].length > 0 && !singleServiceSchedule && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-slate-800 dark:text-white/70">
-                      {DAY_NAMES_ID.map((d) => (
-                        <React.Fragment key={d}>
-                          <span className="text-slate-500 dark:text-white/50">{d}</span>
-                          <span>
-                            {getEffectiveJadwal({ jadwal: uniqueSchedules[0][0].jadwal })[d]}
-                          </span>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 3) Poli dengan satu layanan yang punya jadwal khusus → tampilkan tabel layanan itu */}
-                  {singleServiceSchedule && (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-slate-800 dark:text-white/70">
-                      {DAY_NAMES_ID.map((d) => (
-                        <React.Fragment key={d}>
-                          <span className="text-slate-500 dark:text-white/50">{d}</span>
-                          <span>{getEffectiveJadwal({ jadwal: singleServiceSchedule })[d]}</span>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 4) Banyak layanan dengan jadwal berbeda → tampilkan notice; klik = scroll ke daftar layanan */}
-                  {uniqueSchedules.length > 1 && !singleServiceSchedule && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onPick(s);                 // pastikan poli terpilih
-                        onScrollToServices?.(s.id); // trigger scroll di panel kanan
-                      }}
-                      className="w-full text-left text-[12px] text-amber-700 hover:text-amber-600 underline underline-offset-2 dark:text-amber-300 dark:hover:text-amber-200"
-                      aria-label={`Jadwal beragam untuk ${s.nama}. Klik untuk menuju daftar layanan.`}
-                    >
-                      Jadwal beragam — <span className="font-semibold">cek tiap layanan untuk jadwal</span>
-                    </button>
-                  )}
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate text-white">{s.nama}</div>
+                  <div className="text-xs text-white/60 truncate">{s.klaster}</div>
                 </div>
-              )}
-            </div>
+                <span
+                  className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
+                    open
+                      ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300"
+                      : "bg-rose-500/10 border-rose-400/30 text-rose-300"
+                  }`}
+                >
+                  {open ? "Buka" : "Tutup"}
+                </span>
+              </div>
+            </button>
           );
         })}
       </div>
@@ -491,18 +273,31 @@ function Sidebar({
   );
 }
 
-/* ===================== Cards ===================== */
+/* ===================== Kartu Poli ===================== */
+// Ambil nomor lantai dari string lokasi. Return 1/2/3 atau null kalau tak ketemu.
+function getFloorNumber(lokasi) {
+  if (!lokasi) return null;
+  const m = String(lokasi).match(/(?:lantai|lt)\s*(\d+)/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+// Warna border per lantai
+function floorBorderClass(lokasi) {
+  const n = getFloorNumber(lokasi);
+  if (n === 1) return "border-violet-400/60 hover:border-violet-300/80";
+  if (n === 2) return "border-sky-400/60 hover:border-sky-300/80";
+  if (n === 3) return "border-emerald-400/60 hover:border-emerald-300/80";
+  return "border-white/10 hover:border-white/20";
+}
+
 function ServiceCard({ s, onPick }) {
   return (
     <button
       onClick={() => onPick(s)}
-      className="group relative overflow-hidden rounded-2xl border
-      border-black/10 dark:border-white/10
-      bg-slate-100/70 dark:bg-white/5
-      hover:bg-slate-200/80 dark:hover:bg-white/10
-      active:scale-[.98] transition text-left touch-manipulation"
+      className={`group relative overflow-hidden rounded-2xl border bg-slate-100/5 dark:bg-white/5 hover:bg-white/10 active:scale-[.98] transition text-left touch-manipulation ${floorBorderClass(
+        s.lokasi
+      )}`}
     >
-      <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
+      <div className="w-full bg-slate-200/10 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="h-36 sm:h-44 md:h-48 lg:h-52 grid place-items-center p-2 sm:p-3">
           <img
             src={resolveInfografis(s)}
@@ -515,80 +310,20 @@ function ServiceCard({ s, onPick }) {
       </div>
       <div className="p-3">
         <div className="flex items-center gap-2">
-          <div className="text-xl">{s.ikon}</div>
-          <div className="font-semibold truncate text-slate-900 dark:text-white">{s.nama}</div>
-        </div>
-        <div className="text-xs text-slate-600 mt-1 truncate dark:text-white/60">{s.klaster}</div>
-      </div>
-    </button>
-  );
-}
-
-/* SubServiceCard */
-function SubServiceCard({ item, onPick, parentJadwal }) {
-  const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
-  const bpjsClass = item.bpjs ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
-  const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
-
-  const jadwalLayanan = item.jadwal || null;
-  const open = isOpenNow({ jadwal: jadwalLayanan || parentJadwal });
-  const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
-  const weekly = jadwalLayanan ? summarizeWeekly(jadwalLayanan) : null;
-
-  return (
-    <button
-      onClick={() => onPick(item)}
-      className="relative w-full text-left rounded-2xl border
-      border-black/10 dark:border-white/10
-      bg-slate-100/70 dark:bg-white/5
-      hover:bg-slate-200/80 dark:hover:bg-white/8
-      ring-0 hover:ring-1 hover:ring-black/10 dark:hover:ring-white/15
-      transition-all shadow-sm hover:shadow active:scale-[.99]
-      focus:outline-none focus:ring-2 focus:ring-emerald-500"
-    >
-      <div className="p-4 sm:p-5 space-y-3">
-        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
-          <span className={bpjsClass}>{bpjsText}</span>
-          <span className="ml-auto"><StatusPill open={open} /></span>
-        </div>
-        <div className="text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">{tarifText}</div>
-        <div className="h-px bg-black/10 dark:bg-white/10" />
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
-          <div className="min-w-0 flex-1">
-            <div className="font-semibold text-[15px] sm:text-[16px] leading-snug text-slate-900 dark:text-white">
-              {item.nama}
-            </div>
-            {item.ket && (
-              <div className="text-[13px] sm:text-sm text-slate-600 dark:text-white/70 mt-1 line-clamp-3">
-                {item.ket}
-              </div>
-            )}
-            {/* Jadwal ringkas per layanan */}
-            <div className="mt-2 text-[12px] sm:text-[13px] leading-snug">
-              {jadwalLayanan ? (
-                <>
-                  <div className="text-slate-700 dark:text-white/70">
-                    <span className="text-slate-600 dark:text-white/50">Hari Ini:</span> {today}
-                  </div>
-                  <div className="break-words text-slate-700 dark:text-white/70">
-                    <span className="text-slate-600 dark:text-white/50">Jadwal Buka:</span> {weekly}
-                  </div>
-                </>
-              ) : (
-                <div className="italic text-slate-600 dark:text-white/60">Ikuti jadwal default poli</div>
-              )}
-            </div>
+          <div className="text-xl" aria-hidden>
+            {s.ikon}
           </div>
+          <div className="font-semibold truncate text-white">{s.nama}</div>
         </div>
+        <div className="text-xs text-white/60 mt-1 truncate">{s.klaster}</div>
       </div>
     </button>
   );
 }
 
-/* ===================== Flow Card (pakai FLOW_STEPS) ===================== */
+/* ===================== Flow Card ===================== */
 function FlowCard({ step, index }) {
-  const src = resolveFlowImg(step?.img);
+  const src = step?.img ? (/^https?:\/\//.test(step.img) ? step.img : asset(step.img.replace(/^\//, ""))) : null;
   let lastTap = 0;
   const playNarration = () => {
     const file = step?.audio;
@@ -615,19 +350,18 @@ function FlowCard({ step, index }) {
         player.src = url;
       window.__flowAudioKey = key;
       player.play().catch(() => {});
-    } catch (e) {
-      console.warn("Gagal memutar audio:", e);
-    }
+    } catch {}
   };
 
   return (
     <button
       type="button"
       onClick={playNarration}
-      className="rounded-2xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 overflow-hidden text-left hover:bg-slate-200/80 dark:hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden text-left hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
       aria-label={`Langkah ${index + 1} — ketuk untuk narasi, ketuk cepat 2x untuk ulang`}
+      title="Ketuk untuk memutar narasi. Ketuk dua kali untuk mengulang cepat."
     >
-      <div className="px-3 pt-2 text-[11px] text-slate-600 dark:text-white/50">Langkah {index + 1}</div>
+      <div className="px-3 pt-2 text-[11px] text-white/60">Langkah {index + 1}</div>
       <div className="p-2 sm:p-3 flex items-center justify-center">
         {src ? (
           <img
@@ -635,319 +369,70 @@ function FlowCard({ step, index }) {
             onError={onFlowError}
             alt={step?.name || `Langkah ${index + 1}`}
             className="block max-w-full max-h-[12rem] md:max-h-[14rem] object-contain"
+            loading="lazy"
           />
         ) : (
-          <div className="w-full aspect-[4/3] grid place-items-center text-slate-400 dark:text-white/30 text-sm">—</div>
+          <img
+            src={FLOW_FALLBACK}
+            alt="Gambar alur tidak ditemukan"
+            className="block max-w-full max-h-[12rem] md:max-h-[14rem] object-contain"
+            loading="lazy"
+          />
         )}
       </div>
-      {(step?.name || step?.description) && (
-        <div className="px-3 pb-3">
-          {step?.name && <div className="text-sm font-semibold text-slate-900 dark:text-white">{step.name}</div>}
-          {step?.description && <p className="text-xs text-slate-700 dark:text-white/70 mt-1">{step.description}</p>}
-        </div>
+      {step?.name && (
+        <div className="px-3 pb-2 text-[12px] text-white/80">{step.name}</div>
       )}
     </button>
   );
 }
 
-/* ===================== Info Card ===================== */
-function InfoCard({ title, children }) {
-  return (
-    <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 p-4 sm:p-5 transition-colors duration-300">
-      <div className="text-sm uppercase tracking-wide text-slate-600 dark:text-white/60 mb-2">{title}</div>
-      <div className="prose max-w-none text-slate-800 dark:prose-invert dark:text-slate-300 text-sm leading-relaxed">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/* ===================== Right Panel ===================== */
-function RightPanel({
-  selected,
-  setSelected,
-  filtered,
-  subMatches,
-  onPickSub,
-  jump,
-  setJump,
-  searchQuery,
-  scrollReq,
-}) {
-  const [sub, setSub] = useState(null);
-  const servicesGridRef = useRef(null);
-
-  useEffect(() => setSub(null), [selected]);
-  useEffect(() => {
-    if (jump && selected && selected.id === jump.poliId) {
-      setSub(selected.layanan?.[jump.idx] ?? null);
-      setJump(null);
+/* ===================== EXTRA INFO ===================== */
+function ExtraInfoSection({ title }) {
+  const info = EXTRA_INFO?.[title];
+  if (!info) return null;
+  const render = (node, idx) => {
+    if (!node) return null;
+    if (typeof node === "string") return <p key={idx}>{linkify(node)}</p>;
+    if (Array.isArray(node)) return node.map((n, i) => render(n, `${idx}-${i}`));
+    if (typeof node === "object" && (node.img || node.images || node.text)) {
+      if (node.text || node.images) {
+        return (
+          <div key={idx} className="space-y-2">
+            {node.text && <p>{linkify(node.text)}</p>}
+            {Array.isArray(node.images) &&
+              node.images.map((im, i) => (
+                <img
+                  key={i}
+                  src={/^https?:\/\//.test(im) ? im : asset(im.replace(/^\//, ""))}
+                  alt={node.alt || `info-${i}`}
+                  className="block w-full rounded-xl border border-white/10 object-contain"
+                  loading="lazy"
+                />
+              ))}
+          </div>
+        );
+      }
+      if (node.img) {
+        const src = /^https?:\/\//.test(node.img) ? node.img : asset(node.img.replace(/^\//, ""));
+        return (
+          <img
+            key={idx}
+            src={src}
+            alt={node.alt || "informasi tambahan"}
+            className="block w-full rounded-xl border border-white/10 object-contain"
+            loading="lazy"
+          />
+        );
+      }
     }
-  }, [jump, selected, setJump]);
-
-  const scenarios = useMemo(() => {
-    const A = sub?.alur;
-    if (!A) return {};
-    if (Array.isArray(A)) return { standar: A };
-    return A;
-  }, [sub]);
-
-  const scenarioKeys = Object.keys(scenarios);
-  const [scenarioKey, setScenarioKey] = useState(null);
-  useEffect(() => {
-    setScenarioKey(scenarioKeys[0] ?? null);
-  }, [sub, JSON.stringify(scenarioKeys)]);
-
-  const flowSteps = useMemo(() => {
-    return (scenarios[scenarioKey] || []).map((id) => FLOW_STEPS[id]).filter(Boolean);
-  }, [scenarios, scenarioKey]);
-
-  const showSearchResults = searchQuery?.trim()?.length > 0 && subMatches?.length > 0;
-
-  // Scroll request dari Sidebar (klik notice jadwal beragam)
-  useEffect(() => {
-    if (!scrollReq || !selected || sub) return;
-    if (selected.id !== scrollReq.poliId) return;
-    try {
-      servicesGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    } catch {}
-  }, [scrollReq, selected, sub]);
-
-  if (!selected || showSearchResults) {
-    return (
-      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key="grid-poli-or-search"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-          >
-            {showSearchResults ? (
-              <section className="mb-6">
-                <div className="mb-2 text-slate-700 dark:text-white/70">Hasil Pelayanan</div>
-                <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {subMatches.map(({ poli, item, index }) => (
-                    <SubServiceCard
-                      key={poli.id + "#" + index}
-                      item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
-                      onPick={() => onPickSub(poli.id, index)}
-                      parentJadwal={poli.jadwal}
-                    />
-                  ))}
-                </div>
-              </section>
-            ) : (
-              <>
-                <div className="mb-3 text-slate-700 dark:text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
-                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {filtered.map((s) => (
-                    <ServiceCard key={s.id} s={s} onPick={setSelected} />
-                  ))}
-                </div>
-              </>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  if (!sub) {
-    const list = selected.layanan ?? [];
-    return (
-      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              stopFlowAudio();
-              setSelected(null);
-            }}
-            className="px-3 py-2.5 rounded-xl bg-slate-200/70 border border-black/10 hover:bg-slate-200/90 dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20 transition-colors"
-          >
-            ← Kembali
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="text-2xl">{selected.ikon}</div>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">{selected.nama}</h2>
-          <div className="ml-auto flex gap-2">
-            <Chip>{selected.klaster}</Chip>
-            {selected.telemed && <Chip>Telemed</Chip>}
-          </div>
-        </div>
-
-        <div className="mb-1 text-slate-700 dark:text-white/70">Jenis Layanan — {selected.nama}</div>
-        <div
-          ref={servicesGridRef}
-          className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        >
-          {list.length > 0 ? (
-            list.map((it, i) => (
-              <SubServiceCard key={i} item={it} onPick={setSub} parentJadwal={selected.jadwal} />
-            ))
-          ) : (
-            <div className="text-slate-600 dark:text-white/60">Belum ada jenis layanan terdaftar.</div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
+    return null;
+  };
   return (
-    <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => {
-            stopFlowAudio();
-            setSub(null);
-          }}
-          className="px-3 py-2.5 rounded-xl bg-slate-200/70 border border-black/10 hover:bg-slate-200/90 dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20 transition-colors"
-        >
-          ← Kembali
-        </button>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="text-2xl">{selected.ikon}</div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">
-          {selected.nama} — {sub.nama}
-        </h2>
-        <div className="ml-auto flex gap-2">
-          <Chip>{selected.klaster}</Chip>
-          {selected.telemed && <Chip>Telemed</Chip>}
-        </div>
-      </div>
-
-      <div className="text-slate-700 dark:text-white/70">
-        Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
-      </div>
-
-      {Object.keys(scenarios).length > 1 && (
-        <div className="flex flex-wrap gap-2 -mt-1">
-          {Object.keys(scenarios).map((key) => (
-            <button
-              key={key}
-              onClick={() => {
-                stopFlowAudio();
-                setScenarioKey(key);
-              }}
-              className={`px-3 py-1.5 rounded-lg border text-sm transition ${
-                key === scenarioKey
-                  ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-700 dark:text-emerald-300"
-                  : "bg-slate-200/70 border-black/10 text-slate-800 hover:bg-slate-200/90 dark:bg-white/5 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/10"
-              }`}
-              aria-pressed={key === scenarioKey}
-            >
-              {key.replace(/_/g, " ").replace(/\b\w/g, (m) => m.toUpperCase())}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {flowSteps.map((step, i) => (
-          <FlowCard key={step.id ?? i} step={step} index={i} />
-        ))}
-      </div>
-
-      <div className="mt-4 sm:mt-6">
-        <InfoCard title="Petugas Penanggung Jawab">
-          <div className="font-semibold text-slate-900 dark:text-white mb-1">
-            {DOCTORS_BY_POLI[selected.id] ?? "—"}
-          </div>
-          <div className="text-slate-700 dark:text-white/70">
-            <p className="mb-2">
-              <strong>Detail layanan:</strong> {sub.nama}
-            </p>
-            {(() => {
-              const extra = sub.info ?? EXTRA_INFO[sub.nama];
-
-              const toSrc = (p) => {
-                if (!p) return null;
-                if (/^https?:\/\//.test(p)) return p;
-                const clean = String(p).replace(/^\/+/, "");
-                return asset(clean);
-              };
-
-              if (!extra) {
-                return (
-                  <>
-                    <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-                    <p className="mt-2">
-                      Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
-                      instruksi khusus untuk layanan <em>{sub.nama}</em>.
-                    </p>
-                  </>
-                );
-              }
-
-              if (typeof extra === "string") {
-                return <p>{linkify(extra)}</p>;
-              }
-
-              if (Array.isArray(extra)) {
-                return (
-                  <div className="space-y-3">
-                    {extra.map((item, i) => {
-                      if (typeof item === "string") {
-                        return <p key={`txt-${i}`}>{linkify(item)}</p>;
-                      }
-                      if (item && typeof item === "object" && item.img) {
-                        return (
-                          <div key={`img-${i}`} className="space-y-1">
-                            <img
-                              src={toSrc(item.img)}
-                              alt={item.alt || sub.nama}
-                              className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                              onError={onInfoError}
-                              loading="lazy"
-                            />
-                            {item.alt && (
-                              <div className="text-[12px] text-slate-600 dark:text-white/60 leading-snug">
-                                {item.alt}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                );
-              }
-
-              if (extra && typeof extra === "object") {
-                const { text, images } = extra;
-                return (
-                  <div className="space-y-3">
-                    {text ? <p>{linkify(text)}</p> : null}
-                    {Array.isArray(images) && images.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {images.map((src, i) => (
-                          <img
-                            key={`img2-${i}`}
-                            src={toSrc(src)}
-                            alt={sub.nama}
-                            className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                            onError={onInfoError}
-                            loading="lazy"
-                          />
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              }
-
-              return null;
-            })()}
-          </div>
-        </InfoCard>
-      </div>
-    </div>
+    <section aria-labelledby="extra-info-title" className="space-y-2">
+      <h3 id="extra-info-title" className="font-semibold text-white">Informasi Tambahan</h3>
+      <div className="prose prose-sm dark:prose-invert max-w-none">{render(info, 0)}</div>
+    </section>
   );
 }
 
@@ -963,35 +448,27 @@ function useThemeKey() {
     // Amati perubahan class pada <html>
     const obs = new MutationObserver(() => setKey(get()));
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-
-    // Storage (kalau tab lain mengganti tema)
-    const onStorage = (e) => {
-      if (e.key === "theme") setKey(get());
-    };
-    window.addEventListener("storage", onStorage);
-
-    return () => {
-      obs.disconnect();
-      window.removeEventListener("storage", onStorage);
-    };
+    return () => obs.disconnect();
   }, []);
 
   return key;
 }
 
-/* ===================== App Root ===================== */
+/* ===================== App ===================== */
 export default function App() {
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(null);
   const [facility, setFacility] = useState("pkm-jagakarsa");
   const [navOpen, setNavOpen] = useState(false);
   const [scrollReq, setScrollReq] = useState(null); // { poliId, ts }
   const [jump, setJump] = useState(null);
 
-  const themeKey = useThemeKey(); // ← kunci animasi tema
+  const themeKey = useThemeKey(); // tetap dipakai untuk animasi halus
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
+
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState(null); // poli terpilih
+  const [selectedServiceIdx, setSelectedServiceIdx] = useState(null);
 
   useEffect(() => {
     if (query.trim().length > 0) {
@@ -1000,29 +477,44 @@ export default function App() {
     }
   }, [query]);
 
+  // Pencarian poli (nama atau klaster), lalu URUTKAN BERDASARKAN LANTAI
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SERVICES_CURRENT.filter(
+    const list = SERVICES_CURRENT.filter(
       (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
     );
-  }, [query, SERVICES_CURRENT]);
+    // Sort per lantai → 1,2,3, lalu nama
+    return list.slice().sort((a, b) => {
+      const fa = getFloorNumber(a.lokasi) ?? 999;
+      const fb = getFloorNumber(b.lokasi) ?? 999;
+      if (fa !== fb) return fa - fb;
+      return a.nama.localeCompare(b.nama);
+    });
+  }, [SERVICES_CURRENT, query]);
 
+  // Sub hasil: cari layanan yang match query (tetap ada dari baseline)
   const subResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    const rows = [];
-    SERVICES_CURRENT.forEach((p) =>
-      (p.layanan || []).forEach((item, idx) => {
-        const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
-        if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
-      })
-    );
-    return rows;
-  }, [query, SERVICES_CURRENT]);
+    const res = [];
+    for (const p of SERVICES_CURRENT) {
+      for (let i = 0; i < (p.layanan || []).length; i++) {
+        const l = p.layanan[i];
+        if (
+          l.nama?.toLowerCase().includes(q) ||
+          l.ket?.toLowerCase().includes(q) ||
+          p.nama?.toLowerCase().includes(q)
+        ) {
+          res.push({ poliId: p.id, idx: i, poliNama: p.nama, layanan: l });
+        }
+      }
+    }
+    return res;
+  }, [SERVICES_CURRENT, query]);
 
   const matchPoliIds = useMemo(
-    () => Array.from(new Set(subResults.map((r) => r.poli.id))),
-    [subResults]
+    () => new Set(filtered.map((x) => x.id)),
+    [filtered]
   );
   const sidebarList = useMemo(
     () =>
@@ -1040,144 +532,350 @@ export default function App() {
   }
 
   useEffect(() => {
-    stopFlowAudio();
-    setSelected(null);
-    setQuery("");
-  }, [facility]);
+    if (!jump) return;
+    setSelectedServiceIdx(jump.idx);
+    const t = setTimeout(() => setJump(null), 200);
+    return () => clearTimeout(t);
+  }, [jump]);
 
+  const [anchorServices, setAnchorServices] = useState(null);
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") setNavOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+    if (!scrollReq || !anchorServices) return;
+    if (scrollReq.poliId !== selected?.id) return;
+    anchorServices.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [scrollReq, anchorServices, selected?.id]);
 
+  // ====== RENDER ======
   return (
-    <AnimatePresence mode="wait">
-      {/* motion wrapper untuk cross-fade saat tema berubah */}
-      <motion.div
-        key={themeKey}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.18 }}
-        className="
-          min-h-screen
-          text-slate-900 dark:text-white
-          bg-gradient-to-b
-          from-white via-slate-50 to-slate-100
-          dark:from-slate-900 dark:via-slate-950 dark:to-black
-          transition-colors duration-300
-        "
-      >
-        <header className="
-          sticky top-0 z-30 backdrop-blur
-          bg-white/70 dark:bg-slate-900/70
-          border-b border-black/5 dark:border-white/10
-          transition-colors duration-300
-        ">
-          <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
-            <button
-              className="md:hidden inline-flex items-center justify-center size-9 rounded-xl
-              border border-black/10 dark:border-white/10
-              bg-white/60 dark:bg-white/5
-              hover:bg-slate-200/80 dark:hover:bg-white/10"
-              aria-label="Buka menu"
-              onClick={() => setNavOpen(true)}
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </button>
-
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
-              <div className="font-semibold">Informasi Layanan Puskesmas Jagakarsa</div>
-            </div>
-
-            <div className="ml-auto flex items-center gap-2">
-              <label className="text-xs text-slate-600 dark:text-white/60 hidden sm:block">Fasilitas</label>
-              <select
-                value={facility}
-                onChange={(e) => setFacility(e.target.value)}
-                className="
+    <div className="min-h-[100svh] bg-[#0b1020] text-white">
+      {/* Header */}
+      <header className="h-14 border-b border-white/10 bg-[#0b1020] sticky top-0 z-30" role="banner">
+        <div className="mx-auto max-w-7xl h-full px-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <span aria-hidden className="text-xl">🩺</span>
+            <h1 className="text-base sm:text-lg font-semibold truncate">
+              Informasi Layanan Puskesmas Jagakarsa
+            </h1>
+          </div>
+          <nav aria-label="Toolbar" className="flex items-center gap-2">
+            <label className="text-xs text-white/70 mr-2">Fasilitas</label>
+            <select
+              value={facility}
+              onChange={(e) => setFacility(e.target.value)}
+              className="
                   h-9 rounded-lg px-2 text-sm outline-none
-                  bg-white text-slate-900 border border-black/10
-                  dark:bg-slate-800 dark:text-white dark:border-white/10
+                  bg-white/10 text-white border border-white/10
                   focus:ring-2 focus:ring-emerald-500
                   appearance-none
                 "
-              >
-                {FACILITIES.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
+            >
+              {FACILITIES.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
 
-        <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
-          {navOpen && (
             <button
-              aria-label="Tutup menu"
-              onClick={() => setNavOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
-            />
-          )}
+              className="md:hidden h-9 px-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10"
+              onClick={() => setNavOpen((v) => !v)}
+              aria-label="Buka navigasi"
+            >
+              ☰
+            </button>
+          </nav>
+        </div>
+      </header>
 
-          <div
-            className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
+      <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,1fr] gap-4">
+        {/* Sidebar */}
+        <div
+          className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
               transition-transform md:transition-none
               ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
               h-[100dvh] overflow-y-auto overscroll-contain`}
-            role="dialog"
-            aria-modal="true"
-          >
-            <Sidebar
-              facilityName={facilityName}
-              query={query}
-              setQuery={setQuery}
-              services={sidebarList}
-              onPick={(s) => {
-                setSelected(s);
-                setNavOpen(false);
-              }}
-              onScrollToServices={(poliId) => {
-                setScrollReq({ poliId, ts: Date.now() }); // trigger scroll
-                setNavOpen(false);                         // tutup drawer (mobile)
-              }}
-              selected={selected}
-              highlightIds={matchPoliIds}
-            />
-          </div>
-
-          <RightPanel
-            selected={selected}
-            setSelected={setSelected}
-            filtered={filtered}
-            subMatches={subResults}
-            onPickSub={handlePickSub}
-            jump={jump}
-            setJump={setJump}
-            searchQuery={query}
-            scrollReq={scrollReq}
+          role="dialog"
+          aria-modal="true"
+        >
+          <Sidebar
+            facilityName={facilityName}
+            query={query}
+            setQuery={setQuery}
+            services={sidebarList}
+            onPick={(s) => {
+              setSelected(s);
+              setSelectedServiceIdx(null);
+              setNavOpen(false);
+              stopFlowAudio();
+            }}
           />
         </div>
 
-        <SurveyPopup
-          formUrl="https://forms.gle/72k85XkYQTQZRfq38"
-          delayMs={40000}
-          cooldownDays={14}
-        />
+        {/* Panel kanan */}
+        <section aria-label="Konten utama" className="space-y-4">
+          {/* Grid Poli (default view) */}
+          {!selected && (
+            <div className="space-y-4">
+              <div className="text-sm text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
 
-        <footer className="py-6 text-center text-slate-600 dark:text-white/50 text-sm">
-          © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
-        </footer>
-      </motion.div>
-    </AnimatePresence>
+              {/* Hasil layanan saat pencarian */}
+              {query && subResults.length > 0 && (
+                <div className="rounded-2xl border border-white/10 p-3 bg-white/5">
+                  <div className="text-xs uppercase text-white/60 mb-2">Hasil yang berkaitan</div>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {subResults.map((r, i) => (
+                      <button
+                        key={i}
+                        className="text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 p-3"
+                        onClick={() => handlePickSub(r.poliId, r.idx)}
+                      >
+                        <div className="text-[13px] font-semibold">{r.layanan.nama}</div>
+                        <div className="text-xs text-white/60">{r.poliNama}</div>
+                        {r.layanan.ket && (
+                          <div className="text-xs text-white/60 mt-1 line-clamp-2">{r.layanan.ket}</div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {filtered.map((s) => (
+                  <ServiceCard key={s.id} s={s} onPick={(p) => setSelected(p)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Detail Poli */}
+          {selected && (
+            <section aria-label={`Detail ${selected.nama}`} className="space-y-4">
+              <div className="rounded-2xl border border-white/10 overflow-hidden bg-white/5">
+                <div className="grid md:grid-cols-[1fr,1fr] gap-0">
+                  <div className="p-4 order-2 md:order-1">
+                    <h2 className="text-lg sm:text-xl font-semibold">{selected.nama}</h2>
+                    <p className="text-sm text-white/60">
+                      {selected.klaster} • {selected.lokasi || "Lokasi tidak tersedia"}
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {/* Telemed badge dihapus sesuai permintaan */}
+                      <Chip>{isOpenNow({ jadwal: selected.jadwal }) ? "Sedang buka" : "Sedang tutup"}</Chip>
+                    </div>
+                  </div>
+                  <div className="order-1 md:order-2 bg-slate-900/40 grid place-items-center p-2">
+                    <img
+                      src={resolveInfografis(selected)}
+                      onError={onInfoError}
+                      alt={`Infografis ${selected.nama}`}
+                      className="block w-full max-h-64 object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Daftar layanan */}
+              <div className="space-y-3" ref={setAnchorServices}>
+                <div className="flex items-baseline justify-between">
+                  <h2 className="text-base font-semibold">Layanan di {selected?.nama || "—"}</h2>
+                  <span className="text-xs text-white/60">{(selected.layanan || []).length} layanan</span>
+                </div>
+
+                {(selected.layanan || []).length === 0 ? (
+                  <div className="text-sm text-white/60">Belum ada layanan.</div>
+                ) : (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {(selected.layanan || []).map((item, idx) => {
+                      const jadwalLayanan = item.jadwal || null;
+                      const open = isOpenNow({ jadwal: jadwalLayanan || selected.jadwal });
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedServiceIdx(idx)}
+                          className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all shadow-sm hover:shadow active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        >
+                          <div className="p-4 sm:p-5 space-y-3">
+                            <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
+                              <span className={item.bpjs ? "text-emerald-300" : "text-rose-300"}>
+                                {item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup"}
+                              </span>
+                              <span className="ml-auto text-[11px] px-2 py-1 rounded-full border"
+                                style={{ borderColor: open ? "#34d39988" : "#f8717188", background: open ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.15)" }}>
+                                {open ? "Buka" : "Tutup"}
+                              </span>
+                            </div>
+                            <div className="text-[12px] sm:text-[13px] text-white/80">
+                              Tarif Umum: {formatTarifID(item.tarif)}
+                            </div>
+                            <div className="h-px bg-white/10" />
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 text-xl sm:text-2xl shrink-0" aria-hidden>
+                                {item.ikon ?? "🧩"}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-semibold text-[15px] sm:text-[16px] leading-snug">
+                                  {item.nama}
+                                </div>
+                                {item.ket && (
+                                  <p className="text-[13px] sm:text-sm text-white/70 mt-1 line-clamp-3">
+                                    {item.ket}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Detail Layanan (jika dipilih) */}
+              {selectedServiceIdx != null && selected.layanan?.[selectedServiceIdx] && (
+                <DetailPanel
+                  poli={selected}
+                  layanan={selected.layanan[selectedServiceIdx]}
+                  onBack={() => {
+                    setSelectedServiceIdx(null);
+                    stopFlowAudio();
+                  }}
+                />
+              )}
+            </section>
+          )}
+        </section>
+      </main>
+
+      {/* Survey */}
+      <SurveyPopup />
+
+      <footer className="mt-8 py-6 border-t border-white/10 text-center text-xs text-white/60">
+        <p>
+          © {new Date().getFullYear()} Puskesmas Jagakarsa — Informasi layanan.
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+/* ===================== Detail Panel ===================== */
+function DetailPanel({ poli, layanan, onBack }) {
+  const refTop = useRef(null);
+  useEffect(() => {
+    refTop.current?.focus?.();
+  }, [poli?.id, layanan?.nama]);
+
+  const dokter = DOCTORS_BY_POLI?.[poli?.id] || null;
+
+  function stepsFor(l) {
+    if (!l?.alur) return [];
+    const ids = Array.isArray(l.alur) ? l.alur : Object.values(l.alur || {}).flat();
+    return ids.map((id) => FLOW_STEPS?.[id]).filter(Boolean);
+  }
+  const steps = stepsFor(layanan);
+
+  return (
+    <section aria-label={`Detail layanan ${layanan?.nama}`} className="space-y-4" tabIndex={-1} ref={refTop}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-lg sm:text-xl font-semibold">{layanan?.nama}</h2>
+          <p className="text-sm text-white/60">
+            {poli?.nama} • {poli?.lokasi || "Lokasi tidak tersedia"}
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            stopFlowAudio();
+            onBack?.();
+          }}
+          className="h-10 px-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          aria-label="Kembali ke daftar layanan"
+        >
+          ← Kembali
+        </button>
+      </div>
+
+      <div className="grid lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3 space-y-3">
+          <h3 className="font-semibold">Alur Layanan</h3>
+          {steps.length === 0 ? (
+            <div className="text-sm text-white/60">Alur belum ditambahkan.</div>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {steps.map((st, i) => (
+                <FlowCard key={st.id ?? i} step={st} index={i} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <aside className="lg:col-span-2 space-y-4">
+          <section aria-labelledby="tarif-status">
+            <h3 id="tarif-status" className="font-semibold">Ringkasan</h3>
+            <div className="rounded-xl border border-white/10 p-3 bg-white/5 space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-white/70">Tarif:</span>
+                <PricePill tarif={layanan?.tarif} />
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-white/70">BPJS:</span>
+                <Chip>{layanan?.bpjs ? "Tercakup" : "Tidak Tercakup"}</Chip>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-white/70">Status:</span>
+                <Chip>{isOpenNow({ jadwal: layanan?.jadwal || poli?.jadwal }) ? "Buka" : "Tutup"}</Chip>
+              </div>
+            </div>
+          </section>
+
+          {dokter && (
+            <section aria-labelledby="petugas-title">
+              <h3 id="petugas-title" className="font-semibold">Petugas/Penanggung Jawab</h3>
+              <div className="rounded-xl border border-white/10 p-3 bg-white/5">
+                <p className="text-sm text-white/80">{dokter}</p>
+              </div>
+            </section>
+          )}
+
+          <ExtraInfoSection title={layanan?.nama} />
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+/* ===================== Price pill ===================== */
+function formatTarifID(t) {
+  if (t == null) return "Tidak tersedia";
+  if (Array.isArray(t) && t.length === 2) {
+    const [a, b] = t.map(Number);
+    if (Number.isFinite(a) && Number.isFinite(b)) {
+      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
+    }
+  }
+  if (t && typeof t === "object" && "min" in t && "max" in t) {
+    const a = Number(t.min),
+      b = Number(t.max);
+    if (Number.isFinite(a) && Number.isFinite(b)) {
+      return `Rp ${a.toLocaleString("id-ID")}–${b.toLocaleString("id-ID")}`;
+    }
+  }
+  const n = Number(t);
+  if (Number.isFinite(n)) return n === 0 ? "Gratis" : `Rp ${n.toLocaleString("id-ID")}`;
+  return String(t);
+}
+function PricePill({ tarif }) {
+  const label = formatTarifID(tarif);
+  return label === "Gratis" ? (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30">
+      Gratis
+    </span>
+  ) : (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500/15 text-sky-300 ring-1 ring-sky-400/30">
+      {label}
+    </span>
   );
 }
