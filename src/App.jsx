@@ -587,7 +587,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,1fr] gap-4 items-start">
+      <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,minmax(0,1fr)] gap-6 items-start">
         {/* Sidebar */}
           <Sidebar
             facilityName={facilityName}
@@ -605,39 +605,90 @@ export default function App() {
         {/* Panel kanan */}
         <section aria-label="Konten utama" className="space-y-4 self-start">
           {/* Grid Poli (default view) */}
-          {!selected && (
-            <div className="space-y-4">
-              <div className="text-sm text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
+         {selected && (
+  <section aria-label={`Detail ${selected.nama}`} className="space-y-4">
+    <div className="flex items-center justify-between gap-3">
+      <button
+        onClick={() => { setSelected(null); setSelectedServiceIdx(null); stopFlowAudio(); }}
+        className="h-10 px-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        aria-label="Kembali ke daftar poli"
+      >
+        ← Kembali
+      </button>
+      <div className="min-w-0 text-right">
+        <h2 className="text-xl font-semibold truncate">{selected.nama}</h2>
+        <p className="text-sm text-white/60 truncate">
+          {selected.klaster} — {selected.lokasi || "Lokasi tidak tersedia"}
+        </p>
+      </div>
+    </div>
 
-              {/* Hasil layanan saat pencarian */}
-              {query && subResults.length > 0 && (
-                <div className="rounded-2xl border border-white/10 p-3 bg-white/5">
-                  <div className="text-xs uppercase text-white/60 mb-2">Hasil yang berkaitan</div>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {subResults.map((r, i) => (
-                      <button
-                        key={i}
-                        className="text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 p-3"
-                        onClick={() => handlePickSub(r.poliId, r.idx)}
-                      >
-                        <div className="text-[13px] font-semibold">{r.layanan.nama}</div>
-                        <div className="text-xs text-white/60">{r.poliNama}</div>
-                        {r.layanan.ket && (
-                          <div className="text-xs text-white/60 mt-1 line-clamp-2">{r.layanan.ket}</div>
-                        )}
-                      </button>
-                    ))}
+    {/* Daftar layanan */}
+    <div className="space-y-3">
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-base font-semibold">Layanan di {selected.nama}</h3>
+        <span className="text-xs text-white/60">{(selected.layanan || []).length} layanan</span>
+      </div>
+
+      {(selected.layanan || []).length === 0 ? (
+        <div className="text-sm text-white/60">Belum ada layanan.</div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {(selected.layanan || []).map((item, idx) => {
+            const open = isOpenNow({ jadwal: item.jadwal || selected.jadwal });
+            return (
+              <button
+                key={idx}
+                onClick={() => setSelectedServiceIdx(idx)}
+                className="relative w-full text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all shadow-sm hover:shadow active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <div className="p-4 sm:p-5 space-y-3">
+                  <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
+                    <span className={item.bpjs ? "text-emerald-300" : "text-rose-300"}>
+                      {item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup"}
+                    </span>
+                    <span className="ml-auto text-[11px] px-2 py-1 rounded-full border"
+                      style={{ borderColor: open ? "#34d39988" : "#f8717188", background: open ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.15)" }}>
+                      {open ? "Buka" : "Tutup"}
+                    </span>
+                  </div>
+                  <div className="text-[12px] sm:text-[13px] text-white/80">
+                    Tarif Umum: {formatTarifID(item.tarif)}
+                  </div>
+                  <div className="h-px bg-white/10" />
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 text-xl sm:text-2xl shrink-0" aria-hidden>
+                      {item.ikon ?? "🧩"}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-[15px] sm:text-[16px] leading-snug">
+                        {item.nama}
+                      </div>
+                      {item.ket && (
+                        <p className="text-[13px] sm:text-sm text-white/70 mt-1 line-clamp-3">
+                          {item.ket}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {filtered.map((s) => (
-                  <ServiceCard key={s.id} s={s} onPick={(p) => setSelected(p)} />
-                ))}
-              </div>
-            </div>
-          )}
+    {/* Detail Layanan */}
+    {selectedServiceIdx != null && selected.layanan?.[selectedServiceIdx] && (
+      <DetailPanel
+        poli={selected}
+        layanan={selected.layanan[selectedServiceIdx]}
+        onBack={() => { setSelectedServiceIdx(null); stopFlowAudio(); }}
+      />
+    )}
+  </section>
+)}
 
           {/* Detail Poli */}
           {selected && (
