@@ -560,23 +560,19 @@ export default function App() {
           <nav aria-label="Toolbar" className="flex items-center gap-2">
             <label className="text-xs text-white/70 mr-2">Fasilitas</label>
             <select
-            value={facility}
-            onChange={(e) => setFacility(e.target.value)}
-            className="
-            h-9 rounded-lg px-2 text-sm outline-none
-           text-white border border-white/20
-           bg-[#111827] hover:bg-[#111827] focus:bg-[#111827]
-           focus:ring-2 focus:ring-emerald-500
-           appearance-none
-           "
-          style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
-           >
-              {FACILITIES.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.name}
-                </option>
-              ))}
-            </select>
+  value={facility}
+  onChange={(e) => setFacility(e.target.value)}
+  className="
+    h-9 rounded-lg px-2 text-sm outline-none
+    bg-white/10 text-white border border-white/10
+    focus:ring-2 focus:ring-emerald-500
+    appearance-none
+  "
+>
+  {FACILITIES.map((f) => (
+    <option key={f.id} value={f.id}>{f.name}</option>
+  ))}
+</select>
 
             <button
               className="md:hidden h-9 px-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10"
@@ -591,14 +587,6 @@ export default function App() {
 
       <main className="mx-auto max-w-7xl px-4 py-4 grid md:grid-cols-[20rem,1fr] gap-4 items-start">
         {/* Sidebar */}
-        <div
-          className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
-              transition-transform md:transition-none
-              ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
-              h-[100dvh] overflow-y-auto overscroll-contain`}
-          role="dialog"
-          aria-modal="true"
-        >
           <Sidebar
             facilityName={facilityName}
             query={query}
@@ -611,8 +599,7 @@ export default function App() {
               stopFlowAudio();
             }}
           />
-        </div>
-
+        
         {/* Panel kanan */}
         <section aria-label="Konten utama" className="space-y-4 self-start">
           {/* Grid Poli (default view) */}
