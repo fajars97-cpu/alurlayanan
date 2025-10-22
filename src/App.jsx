@@ -434,7 +434,7 @@ function Sidebar({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cari 'umum', 'gigi', 'cabut gigi' ..."
+          placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' ..."
           className="w-full h-11 px-3 rounded-xl
           bg-white text-slate-900 border border-black/10
           dark:bg-white/5 dark:text-white dark:border-white/10
