@@ -27,7 +27,7 @@ export const DOCTORS_BY_POLI = {
   uks: "Petugas UKS",
   "vaksin-dengue": "Perawat Vaksin",
   "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
-  "RB": "Bidan Ika Nurmalasari, A.Md. Keb.",
+  "RB": "dr. Olivia Vistary, MARS. dan Bidan Rahayu Hartati.",
   ckg: "dr. Rakhmawaty",
 };
 
@@ -50,6 +50,9 @@ export const EXTRA_INFO = {
   // Layanan 24 Jam
   "Pemeriksaan Jenazah (24 Jam)": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
  
+  // Catin
+  "Pemeriksaan Calon Pengantin": ["1. Pernikahan (akad) akan dilaksanakan sampai 3 bulan ke depan, bila lebih dari itu proses pengajuan akan ditolak.","2.Catin yang mengajukan pemeriksaan di Puskesmas Jagakarsa HARUS BERDOMISILI di wilayah kerja Puskesmas Jagakarsa.","3. - Catin dengan usia >19 tahun bisa diajukan pembuatan sertifikat layak nikah.","- Catin yang berusia 18 - 19 Tahun WAJIB menyertakan surat dispensasi menikah dari Pengadilan Agama/ Pengadilan Negeri","Catin berusia <18 tahun TIDAK BISA diajukan pembuatan sertifikat layak nikah, hanya bisa dilakukan pemeriksaan kesehatan saja.","Informasi lebih lanjut bisa mengklik link berikut: https://bit.ly/daftarLIONTIN"],
+
   // KB & IVA
   "Konsultasi KB": "Konsultasi KB.",
   "Suntik KB": "Mohon untuk membawa kartu peserta KB saat kontrol.",
