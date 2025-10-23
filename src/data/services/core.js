@@ -20,7 +20,7 @@ export const FLOW_STEPS = {
     id: 3,
     title: "Langkah 3",
     name: "Menuju Poli Gigi",
-    description: "Silahkan menuju poli gigi lantai 2.",
+    description: "Silahkan menuju ruang poli gigi di lantai apabila nama Anda telah dipanggil.",
     img: "/alur/81-menuju-poli-gigi.webp",
   },
   4: {
@@ -685,7 +685,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: true,
           ket: "Pencabutan gigi permanen",
-          alur: [1, 82, 83, ,4, 5],
+          alur: [1, 81, 3, 82, 83, ,4, 5],
         },
         {
           nama: "Scaling",
@@ -693,7 +693,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 40000,
           bpjs: false,
           ket: "Pembersihan karang gigi",
-          alur: [1, 82, 83, 5],
+          alur: [1, 81, 3, 82, 83, 5],
         },
       ],
     },
@@ -738,7 +738,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Layanan 24 jam",
           ikon: "⚡",
-          tarif: 0,
+          tarif: 20000,
           bpjs: true,
           ket: "Pelayanan Umum 24 Jam",
           jadwal: {
