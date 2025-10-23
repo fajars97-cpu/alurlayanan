@@ -603,16 +603,23 @@ export const FLOW_STEPS = {
     92: {
     id: 92,
     title: "Langkah 92",
-    name: "Pengambilan Sampel Darah Catin",
-    description: "Silahkan menuju laboratorium (lantai 3, dari tangga/ lift ke kiri) lalu taruh surat pengantar di meja petugas, tunggu hingga nama Anda dipanggil untuk masuk ke ruang pengambilan darah.",
+    name: "Menaruh Formulir Laboratorium",
+    description: "Silahkan menuju laboratorium (lantai 3, dari tangga/ lift ke kiri) lalu taruh surat pengantar di keranjang yang disediakan. Tunggu hingga nama Anda dipanggil untuk masuk ke ruang pengambilan darah.",
     img: "/alur/92-pengambilan-sampel-darah.webp",
     },
     93: {
     id: 93,
     title: "Langkah 93",
+    name: "Pengambilan Sampel Darah Catin",
+    description: "Silahkan menuju ruang pengambilan sampel darah laboratorium jika nama Anda telah dipanggil.",
+    img: "/alur/93-pengambilan-sampel-darah.webp",
+    },
+    94: {
+    id: 94,
+    title: "Langkah 94",
     name: "Pengambilan Sertifikat",
     description: "Setelah pengambilan sampel darah, Anda bisa pulang terlebih dahulu dan akan diberitahukan jika sertifikat sudah jadi melalui wa, silahkan ambil sertifikat di pos security.",
-    img: "/alur/93-pengambilan-sertifikat.webp",
+    img: "/alur/94-pengambilan-sertifikat.webp",
     },
 };
 
@@ -847,7 +854,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Skrining pranikah",
-          alur: [89, 90, 91, 92, 93],
+          alur: [89, 90, 91, 92, 93, 94],
         },
       ],
     },
