@@ -205,8 +205,26 @@ function getOpenStatus(service, ref = new Date()) {
     const tRanges = rangesForToday(schedule, tmr);
     if (tRanges.length) nextChange = tRanges[0].from + 1440;
   }
+  // === NEW: Istirahat Senin–Jumat pukul 12:00–13:00
+  const dayName = DAY_NAMES_ID[ref.getDay()];
+  const isWeekday = ["Senin","Selasa","Rabu","Kamis","Jumat"].includes(dayName);
+  const rest = isWeekday && now >= 720 && now < 780; // 12:00–13:00
+  if (rest) {
+    open = false;
+    // saat istirahat, perubahan terdekat adalah pukul 13:00
+    if (nextChange == null || 780 < nextChange) nextChange = 780;
+  }
+
   const minutesUntilChange = nextChange != null ? nextChange - now : null;
-  return { open, minutesUntilChange };
+
+  // === NEW: penanda segera buka/tutup (±30 menit)
+  let soon = null;
+  if (!rest && minutesUntilChange != null && minutesUntilChange >= 0) {
+    if (!open && minutesUntilChange <= 30) soon = "segera-buka";
+    if ( open && minutesUntilChange <= 30) soon = "segera-tutup";
+  }
+
+  return { open, rest, soon, minutesUntilChange };
 }
 export function getEffectiveJadwal(s) {
   const { weekly } = normalizeSchedule(s?.jadwal || {});
@@ -326,17 +344,29 @@ function PricePill({ tarif }) {
   const label = formatTarifID(tarif);
   return label === "Gratis" ? <Pill tone="emerald">Gratis</Pill> : <Pill tone="sky">{label}</Pill>;
 }
-const StatusPill = ({ open }) => (
-  <span
-    className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${
-      open
-        ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-700 dark:text-emerald-300"
-        : "bg-rose-500/10 border-rose-400/30 text-rose-700 dark:text-rose-300"
-    }`}
-  >
-    {open ? "Buka" : "Tutup"}
-  </span>
-);
+const StatusPill = ({ open, rest, soon }) => {
+  let label = open ? "Buka" : "Tutup";
+  let tone  = open
+    ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-700 dark:text-emerald-300"
+    : "bg-rose-500/10 border-rose-400/30 text-rose-700 dark:text-rose-300";
+
+  if (rest) {
+    label = "Istirahat";
+    tone  = "bg-slate-500/10 border-slate-400/30 text-slate-700 dark:text-slate-300";
+  } else if (soon === "segera-buka") {
+    label = "Segera buka";
+    tone  = "bg-sky-500/10 border-sky-400/30 text-sky-700 dark:text-sky-300";
+  } else if (soon === "segera-tutup") {
+    label = "Segera tutup";
+    tone  = "bg-amber-500/10 border-amber-400/30 text-amber-700 dark:text-amber-300";
+  }
+
+  return (
+    <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${tone}`}>
+      {label}
+    </span>
+  );
+};
 
 /* ===================== Drawer (NEW) ===================== */
 function Drawer({ open, onClose, children }) {
@@ -457,6 +487,8 @@ function Sidebar({
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
           const open = poliOpenAny(s);
+          // gunakan status poli untuk label (memunculkan Istirahat/Segera *)
+          const { open: openPill, rest, soon } = getOpenStatus({ jadwal: s.jadwal });
 
           const schedList = schedulesForPoli(s);
           const groups = new Map();
@@ -488,7 +520,7 @@ function Sidebar({
                     <div className="font-medium truncate text-slate-900 dark:text-white">{s.nama}</div>
                     <div className="text-xs text-slate-600 dark:text-white/60 truncate">{s.klaster}</div>
                   </div>
-                  <StatusPill open={open} />
+                  <StatusPill open={openPill} rest={rest} soon={soon} />
                 </div>
               </button>
 
@@ -598,7 +630,7 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
 
   const jadwalLayanan = item.jadwal || null;
-  const open = isOpenNow({ jadwal: jadwalLayanan || parentJadwal });
+  const { open, rest, soon } = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
   const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
   const weekly = jadwalLayanan ? summarizeWeekly(jadwalLayanan) : null;
 
@@ -616,7 +648,7 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
       <div className="p-4 sm:p-5 space-y-3">
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
           <span className={bpjsClass}>{bpjsText}</span>
-          <span className="ml-auto"><StatusPill open={open} /></span>
+          <span className="ml-auto"><StatusPill open={open} rest={rest} soon={soon} /></span>
         </div>
         <div className="text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">{tarifText}</div>
         <div className="h-px bg-black/10 dark:bg-white/10" />

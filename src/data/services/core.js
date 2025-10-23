@@ -670,6 +670,20 @@ export const FLOW_STEPS = {
     description: "Layanan selesai. Pasien boleh pulang atau mendapat instruksi kontrol berikutnya.",
     img: "/alur/95-pasien-catin-pulang.webp",
     },
+    96: {
+    id: 96,
+    title: "Langkah 96",
+    name: "Menuju Loket MTBS",
+    description: "Setelah mengambil nomor antrian loket, silahkan menunggu hingga nomor Anda dipanggil. Silahkan menuju loket dan persiapkan identitas pasien.",
+    img: "/alur/96-menuju-loket-mtbs.webp",
+    },
+    97: {
+    id: 97,
+    title: "Langkah 97",
+    name: "Mengambil Obat",
+    description: "Silahkan menunggu di depan bagian farmasi, jika nama Anda dipanggil, silahkan mengambil obat dan ikuti arahan petugas mengenai petunjuk konsumsi/ penggunaan obat/suplemen.",
+    img: "/alur/97-mengambil-obat-mtbs.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -1209,7 +1223,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Standar MTBS",
-          alur: [1, 5],
+          alur: [96, 85, 86, 97, 87],
         },
       ],
     },
