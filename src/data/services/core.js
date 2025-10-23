@@ -579,6 +579,41 @@ export const FLOW_STEPS = {
     description: "Silahkan masuk ke ruang poli gigi jika nama Anda telah dipanggil dan ikuti arahan petugas.",
     img: "/alur/82-pemeriksaan-gigi.webp",
     },
+    89: {
+    id: 89,
+    title: "Langkah 89",
+    name: "Menuju Loket",
+    description: "Setelah mendapatkan jadwal melalui wa, silahkan datang ke puskesmas, mengambil antrian loket, dan mendaftar di loket pendaftaran.",
+    img: "/alur/89-loket-catin.webp",
+    },
+    90: {
+    id: 90,
+    title: "Langkah 90",
+    name: "Menuju Poli Catin",
+    description: "Setelah itu silahkan menuju poli catin di lantai 2 ketuk dan serahkan resi pendaftaran kepada petugas, silahkan tunggu di depan poli catin.",
+    img: "/alur/90-menuju-poli-catin.webp",
+    },
+    91: {
+    id: 91,
+    title: "Langkah 91",
+    name: "Pemeriksaan Catin",
+    description: "Setelah nama Anda dipanggil, silahkan masuk ke ruang poli catin dan ikuti instruksi petugas.",
+    img: "/alur/91-pemeriksaan-catin.webp",
+    },
+    92: {
+    id: 92,
+    title: "Langkah 92",
+    name: "Pengambilan Sampel Darah Catin",
+    description: "Silahkan menuju laboratorium (lantai 3, dari tangga/ lift ke kiri) lalu taruh surat pengantar di meja petugas, tunggu hingga nama Anda dipanggil untuk masuk ke ruang pengambilan darah.",
+    img: "/alur/92-pengambilan-sampel-darah.webp",
+    },
+    93: {
+    id: 93,
+    title: "Langkah 93",
+    name: "Pengambilan Sertifikat",
+    description: "Setelah pengambilan sampel darah, Anda bisa pulang terlebih dahulu dan akan diberitahukan jika sertifikat sudah jadi melalui wa, silahkan ambil sertifikat di pos security.",
+    img: "/alur/93-pengambilan-sertifikat.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -812,7 +847,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Skrining pranikah",
-          alur: [1, 5],
+          alur: [89, 90, 91, 92, 93],
         },
       ],
     },
@@ -1200,7 +1235,7 @@ export const SERVICES_BY_FACILITY = {
     },
     {
       id: "ims",
-      nama: "IMS",
+      nama: "IMS/ Lestari",
       klaster: "Penyakit Menular",
       ikon: "⚕️",
       lokasi: "Lantai 2",
