@@ -191,7 +191,9 @@ function getOpenStatus(service, ref = new Date()) {
   const now = ref.getHours() * 60 + ref.getMinutes();
   let open = false;
   let nextChange = null;
-  for (const r of ranges) {
+  // --- sort & scan
+  const sorted = [...ranges].sort((a,b) => a.from - b.from);
+  for (const r of sorted) {
     if (now >= r.from && now <= r.to) {
       open = true;
       if (nextChange == null || r.to < nextChange) nextChange = r.to;
@@ -205,7 +207,25 @@ function getOpenStatus(service, ref = new Date()) {
     const tRanges = rangesForToday(schedule, tmr);
     if (tRanges.length) nextChange = tRanges[0].from + 1440;
   }
-  // === NEW: Istirahat Senin–Jumat pukul 12:00–13:00
+   // === NEW: deteksi 24 jam penuh (union menutup 0..1440 tanpa jeda)
+  let isFullDay = false;
+  if (sorted.length) {
+    let curFrom = Math.max(0, sorted[0].from);
+    let curTo = Math.min(1440, sorted[0].to);
+    for (let i = 1; i < sorted.length; i++) {
+      const r = sorted[i];
+      if (r.from <= curTo) {
+        // gabungkan overlap / nempel
+        curTo = Math.max(curTo, r.to);
+      } else {
+        // ada jeda → bukan 24 jam penuh
+        break;
+      }
+    }
+    isFullDay = curFrom <= 0 && curTo >= 1440;
+  }
+
+  // === NEW: Istirahat Senin–Jumat pukul 12:00–13:00 (kecuali 24 jam)
   const dayName = DAY_NAMES_ID[ref.getDay()];
   const isWeekday = ["Senin","Selasa","Rabu","Kamis","Jumat"].includes(dayName);
   const rest = isWeekday && now >= 720 && now < 780; // 12:00–13:00
@@ -219,11 +239,14 @@ function getOpenStatus(service, ref = new Date()) {
 
   // === NEW: penanda segera buka/tutup (±30 menit)
   let soon = null;
-  if (!rest && minutesUntilChange != null && minutesUntilChange >= 0) {
+  if (!isFullDay && !rest && minutesUntilChange != null && minutesUntilChange >= 0) {
     if (!open && minutesUntilChange <= 30) soon = "segera-buka";
     if ( open && minutesUntilChange <= 30) soon = "segera-tutup";
   }
 
+  if (isFullDay) {
+    return { open: true, rest: false, soon: null, minutesUntilChange: null };
+  }
   return { open, rest, soon, minutesUntilChange };
 }
 export function getEffectiveJadwal(s) {
