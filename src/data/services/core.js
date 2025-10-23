@@ -605,7 +605,7 @@ export const FLOW_STEPS = {
     title: "Langkah 92",
     name: "Menaruh Formulir Laboratorium",
     description: "Silahkan menuju laboratorium (lantai 3, dari tangga/ lift ke kiri) lalu taruh surat pengantar di keranjang yang disediakan. Tunggu hingga nama Anda dipanggil untuk masuk ke ruang pengambilan darah.",
-    img: "/alur/92-pengambilan-sampel-darah.webp",
+    img: "/alur/92-formulir-lab.webp",
     },
     93: {
     id: 93,
@@ -620,6 +620,13 @@ export const FLOW_STEPS = {
     name: "Pengambilan Sertifikat",
     description: "Setelah pengambilan sampel darah, Anda bisa pulang terlebih dahulu dan akan diberitahukan jika sertifikat sudah jadi melalui wa, silahkan ambil sertifikat di pos security.",
     img: "/alur/94-pengambilan-sertifikat.webp",
+    },
+    95: {
+    id: 95,
+    title: "Langkah 95",
+    name: "Layanan Selesai",
+    description: "Layanan selesai. Pasien boleh pulang atau mendapat instruksi kontrol berikutnya.",
+    img: "/alur/95-pasien-catin-pulang.webp",
     },
 };
 
@@ -783,7 +790,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pemeriksaan Ibu Hamil",
           ikon: "🤰",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Antenatal care",
           alur: [1, 5],
@@ -851,7 +858,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pemeriksaan Calon Pengantin",
           ikon: "💍",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Skrining pranikah",
           alur: [89, 90, 91, 92, 93, 94],
@@ -869,7 +876,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi HB",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -889,7 +896,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi DPT",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -909,7 +916,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi OPV (Polio Tetes)",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -929,7 +936,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi PCV",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -949,7 +956,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi IPV",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -969,7 +976,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi Rotavirus",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -989,7 +996,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi MR",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -1009,7 +1016,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi BCG",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -1029,7 +1036,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Imunisasi TD Ibu Hamil",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai jadwal nasional",
           jadwal: {
@@ -1062,7 +1069,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Konsultasi KB",
           ikon: "👩‍⚕️",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [1, 61, 63, 5],
@@ -1070,7 +1077,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Suntik KB",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [1, 61, 64, 5],
@@ -1078,7 +1085,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pil KB",
           ikon: "💊",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [1, 61, 63, 5],
@@ -1086,7 +1093,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "IUD/Spiral",
           ikon: "💊",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [1, 61, 64, 5],
@@ -1094,7 +1101,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "IVA Test + HPV DNA",
           ikon: "🧬",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [1, 61, 62, 5],
@@ -1102,7 +1109,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Implant/ Susuk",
           ikon: "💉",
-          tarif: 0,
+          tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [1, 61, 64, 5],
@@ -1157,7 +1164,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Manajemen Terpadu Balita Sakit",
           ikon: "👶",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Standar MTBS",
           alur: [1, 5],
@@ -1177,10 +1184,10 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pelayanan Kesehatan Peduli Remaja",
           ikon: "🎒",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Konseling remaja",
-          alur: [1, 5],
+          alur: [1, 78, 79, 80, 4, 5],
         },
       ],
     },
@@ -1195,7 +1202,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pelayanan Kesehatan Lansia",
           ikon: "🧓",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Skrining & kontrol",
           alur: [1, , 58 , 59, 4, 60],
@@ -1215,7 +1222,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Konsultasi PTM",
           ikon: "❤️‍🩹",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Hipertensi, DM, dsb",
           alur: [1, 5],
@@ -1233,7 +1240,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pengobatan Penyakit Menular",
           ikon: "🧫",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "TB, Kusta, dsb",
           alur: [72, 73, 75, 74, 76, 77],
@@ -1251,7 +1258,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Infeksi Menular Seksual",
           ikon: "⚕️",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Terapi IMS",
           alur: [1, 5],
@@ -1321,10 +1328,10 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Konseling Gizi",
           ikon: "🥗",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Diet & nutrisi",
-          alur: [1, 5],
+          alur: [88, 65, 95],
         },
       ],
     },
@@ -1339,7 +1346,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Konseling Psikososial",
           ikon: "🧠",
-          tarif: 0,
+          tarif: 15000,
           bpjs: true,
           ket: "Kesehatan mental & sosial",
           alur: [1, 5],
