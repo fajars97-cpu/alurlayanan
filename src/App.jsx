@@ -393,15 +393,20 @@ const StatusPill = ({ open, rest, soon }) => {
 /* ===== Sticky Back (reusable) ===== */
 function StickyBack({ onClick, label = "Kembali" }) {
   return (
-    <div className="sticky top-[var(--topbar-h,56px)] z-40 px-3 py-2 pointer-events-none">
+    <div
+      className="sticky z-20 px-3 py-2 pointer-events-none"
+      style={{ top: "var(--topbar-h, 56px)" }} // offset dinamis mengikuti tinggi header
+    >
       <button
         onClick={onClick}
         aria-label="Kembali"
-        className="pointer-events-auto px-3 py-1.5 rounded-lg shadow-md
-                   bg-slate-900/90 text-white dark:bg-white/10 dark:text-white
-                   hover:opacity-90 active:scale-95"
+        className="pointer-events-auto inline-flex items-center gap-2
+                   px-3.5 py-1.5 rounded-full text-[14px] font-medium
+                   bg-slate-900/95 text-white border border-white/20
+                   shadow-lg backdrop-blur-sm
+                   hover:bg-slate-900 active:scale-95"
       >
-        ← {label}
+        <span className="-rotate-180">➜</span> {label}
       </button>
     </div>
   );
@@ -1104,7 +1109,7 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
- const swipeRef = useRef({ x0: 0, x: 0, t0: 0 });
+  const swipeRef = useRef({ x0: 0, x: 0, t0: 0 });
   function onDrawerTouchStart(e) {
     const x = e.touches?.[0]?.clientX ?? 0;
     swipeRef.current = { x0: x, x, t0: Date.now() };
@@ -1122,6 +1127,34 @@ export default function App() {
     const fastEnough = v < -0.5;   // atau cukup cepat
     if (farEnough || fastEnough) setNavOpen(false);
   }
+  const headerRef = useRef(null);
+  useEffect(() => {
+    const apply = () => {
+      try {
+        const h = (headerRef.current && headerRef.current.offsetHeight) || 56; // fallback
+        document.documentElement?.style?.setProperty?.("--topbar-h", `${h}px`);
+      } catch {}
+    };
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", apply, { once: true });
+    } else {
+      apply();
+    }
+    let ro = null;
+    try {
+      if ("ResizeObserver" in window) {
+        ro = new ResizeObserver(apply);
+        if (headerRef.current) ro.observe(headerRef.current);
+      }
+    } catch {}
+    window.addEventListener("resize", apply);
+    window.addEventListener("orientationchange", apply);
+    return () => {
+      try { ro && ro.disconnect && ro.disconnect(); } catch {}
+      window.removeEventListener("resize", apply);
+      window.removeEventListener("orientationchange", apply);
+    };
+  }, []);
 
   useEffect(() => {
     if (query.trim().length > 0) {
@@ -1200,7 +1233,7 @@ export default function App() {
           transition-colors duration-300
         "
       >
-        <header className="
+        <header ref={headerRef} className="
           sticky top-0 z-30 backdrop-blur
           bg-white/70 dark:bg-slate-900/70
           border-b border-black/5 dark:border-white/10
