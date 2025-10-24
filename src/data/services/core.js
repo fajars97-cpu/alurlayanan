@@ -1,4 +1,12 @@
 export const FLOW_STEPS = {
+  0: {
+    id: 0,
+    title: "Langkah 0",
+    name: "Nomor Antrian Loket",
+    description:
+       "Silahkan mengambil nomor antrian loket di lobby lantai 1 Puskesmas. Sentuh layar loket 1, 2, atau 3 sesuai poli yang Anda tuju.",
+    img: "/alur/0-mesin-nomor-antrian.webp",
+  },
   1: {
     id: 1,
     title: "Langkah 1",
@@ -712,9 +720,9 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Pemeriksaan dokter umum",
           alur: {
-            farmasi:        [1, 9, 6, 4, 5], // ambil obat
-            pemeriksaan_laboratorium: [1, 9, 6, 7, 8, 10, 5], // ke Lab
-            rujuk_luar:     [1, 9, 6, 5],    // rujuk RS
+            farmasi:        [0, 1, 9, 6, 4, 5], // ambil obat
+            pemeriksaan_laboratorium: [0, 1, 9, 6, 7, 8, 10, 5], // ke Lab
+            rujuk_luar:     [0, 1, 9, 6, 5],    // rujuk RS
             },
         },
         {
@@ -723,7 +731,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Kontrol kondisi pasien",
-          alur: [1, 6, 5],
+          alur: [0, 1, 6, 5],
         },
       ],
     },
@@ -741,7 +749,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: true,
           ket: "Pencabutan gigi permanen",
-          alur: [1, 81, 3, 82, 83, ,4, 5],
+          alur: [0, 1, 81, 3, 82, 83, ,4, 5],
         },
         {
           nama: "Scaling",
@@ -749,7 +757,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 40000,
           bpjs: false,
           ket: "Pembersihan karang gigi",
-          alur: [1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 83, 5],
         },
       ],
     },
@@ -779,7 +787,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 28, 4, 5],
+          alur: [0, 1, 28, 4, 5],
         },
       ],
     },
@@ -809,7 +817,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 28, 4, 5],
+          alur: [0, 1, 28, 4, 5],
         },
         {
           nama: "Pemeriksaan Jenazah (24 Jam)",
@@ -829,7 +837,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 28, 19]
+          alur: [0, 1, 28, 19]
         },
       ],
     },
@@ -849,7 +857,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Antenatal care",
-          alur: [1, 5],
+          alur: [0, 1, 5],
         },
       ],
     },
@@ -879,7 +887,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 41, 42, 4, 43],
+          alur: [0, 1, 41, 42, 4, 43],
         },
         {
           nama: "Tindik/ Piercing",
@@ -899,7 +907,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 41, 57, 4, 5],
+          alur: [0, 1, 41, 57, 4, 5],
         },
       ],
     },
@@ -917,7 +925,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Skrining pranikah",
-          alur: [89, 90, 91, 92, 93, 94],
+          alur: [0, 89, 90, 91, 92, 93, 94],
         },
       ],
     },
@@ -947,7 +955,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi DPT",
@@ -967,7 +975,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi OPV (Polio Tetes)",
@@ -987,7 +995,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi PCV",
@@ -1007,7 +1015,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi IPV",
@@ -1027,7 +1035,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi Rotavirus",
@@ -1047,7 +1055,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi MR",
@@ -1067,7 +1075,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi BCG",
@@ -1087,7 +1095,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 29, 30, 31, 32],
+          alur: [0, 1, 29, 30, 31, 32],
         },
         {
           nama: "Imunisasi TD Ibu Hamil",
@@ -1109,7 +1117,7 @@ export const SERVICES_BY_FACILITY = {
           },
           alur: {
             rujukan: [35, 36, 37], // rujukan KI
-            langsung: [1, 35, 36, 37], // langsung ke imunisasi
+            langsung: [0, 1, 35, 36, 37], // langsung ke imunisasi
             },
         },
       ],
@@ -1128,7 +1136,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
-          alur: [1, 61, 63, 5],
+          alur: [0, 1, 61, 63, 5],
         },
         {
           nama: "Suntik KB",
@@ -1136,7 +1144,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
-          alur: [1, 61, 64, 5],
+          alur: [0, 1, 61, 64, 5],
         },
         {
           nama: "Pil KB",
@@ -1144,7 +1152,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
-          alur: [1, 61, 63, 5],
+          alur: [0, 1, 61, 63, 5],
         },
         {
           nama: "IUD/Spiral",
@@ -1152,7 +1160,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
-          alur: [1, 61, 64, 5],
+          alur: [0, 1, 61, 64, 5],
         },
         {
           nama: "IVA Test + HPV DNA",
@@ -1160,7 +1168,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
-          alur: [1, 61, 62, 5],
+          alur: [0, 1, 61, 62, 5],
         },
         {
           nama: "Implant/ Susuk",
@@ -1168,7 +1176,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
-          alur: [1, 61, 64, 5],
+          alur: [0, 1, 61, 64, 5],
         },
       ],
     },
@@ -1204,7 +1212,7 @@ export const SERVICES_BY_FACILITY = {
       },
       alur: {
             kunjungan_pertama: [24, 22, 23], // rujukan poli lain
-            kunjungan_lanjutan: [1, 22, 23], // pasien bisa langsung datang ke poli
+            kunjungan_lanjutan: [0, 1, 22, 23], // pasien bisa langsung datang ke poli
             },
     },
   ],
@@ -1223,7 +1231,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Standar MTBS",
-          alur: [96, 85, 86, 97, 87],
+          alur: [0, 96, 85, 86, 97, 87],
         },
       ],
     },
@@ -1243,7 +1251,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Konseling remaja",
-          alur: [1, 78, 79, 80, 4, 5],
+          alur: [0, 1, 78, 79, 80, 4, 5],
         },
       ],
     },
@@ -1261,7 +1269,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Skrining & kontrol",
-          alur: [1, , 58 , 59, 4, 60],
+          alur: [0, 1, 58 , 59, 4, 60],
         },
       ],
     },
@@ -1281,8 +1289,8 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Hipertensi, DM, dsb",
-          alur: {Farmasi: [1, 83, 84, 4, 5],
-                 Laboratorium: [1, 83, 84, 98, 99, 100, 4, 5],
+          alur: {Farmasi: [0, 1, 83, 84, 4, 5],
+                 Laboratorium: [0, 1, 83, 84, 98, 99, 100, 4, 5],
           },
         },
       ],
@@ -1319,7 +1327,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Terapi IMS",
-          alur: [1, 5],
+          alur: [0, 1, 5],
         },
       ],
     },
@@ -1371,7 +1379,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: false,
           ket: "Pemeriksaan kesehatan calon jamaah haji",
-          alur: [1, 38, 39, 40],
+          alur: [0, 1, 38, 39, 40],
         },
       ],
     },
@@ -1389,7 +1397,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Diet & nutrisi",
-          alur: [88, 65, 95],
+          alur: [0, 88, 65, 95],
         },
       ],
     },
@@ -1407,7 +1415,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Kesehatan mental & sosial",
-          alur: [1, 5],
+          alur: [0, 1, 5],
         },
       ],
     },
@@ -1537,7 +1545,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [1, 44, 45, 46],
+          alur: [0, 1, 44, 45, 46],
         },
       ],
     },
