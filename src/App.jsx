@@ -84,6 +84,26 @@ function linkify(text) {
   return nodes;
 }
 
+// helper header ref back button
+const headerRef = useRef(null);
+
+useEffect(() => {
+  const apply = () => {
+    const h = headerRef.current?.offsetHeight || 56; // fallback
+    document.documentElement.style.setProperty('--topbar-h', `${h}px`);
+  };
+  apply();
+  const ro = new ResizeObserver(apply);
+  if (headerRef.current) ro.observe(headerRef.current);
+  window.addEventListener('resize', apply);
+  window.addEventListener('orientationchange', apply);
+  return () => {
+    ro.disconnect();
+    window.removeEventListener('resize', apply);
+    window.removeEventListener('orientationchange', apply);
+  };
+}, []);
+
 /* ===================== Flow fallback & audio ===================== */
 const FLOW_FALLBACK =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="%231f2937"/><text x="50%" y="50%" fill="white" font-family="Segoe UI,Arial" font-size="16" text-anchor="middle" dominant-baseline="middle">Gambar alur tidak ditemukan</text></svg>';
@@ -393,14 +413,17 @@ const StatusPill = ({ open, rest, soon }) => {
 /* ===== Sticky Back (reusable) ===== */
 function StickyBack({ onClick, label = "Kembali" }) {
   return (
-    <div className="sticky top-14 z-30 px-3 py-2">
+    <div className="sticky top-[var(--topbar-h,56px)] z-20 px-3 py-2 pointer-events-none">
       <button
         onClick={onClick}
-        className="px-3 py-1.5 rounded-lg bg-slate-900/90 text-white
-                   dark:bg-white/10 dark:text-white hover:opacity-90 active:scale-95"
         aria-label="Kembali"
+        className="pointer-events-auto inline-flex items-center gap-2
+                   px-3.5 py-1.5 rounded-full text-[14px] font-medium
+                   bg-slate-900/95 text-white border border-white/20
+                   shadow-lg backdrop-blur-sm
+                   hover:bg-slate-900 active:scale-95"
       >
-        ← {label}
+        <span className="-rotate-180">➜</span> {label}
       </button>
     </div>
   );
@@ -1199,7 +1222,7 @@ export default function App() {
           transition-colors duration-300
         "
       >
-        <header className="
+        <header ref={headerRef} className="
           sticky top-0 z-30 backdrop-blur
           bg-white/70 dark:bg-slate-900/70
           border-b border-black/5 dark:border-white/10
