@@ -390,6 +390,22 @@ const StatusPill = ({ open, rest, soon }) => {
     </span>
   );
 };
+/* ===== Sticky Back (reusable) ===== */
+function StickyBack({ onClick, label = "Kembali" }) {
+  return (
+    <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur
+                    border-b border-black/5 dark:border-white/10 px-3 py-2">
+      <button
+        onClick={onClick}
+        className="px-3 py-1.5 rounded-lg bg-slate-900/90 text-white
+                   dark:bg-white/10 dark:text-white hover:opacity-90 active:scale-95"
+        aria-label="Kembali"
+      >
+        ← {label}
+      </button>
+    </div>
+  );
+}
 
 /* ===================== Drawer (NEW) ===================== */
 function Drawer({ open, onClose, children }) {
@@ -529,14 +545,14 @@ function Sidebar({
             <div key={s.id} className="space-y-2">
               <button
                 onClick={() => toggle(s)}
-                className={`group w-full text-left p-3 rounded-xl border transition
+                className={`group w-full text-left px-4 py-3.5 rounded-xl border transition
                 ${selected?.id === s.id
-                  ? "bg-emerald-500/10 border-emerald-500/60"
-                  : hl
-                  ? "bg-emerald-400/10 border-emerald-400/50"
-                  : "bg-slate-100/70 border-black/10 dark:bg-white/5 dark:border-white/10"}
+                ? "bg-emerald-500/15 border-emerald-500/70 ring-2 ring-emerald-400/40"
+                : hl
+                ? "bg-emerald-400/10 border-emerald-400/50"
+                : "bg-slate-100/70 border-black/10 dark:bg-white/5 dark:border-white/10"}
                 hover:bg-slate-200/80 dark:hover:bg-white/8`}
-              >
+                >
                 <div className="flex items-center gap-3">
                   <div className="text-lg">{s.ikon}</div>
                   <div className="min-w-0 flex-1">
@@ -880,17 +896,8 @@ function RightPanel({
     const list = selected.layanan ?? [];
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              stopFlowAudio();
-              setSelected(null);
-            }}
-            className="px-3 py-2.5 rounded-xl bg-slate-200/70 border border-black/10 hover:bg-slate-200/90 dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20 transition-colors"
-          >
-            ← Kembali
-          </button>
-        </div>
+        {/* Sticky back untuk halaman daftar layanan poli */}
+        <StickyBack onClick={() => { stopFlowAudio(); setSelected(null); }} />
 
         <div className="flex items-center gap-3">
           <div className="text-2xl">{selected.ikon}</div>
@@ -916,17 +923,8 @@ function RightPanel({
 
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => {
-            stopFlowAudio();
-            setSub(null);
-          }}
-          className="px-3 py-2.5 rounded-xl bg-slate-200/70 border border-black/10 hover:bg-slate-200/90 dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20 transition-colors"
-        >
-          ← Kembali
-        </button>
-      </div>
+      {/* Sticky back untuk halaman detail layanan */}
+      <StickyBack onClick={() => { stopFlowAudio(); setSub(null); }} />
 
       <div className="flex items-center gap-3">
         <div className="text-2xl">{selected.ikon}</div>
