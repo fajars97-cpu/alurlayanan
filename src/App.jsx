@@ -264,6 +264,77 @@ export function isOpenNow(s, ref = new Date()) {
   return getOpenStatus(s, ref).open;
 }
 
+// === Union status untuk sebuah poli (menggabungkan jadwal poli + semua layanan)
+function getOpenStatusForPoli(poli, ref = new Date()) {
+  const schedules = [];
+  if (poli?.jadwal) schedules.push(poli.jadwal);
+  (poli?.layanan || []).forEach((L) => {
+    if (L?.jadwal) schedules.push(L.jadwal);
+  });
+
+  // kalau tidak ada apa-apa, pakai default rule yang sudah kamu definisikan
+  if (schedules.length === 0) return getOpenStatus({ jadwal: {} }, ref);
+
+  // gabungkan semua rentang "hari ini" + overnight
+  const ranges = schedules.flatMap((j) => rangesForToday(j, ref));
+  if (ranges.length === 0) return getOpenStatus({ jadwal: {} }, ref);
+
+  // --- logika sama seperti getOpenStatus(), tapi langsung dari 'ranges'
+  const now = ref.getHours() * 60 + ref.getMinutes();
+  let open = false;
+  let nextChange = null;
+
+  const sorted = [...ranges].sort((a, b) => a.from - b.from);
+
+  for (const r of sorted) {
+    if (now >= r.from && now <= r.to) {
+      open = true;
+      if (nextChange == null || r.to < nextChange) nextChange = r.to;
+    } else if (now < r.from) {
+      if (nextChange == null || r.from < nextChange) nextChange = r.from;
+    }
+  }
+
+  if (nextChange == null) {
+    const tmr = new Date(ref);
+    tmr.setDate(ref.getDate() + 1);
+    const tRanges = schedules.flatMap((j) => rangesForToday(j, tmr));
+    if (tRanges.length) nextChange = tRanges.sort((a,b)=>a.from-b.from)[0].from + 1440;
+  }
+
+  // deteksi 24 jam penuh (union menutup 0..1440)
+  let isFullDay = false;
+  if (sorted.length) {
+    let curFrom = Math.max(0, sorted[0].from);
+    let curTo = Math.min(1440, sorted[0].to);
+    for (let i = 1; i < sorted.length; i++) {
+      const r = sorted[i];
+      if (r.from <= curTo) curTo = Math.max(curTo, r.to);
+      else break; // ada jeda → bukan 24h penuh
+    }
+    isFullDay = curFrom <= 0 && curTo >= 1440;
+  }
+
+  // Istirahat 12:00–13:00 (Sen–Jum), kecuali 24 jam
+  const dayName = DAY_NAMES_ID[ref.getDay()];
+  const isWeekday = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"].includes(dayName);
+  const rest = !isFullDay && isWeekday && now >= 720 && now < 780;
+  if (rest) {
+    open = false;
+    if (nextChange == null || 780 < nextChange) nextChange = 780;
+  }
+
+  const minutesUntilChange = nextChange != null ? nextChange - now : null;
+  let soon = null;
+  if (!isFullDay && !rest && minutesUntilChange != null && minutesUntilChange >= 0) {
+    if (!open && minutesUntilChange <= 30) soon = "segera-buka";
+    if ( open && minutesUntilChange <= 30) soon = "segera-tutup";
+  }
+
+  if (isFullDay) return { open: true, rest: false, soon: null, minutesUntilChange: null };
+  return { open, rest, soon, minutesUntilChange };
+}
+
 /* ===== Jadwal aggregator untuk Sidebar (beragam per layanan) ===== */
 function schedulesForPoli(poli) {
   const list = [];
@@ -532,7 +603,7 @@ function Sidebar({
           const hl = highlightIds.includes(s.id);
           const open = poliOpenAny(s);
           // gunakan status poli untuk label (memunculkan Istirahat/Segera *)
-          const { open: openPill, rest, soon } = getOpenStatus({ jadwal: s.jadwal });
+          const { open: openPill, rest, soon } = getOpenStatusForPoli(s);
 
           const schedList = schedulesForPoli(s);
           const groups = new Map();
