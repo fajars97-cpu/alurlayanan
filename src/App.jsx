@@ -552,7 +552,7 @@ function Sidebar({
     onPick(s);
     setExpandedId((id) => (id === s.id ? null : s.id));
   };
-
+  const searchRef = useRef(null);
   return (
     <aside
       className="
@@ -1208,7 +1208,6 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
-  const searchRef = useRef(null);
   const swipeRef = useRef({ x0: 0, x: 0, t0: 0 });
   function onDrawerTouchStart(e) {
     const x = e.touches?.[0]?.clientX ?? 0;

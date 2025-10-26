@@ -814,7 +814,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Tindakan Darurat",
           ikon: "⚡",
-          tarif: 0,
+          tarif: 20000,
           bpjs: true,
           ket: "Penanganan kegawatdaruratan",
           jadwal: {
