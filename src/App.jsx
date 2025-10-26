@@ -576,15 +576,43 @@ function Sidebar({
 
       <div className="p-4 space-y-3">
         <label className="text-xs uppercase text-slate-600 dark:text-white/50">Pencarian</label>
+         <div className="relative">
         <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' ..."
-          className="w-full h-11 px-3 rounded-xl
-          bg-white text-slate-900 border border-black/10
-          dark:bg-white/5 dark:text-white dark:border-white/10
-          outline-none focus:ring-2 focus:ring-emerald-500 text-[15px]"
+         ref={searchRef}
+         type="search"
+         value={query}
+         onChange={(e) => setQuery(e.target.value)}
+         onKeyDown={(e) => {
+          if (e.key === "Escape" && query) {
+         setQuery("");
+         // opsional: bersihkan pilihan hasil
+         // setSelected(null);
+         requestAnimationFrame(() => searchRef.current?.focus());
+         }
+         }}
+         enterKeyHint="search"
+         placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' …"
+         className="w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5 border border-emerald-500/20 focus:border-emerald-500/60 outline-none pr-12 pl-4"
         />
+        {query && (
+        <button
+        type="button"
+        onClick={() => {
+         setQuery("");
+         // opsional: reset pilihan
+         // setSelected(null);
+         requestAnimationFrame(() => searchRef.current?.focus());
+         }}
+        aria-label="Hapus pencarian"
+        className="absolute inset-y-0 right-2 my-auto h-8 min-w-8 rounded-full
+                  bg-slate-900/80 text-white dark:bg-white/10 dark:text-white
+                  border border-white/20 shadow-sm backdrop-blur-sm
+                  flex items-center justify-center text-base"
+        >
+        ×
+        </button>
+        )}
+       </div>
       </div>
 
       <div
@@ -1180,6 +1208,7 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
+  const searchRef = useRef(null);
   const swipeRef = useRef({ x0: 0, x: 0, t0: 0 });
   function onDrawerTouchStart(e) {
     const x = e.touches?.[0]?.clientX ?? 0;

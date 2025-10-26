@@ -874,8 +874,8 @@ export const SERVICES_BY_FACILITY = {
               Rabu:   "16:00-06:00",
               Kamis:  "16:00-06:00",
               Jumat:  "16:00-06:00",
-              Sabtu:  "16:00-06:00",
-              Minggu: "16:00-06:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
             },
             exceptions: {}
           },
