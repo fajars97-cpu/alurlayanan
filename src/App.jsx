@@ -3,12 +3,6 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 
-// === Aksesibilitas
-const [prefHC, setPrefHC] = useState(() => localStorage.getItem("prefHC") === "1");
-const [prefLG, setPrefLG] = useState(() => localStorage.getItem("prefLG") === "1");
-useEffect(() => localStorage.setItem("prefHC", prefHC ? "1" : "0"), [prefHC]);
-useEffect(() => localStorage.setItem("prefLG", prefLG ? "1" : "0"), [prefLG]);
-
 // === Import data ===
 import {
   FACILITIES,
@@ -1230,18 +1224,15 @@ export default function App() {
   }, []);
 
   return (
-    <div
-  className={`
-    min-h-screen
-    text-slate-900 dark:text-white
-    bg-gradient-to-b
-    from-white via-slate-50 to-slate-100
-    dark:from-slate-900 dark:via-slate-950 dark:to-black
-    transition-colors duration-300
-    ${prefHC ? "contrast-125 saturate-125" : ""}
-    ${prefLG ? "text-[17px]" : ""}
-  `}
->
+    <div className="
+          min-h-screen
+          text-slate-900 dark:text-white
+          bg-gradient-to-b
+          from-white via-slate-50 to-slate-100
+          dark:from-slate-900 dark:via-slate-950 dark:to-black
+          transition-colors duration-300
+        "
+      >
         <header ref={headerRef} className="
           sticky top-0 z-30 backdrop-blur
           bg-white/70 dark:bg-slate-900/70
@@ -1266,42 +1257,6 @@ export default function App() {
               <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
               <div className="font-semibold">Informasi Layanan Puskesmas Jagakarsa</div>
             </div>
-
- <details className="relative mr-2">
-    <summary
-      className="list-none rounded-xl p-2 hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer"
-      title="Pengaturan aksesibilitas"
-    >
-      ⚙️
-    </summary>
-
-    <div className="absolute right-0 mt-2 w-60 rounded-xl border border-black/10 dark:border-white/10
-                    bg-white/90 dark:bg-slate-900/90 backdrop-blur p-3 text-sm shadow-lg space-y-2 z-50">
-      <label className="flex items-center justify-between gap-3">
-        <span>Teks besar</span>
-        <input
-          type="checkbox"
-          checked={prefLG}
-          onChange={(e) => setPrefLG(e.target.checked)}
-          aria-label="Aktifkan teks besar"
-        />
-      </label>
-
-      <label className="flex items-center justify-between gap-3">
-        <span>Kontras tinggi</span>
-        <input
-          type="checkbox"
-          checked={prefHC}
-          onChange={(e) => setPrefHC(e.target.checked)}
-          aria-label="Aktifkan kontras tinggi"
-        />
-      </label>
-
-      <p className="text-[11px] text-slate-600 dark:text-white/50 m-0">
-        Preferensi disimpan di perangkat ini.
-      </p>
-    </div>
-  </details>
 
             <div className="ml-auto flex items-center gap-2">
               <label className="text-xs text-slate-600 dark:text-white/60 hidden sm:block">Fasilitas</label>
