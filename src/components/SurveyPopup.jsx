@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { trackEvent, trackTiming } from "../ga.js";
 
 export default function SurveyPopup({
   formUrl,
@@ -8,6 +9,7 @@ export default function SurveyPopup({
 }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef(null);
+  const openedAtRef = useRef(0);
 
   // Cek cooldown
   useEffect(() => {
@@ -15,7 +17,11 @@ export default function SurveyPopup({
     const now = Date.now();
     if (now < until) return; // masih cooldown
 
-    const t = setTimeout(() => setOpen(true), delayMs);
+    const t = setTimeout(() => {
+      setOpen(true);
+      openedAtRef.current = performance.now();
+      trackEvent("Survey", "shown");
+    }, delayMs);
     return () => clearTimeout(t);
   }, [delayMs, storageKey]);
 
@@ -24,11 +30,18 @@ export default function SurveyPopup({
     const until = Date.now() + cooldownDays * 24 * 60 * 60 * 1000;
     localStorage.setItem(storageKey, String(until));
     setOpen(false);
+    const ms = Math.round(performance.now() - openedAtRef.current || 0);
+    if (ms > 0) trackTiming("survey_popup_open_ms", ms);
   }
 
   // Tutup dengan ESC
   useEffect(() => {
-    function onKey(e) { if (e.key === "Escape") closeWithCooldown(); }
+    function onKey(e) {
+      if (e.key === "Escape") {
+        trackEvent("Survey", "dismiss", "esc");
+        closeWithCooldown();
+      }
+    }
     if (open) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
@@ -41,7 +54,12 @@ export default function SurveyPopup({
       role="dialog"
       aria-modal="true"
       aria-label="Survei singkat"
-      onClick={(e) => { if (e.target === e.currentTarget) closeWithCooldown(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          trackEvent("Survey", "dismiss", "overlay");
+          closeWithCooldown();
+        }
+      }}
       ref={dialogRef}
     >
       <div className="w-full max-w-2xl rounded-2xl bg-slate-900 shadow-2xl ring-1 ring-white/10 overflow-hidden">
@@ -50,7 +68,7 @@ export default function SurveyPopup({
             Survei singkat (≤ 60 detik)
           </h2>
           <button
-            onClick={closeWithCooldown}
+            onClick={() => { trackEvent("Survey", "dismiss", "close_button"); closeWithCooldown(); }}
             className="ml-3 rounded-lg px-2 py-1 text-slate-300 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30"
             aria-label="Tutup"
           >
@@ -70,6 +88,7 @@ export default function SurveyPopup({
               target="_blank"
               rel="noreferrer"
               className="text-sm underline text-sky-300 hover:text-sky-200"
+              onClick={() => trackEvent("Survey", "open_form", "fallback_link")}
             >
               Buka survei di tab baru
             </a>
@@ -83,13 +102,15 @@ export default function SurveyPopup({
               className="h-full w-full"
               loading="lazy"
               allow="clipboard-write; autoplay"
+              onLoad={() => trackEvent("Survey", "iframe_loaded")}
+              onError={() => trackEvent("Survey", "iframe_error")}
             />
           </div>
         </div>
 
         <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-3 border-t border-white/10">
           <button
-            onClick={closeWithCooldown}
+            onClick={() => { trackEvent("Survey", "done"); closeWithCooldown(); }}
             className="rounded-xl px-4 py-2 text-sm font-medium bg-slate-800 text-slate-100 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-white/30"
           >
             Selesai

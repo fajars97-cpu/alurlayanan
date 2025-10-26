@@ -1,5 +1,6 @@
 // src/App.jsx
 import React, { useMemo, useState, useEffect, useRef } from "react";
+import { trackEvent, trackTiming } from "./ga.js";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 
@@ -583,6 +584,9 @@ function Sidebar({
          value={query}
          onChange={(e) => setQuery(e.target.value)}
          onKeyDown={(e) => {
+          if (e.key === "Enter" && query.trim()) {
+            trackEvent("Search", "submit", query.trim());
+          }
           if (e.key === "Escape" && query) {
          setQuery("");
          // opsional: bersihkan pilihan hasil
@@ -599,6 +603,7 @@ function Sidebar({
         type="button"
         onClick={() => {
          setQuery("");
+         trackEvent("Search", "clear");
          // opsional: reset pilihan
          // setSelected(null);
          requestAnimationFrame(() => searchRef.current?.focus());
@@ -716,6 +721,7 @@ function Sidebar({
                       onClick={() => {
                         onPick(s);                 // pastikan poli terpilih
                         onScrollToServices?.(s.id); // trigger scroll di panel kanan
+                        trackEvent("Navigation","scroll_to_services", s.id);
                       }}
                       className="w-full text-left text-[12px] text-amber-700 hover:text-amber-600 underline underline-offset-2 dark:text-amber-300 dark:hover:text-amber-200"
                       aria-label={`Jadwal beragam untuk ${s.nama}. Klik untuk menuju daftar layanan.`}
@@ -737,7 +743,10 @@ function Sidebar({
 function ServiceCard({ s, onPick }) {
   return (
     <button
-   onClick={() => onPick(s)}
+   onClick={() => {
+     trackEvent("Navigation", "select_poli", s.id);
+     onPick(s);
+   }}
    className={`group relative overflow-hidden rounded-2xl border
    bg-slate-100/70 dark:bg-white/5
    hover:bg-slate-200/80 dark:hover:bg-white/10
@@ -848,6 +857,7 @@ function FlowCard({ step, index }) {
         player.currentTime = 0;
         player.play();
       } catch {}
+      trackEvent("Flow","restart_audio", key);
       return;
     }
     try {
@@ -857,6 +867,7 @@ function FlowCard({ step, index }) {
         player.src = url;
       window.__flowAudioKey = key;
       player.play().catch(() => {});
+      trackEvent("Flow","play_audio", key);
     } catch (e) {
       console.warn("Gagal memutar audio:", e);
     }
@@ -917,6 +928,14 @@ function RightPanel({
   scrollReq,
 }) {
   const [sub, setSub] = useState(null);
+  // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
+  useEffect(() => {
+    let t0 = performance.now();
+    return () => {
+      const ms = Math.round(performance.now() - t0);
+      if (sub) trackTiming("view_service_ms", ms, { label: sub?.nama });
+    };
+  }, [sub]);
   const servicesGridRef = useRef(null);
 
   useEffect(() => setSub(null), [selected]);
@@ -1001,7 +1020,7 @@ function RightPanel({
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
         {/* Sticky back untuk halaman daftar layanan poli */}
-        <StickyBack onClick={() => { stopFlowAudio(); setSelected(null); }} />
+        <StickyBack onClick={() => { stopFlowAudio(); setSelected(null); trackEvent("Navigation","back_from_poli"); }} />
 
         <div className="flex items-center gap-3">
           <div className="text-2xl">{selected.ikon}</div>
@@ -1028,7 +1047,7 @@ function RightPanel({
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
       {/* Sticky back untuk halaman detail layanan */}
-      <StickyBack onClick={() => { stopFlowAudio(); setSub(null); }} />
+      <StickyBack onClick={() => { stopFlowAudio(); setSub(null); trackEvent("Navigation","back_from_service"); }} />
 
       <div className="flex items-center gap-3">
         <div className="text-2xl">{selected.ikon}</div>
@@ -1049,6 +1068,7 @@ function RightPanel({
               onClick={() => {
                 stopFlowAudio();
                 setScenarioKey(key);
+                trackEvent("Flow","select_scenario", key);
               }}
               className={`px-3 py-1.5 rounded-lg border text-sm transition ${
                 key === scenarioKey
@@ -1306,6 +1326,7 @@ export default function App() {
     setSelected(p);
     setJump({ poliId, idx });
     setNavOpen(false);
+    trackEvent("Navigation", "select_service", `${poliId}#${idx}`);
   }
 
   useEffect(() => {
@@ -1345,7 +1366,7 @@ export default function App() {
               bg-white/60 dark:bg-white/5
               hover:bg-slate-200/80 dark:hover:bg-white/10"
               aria-label="Buka menu"
-              onClick={() => setNavOpen(true)}
+              onClick={() => { setNavOpen(true); trackEvent("Drawer","open"); }}
             >
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                 <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -1361,7 +1382,11 @@ export default function App() {
               <label className="text-xs text-slate-600 dark:text-white/60 hidden sm:block">Fasilitas</label>
               <select
                 value={facility}
-                onChange={(e) => setFacility(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFacility(v);
+                  trackEvent("Facility", "change", v);
+                }}
                 className="
                   h-9 rounded-lg px-2 text-sm outline-none
                   bg-white text-slate-900 border border-black/10
@@ -1384,7 +1409,7 @@ export default function App() {
           {navOpen && (
             <button
               aria-label="Tutup menu"
-              onClick={() => setNavOpen(false)}
+              onClick={() => { setNavOpen(false); trackEvent("Drawer","close","overlay"); }}
               className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
             />
           )}
@@ -1398,7 +1423,7 @@ export default function App() {
             aria-modal="true"
             onTouchStart={onDrawerTouchStart}
             onTouchMove={onDrawerTouchMove}
-            onTouchEnd={onDrawerTouchEnd}
+            onTouchEnd={(e) => { onDrawerTouchEnd(e); trackEvent("Drawer","close","swipe"); }}
           >
             {/* NEW: area handle di tepi kanan agar mudah diseret/geser */}
             <div
