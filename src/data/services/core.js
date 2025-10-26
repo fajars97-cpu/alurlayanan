@@ -899,7 +899,11 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Antenatal care",
-          alur: [0, 1, 5],
+          alur: 
+            {
+            pemeriksaan_1:        [0, 1, 66, 67, 68, 69, 70, 4, 71], 
+            pemeriksaan_selanjutnya : [0, 1, 66, 67, 4, 71],  
+            },
         },
       ],
     },
