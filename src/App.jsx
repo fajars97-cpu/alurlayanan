@@ -1099,87 +1099,112 @@ function RightPanel({
               <strong>Detail layanan:</strong> {sub.nama}
             </p>
             {(() => {
-              const extra = sub.info ?? EXTRA_INFO[sub.nama];
+  // Urutan prioritas:
+  // 1) sub.info (jika hardcoded di data)
+  // 2) EXTRA_INFO[<nama layanan>]
+  // 3) EXTRA_INFO[<nama poli>]
+  // 4) EXTRA_INFO[<id poli>]  (jika kamu pernah menyimpan pakai id)
+  // 5) EXTRA_INFO["Laboratorium"] dst (alias opsional)
+  const pickExtra = () => {
+    if (sub?.info) return sub.info;
 
-              const toSrc = (p) => {
-                if (!p) return null;
-                if (/^https?:\/\//.test(p)) return p;
-                const clean = String(p).replace(/^\/+/, "");
-                return asset(clean);
-              };
+    const tryKeys = [
+      sub?.nama,               // "Darah Lengkap"
+      selected?.nama,          // "Laboratorium"
+      selected?.id,            // "laboratorium"
+      // alias opsional — tambahkan jika kamu punya pola kunci lain
+      `${selected?.nama} - ${sub?.nama}`,
+      `${selected?.nama}: ${sub?.nama}`,
+    ].filter(Boolean);
 
-              if (!extra) {
-                return (
-                  <>
-                    <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-                    <p className="mt-2">
-                      Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
-                      instruksi khusus untuk layanan <em>{sub.nama}</em>.
-                    </p>
-                  </>
-                );
-              }
+    for (const k of tryKeys) {
+      if (EXTRA_INFO && Object.prototype.hasOwnProperty.call(EXTRA_INFO, k)) {
+        return EXTRA_INFO[k];
+      }
+    }
+    return null;
+  };
 
-              if (typeof extra === "string") {
-                return <p>{linkify(extra)}</p>;
-              }
+  const extra = pickExtra();
 
-              if (Array.isArray(extra)) {
-                return (
-                  <div className="space-y-3">
-                    {extra.map((item, i) => {
-                      if (typeof item === "string") {
-                        return <p key={`txt-${i}`}>{linkify(item)}</p>;
-                      }
-                      if (item && typeof item === "object" && item.img) {
-                        return (
-                          <div key={`img-${i}`} className="space-y-1">
-                            <img
-                              src={toSrc(item.img)}
-                              alt={item.alt || sub.nama}
-                              className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                              onError={onInfoError}
-                              loading="lazy"
-                            />
-                            {item.alt && (
-                              <div className="text-[12px] text-slate-600 dark:text-white/60 leading-snug">
-                                {item.alt}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
+  const toSrc = (p) => {
+    if (!p) return null;
+    if (/^https?:\/\//.test(p)) return p;
+    const clean = String(p).replace(/^\/+/, "");
+    return asset(clean);
+  };
+
+  if (!extra) {
+    return (
+      <>
+        <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+        <p className="mt-2">
+          Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
+          instruksi khusus untuk layanan <em>{sub.nama}</em>.
+        </p>
+      </>
+    );
+  }
+
+  if (typeof extra === "string") {
+    return <p>{linkify(extra)}</p>;
+  }
+
+  if (Array.isArray(extra)) {
+    return (
+      <div className="space-y-3">
+        {extra.map((item, i) => {
+          if (typeof item === "string") return <p key={`txt-${i}`}>{linkify(item)}</p>;
+          if (item && typeof item === "object" && item.img) {
+            return (
+              <div key={`img-${i}`} className="space-y-1">
+                <img
+                  src={toSrc(item.img)}
+                  alt={item.alt || sub.nama}
+                  className="w-full rounded-xl border border-black/10 dark:border-white/10"
+                  onError={onInfoError}
+                  loading="lazy"
+                />
+                {item.alt && (
+                  <div className="text-[12px] text-slate-600 dark:text-white/60 leading-snug">
+                    {item.alt}
                   </div>
-                );
-              }
+                )}
+              </div>
+            );
+          }
+          return null;
+        })}
+      </div>
+    );
+  }
 
-              if (extra && typeof extra === "object") {
-                const { text, images } = extra;
-                return (
-                  <div className="space-y-3">
-                    {text ? <p>{linkify(text)}</p> : null}
-                    {Array.isArray(images) && images.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {images.map((src, i) => (
-                          <img
-                            key={`img2-${i}`}
-                            src={toSrc(src)}
-                            alt={sub.nama}
-                            className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                            onError={onInfoError}
-                            loading="lazy"
-                          />
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              }
+  if (extra && typeof extra === "object") {
+    const { text, images } = extra;
+    return (
+      <div className="space-y-3">
+        {text ? <p>{linkify(text)}</p> : null}
+        {Array.isArray(images) && images.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {images.map((src, i) => (
+              <img
+                key={`img2-${i}`}
+                src={toSrc(src)}
+                alt={sub.nama}
+                className="w-full rounded-xl border border-black/10 dark:border-white/10"
+                onError={onInfoError}
+                loading="lazy"
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
 
-              return null;
-            })()}
+  return null;
+})()}
+
           </div>
         </InfoCard>
       </div>
