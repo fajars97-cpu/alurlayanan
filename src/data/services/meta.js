@@ -128,6 +128,11 @@ export const EXTRA_INFO = {
   // UKS
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
 
+  // LABORATORIUM
+  "Laboratorium": [{ img: "/infografis/daftar-waktu-penyampaian-hasil-lab-1.webp", alt: "Daftar Waktu Penyampaian Hasil Lab" },
+                   { img: "/infografis/daftar-waktu-penyampaian-hasil-lab-2.webp", alt: "Daftar Waktu Penyampaian Hasil Lab" },
+  ],
+
   // CKG
   "Cek Kesehatan Gratis": [
     "Pemeriksaan Kesehatan Gratis (CKG) adalah program pemerintah untuk mendeteksi dini faktor risiko penyakit tidak menular seperti hipertensi, diabetes, kolesterol tinggi, dan obesitas pada masyarakat usia 15 tahun ke atas 1 kali setahun.",
