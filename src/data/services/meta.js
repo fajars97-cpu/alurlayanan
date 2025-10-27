@@ -29,6 +29,7 @@ export const DOCTORS_BY_POLI = {
   "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
   "RB": "dr. Olivia Vistary, MARS. dan Bidan Rahayu Hartati.",
   ckg: "dr. Rakhmawaty",
+  laboratorium: "Listia Nurlita R"
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -129,7 +130,8 @@ export const EXTRA_INFO = {
   "Pelayanan UKS": "Informasi tambahan belum tersedia.",
 
   // LABORATORIUM
-  "Laboratorium": [{ img: "/infografis/daftar-waktu-penyampaian-hasil-lab-1.webp", alt: "Daftar Waktu Penyampaian Hasil Lab" },
+  "Laboratorium": ["Pemeriksaan Laboratorium Puskesmas Jagakarsa HANYA untuk rujukan internal Puskesmas Kecamatan Jagakarsa/ Puskesmas Pembantu di Wilayah Kecamatan Jagakarsa",
+                   { img: "/infografis/daftar-waktu-penyampaian-hasil-lab-1.webp", alt: "Daftar Waktu Penyampaian Hasil Lab" },
                    { img: "/infografis/daftar-waktu-penyampaian-hasil-lab-2.webp", alt: "Daftar Waktu Penyampaian Hasil Lab" },
   ],
 
