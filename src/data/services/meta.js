@@ -18,7 +18,7 @@ export const DOCTORS_BY_POLI = {
   lansia: "dr. Fitri Astuti Aditama",
   ptm: "dr. Azzahra Azmi",
   pm: "dr. Uli Siger",
-  ims: "dr. Asrie Rahayu",
+  ims: "dr. Marta Basarida",
   ispa: "dr. ISPA",
   mata: "dr. Asrie Rahayu",
   gizi: "dr. Dewi Wulansari",
