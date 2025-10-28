@@ -457,7 +457,9 @@ const StatusPill = ({ open, rest, soon }) => {
   }
 
   return (
-    <span className={`ml-auto text-[11px] px-2 py-1 rounded-full border ${tone}`}>
+    <span
+      className={`shrink-0 whitespace-nowrap leading-none text-[11px] px-2 py-1 rounded-full border ${tone}`}
+    >
       {label}
     </span>
   );
@@ -577,7 +579,7 @@ function Sidebar({
 
       <div className="p-4 space-y-3">
         <label className="text-xs uppercase text-slate-600 dark:text-white/50">Pencarian</label>
-         <div className="relative">
+         <div className="relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible">
         <input
          ref={searchRef}
          type="search"
@@ -795,12 +797,12 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
       hover:bg-slate-200/80 dark:hover:bg-white/8
       ring-0 hover:ring-1 hover:ring-black/10 dark:hover:ring-white/15
       transition-all shadow-sm hover:shadow active:scale-[.99]
-      focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      focus:outline-none focus:ring-2 focus:ring-emerald-500 overflow-visible"
     >
       <div className="p-4 sm:p-5 space-y-3">
-        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
+        <div className="flex items-start justify-between gap-2 text-[12px] sm:text-[13px] font-semibold tracking-tight">
           <span className={bpjsClass}>{bpjsText}</span>
-          <span className="ml-auto"><StatusPill open={open} rest={rest} soon={soon} /></span>
+          <StatusPill open={open} rest={rest} soon={soon} />
         </div>
         <div className="text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">{tarifText}</div>
         <div className="h-px bg-black/10 dark:bg-white/10" />
