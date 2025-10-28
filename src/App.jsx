@@ -931,114 +931,125 @@ function RightPanel({
 }) {
   const [sub, setSub] = useState(null);
 
-  // === Trap tombol Back (versi kuat & stabil) ===
-const GUARD_DEPTH = 8; // tahan spam back 8x berturut
-const guardRef = useRef({ seeded: false, depth: GUARD_DEPTH, lock: false, exitArmedAt: 0, disabled: false });
+  // === Trap tombol Back (satu-trap deterministik) ===
+const EXIT_WINDOW_MS = 2000;
 const [showBackHint, setShowBackHint] = useState(false);
 
-const seedGuards = () => {
-  if (typeof window === "undefined") return;
-  const g = guardRef.current;
-  if (g.seeded) return;
-  try {
-    // push N guard layer
-    for (let i = 0; i < GUARD_DEPTH; i++) {
-      window.history.pushState({ __guard: i + 1, t: Date.now() }, "");
-    }
-    g.seeded = true;
-    g.depth = GUARD_DEPTH;
-    g.disabled = false;
-    g.exitArmedAt = 0;
-  } catch {}
-};
+const backStateRef = useRef({
+  seeded: false,
+  lock: false,
+  exitArmedAt: 0,
+  listenersAttached: false,
+});
 
-const pushOneGuardSync = () => {
-  if (typeof window === "undefined") return;
-  const g = guardRef.current;
-  if (g.disabled) return; // saat mau keluar, jangan tambah guard
-  try {
-    window.history.pushState({ __guard: "reseed", t: Date.now() }, "");
-    g.depth += 1;
-    // batasi agar tidak mem-bloat; tetap jaga >= GUARD_DEPTH
-    if (g.depth > GUARD_DEPTH * 2) g.depth = GUARD_DEPTH * 2;
-  } catch {}
-};
-
-// hitung level navigasi saat ini
 const getLevel = () => (sub ? 2 : selected ? 1 : 0);
+
+const seedEntryAndTrap = () => {
+  if (typeof window === "undefined") return;
+  const S = backStateRef.current;
+  try {
+    // Tandai entry (gantikan current) lalu pasang satu TRAP
+    if (!history.state || !history.state.__ENTRY) {
+      history.replaceState({ __ENTRY: true }, "");
+    }
+    history.pushState({ __TRAP: true, t: Date.now() }, "");
+    S.seeded = true;
+  } catch {}
+};
 
 useEffect(() => {
   if (typeof window === "undefined") return;
-  seedGuards();
+
+  const S = backStateRef.current;
+
+  const reTrapSync = () => {
+    if (typeof window === "undefined") return;
+    try {
+      // Pasang lagi 1 TRAP sinkron di awal handler agar back cepat tetap tertahan
+      history.pushState({ __TRAP: true, t: Date.now() }, "");
+    } catch {}
+  };
 
   const handleBack = () => {
-    const g = guardRef.current;
-    if (g.lock) return;
-    if (g.disabled) return; // sudah dalam mode keluar; biarkan browser lanjut
-    g.lock = true;
+    if (S.lock) return;
+    S.lock = true;
 
-    // Selalu tambah 1 guard di awal supaya back kedua (cepat) tetap mentok ke sini
-    pushOneGuardSync();
+    // Kunci: pasang lagi TRAP sinkron di awal
+    reTrapSync();
 
     const level = getLevel();
 
-    // 1) SUBSERVICE → mundur ke POLI
+    // 1) SUBSERVICE → kembali ke POLI
     if (level === 2) {
       try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch {}
       setSub(null);
-      g.lock = false;
+      S.lock = false;
       return;
     }
-    // 2) POLI → mundur ke BERANDA
+    // 2) POLI → kembali ke BERANDA
     if (level === 1) {
       try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch {}
       setSelected(null);
-      g.lock = false;
+      S.lock = false;
       return;
     }
     // 3) BERANDA → double-back untuk keluar
     const now = Date.now();
-    if (now - g.exitArmedAt <= 2000) {
-      // Tap kedua dalam ≤2 detik → benar-benar keluar
-      g.disabled = true; // jangan tambah guard lagi
-      // Lepas listener agar tidak intercept saat melompat melewati seluruh guard
-      window.removeEventListener("popstate", onPop);
-      window.removeEventListener("hashchange", onHash);
-      // Lompat melewati seluruh guard + 1 (entry asli sebelum guard)
-      const steps = -(g.depth + 1);
-      try { window.history.go(steps); } catch { try { window.history.back(); } catch {} }
-      g.lock = false;
+    if (now - S.exitArmedAt <= EXIT_WINDOW_MS) {
+      // Lepas listener supaya lompatan keluar tidak di-intercept lagi
+      if (S.listenersAttached) {
+        window.removeEventListener("popstate", onPop);
+        window.removeEventListener("hashchange", onHash);
+        window.removeEventListener("pageshow", onPageShow);
+        document.removeEventListener("visibilitychange", onVis);
+        S.listenersAttached = false;
+      }
+      // Loncat melewati TRAP & ENTRY → benar-benar keluar dari situs
+      try { history.go(-2); } catch { try { history.back(); } catch {} }
+      S.lock = false;
       return;
     }
-    // Tap pertama di beranda → tampilkan toast
-    g.exitArmedAt = now;
+
+    // Tap pertama di beranda → tampilkan toast + arm exit
+    S.exitArmedAt = now;
     setShowBackHint(true);
     setTimeout(() => setShowBackHint(false), 1800);
-    g.lock = false;
+    S.lock = false;
   };
 
   const onPop = () => handleBack();
-  const onHash = () => handleBack(); // jaga-jaga bila hash berubah
+  const onHash = () => handleBack();
 
-  window.addEventListener("popstate", onPop);
-  window.addEventListener("hashchange", onHash);
+  const onPageShow = (e) => {
+    // Termasuk navigasi back-forward cache (bfcache)
+    // Setiap halaman jadi aktif → seed ulang ENTRY+TRAP
+    seedEntryAndTrap();
+  };
 
-  // Saat kembali fokus / reload, aktifkan lagi guard agar tidak langsung keluar
   const onVis = () => {
     if (document.hidden) return;
-    const g = guardRef.current;
-    // reset mode keluar & re-seed jika perlu
-    g.disabled = false;
-    if (!g.seeded || g.depth < GUARD_DEPTH) seedGuards();
-    // tambahkan 1 guard untuk berjaga
-    pushOneGuardSync();
+    // Saat kembali fokus → pastikan ada ENTRY+TRAP
+    seedEntryAndTrap();
   };
-  document.addEventListener("visibilitychange", onVis);
+
+  // Seed saat mount pertama
+  seedEntryAndTrap();
+
+  // Pasang listener sekali saja
+  if (!S.listenersAttached) {
+    window.addEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onHash);
+    window.addEventListener("pageshow", onPageShow);
+    document.addEventListener("visibilitychange", onVis);
+    S.listenersAttached = true;
+  }
 
   return () => {
     window.removeEventListener("popstate", onPop);
     window.removeEventListener("hashchange", onHash);
+    window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVis);
+    S.listenersAttached = false;
   };
 // tergantung posisi (agar mundur level bekerja)
 }, [selected, sub]);
