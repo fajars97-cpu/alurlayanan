@@ -936,52 +936,57 @@ function RightPanel({
   const backHintTsRef = useRef(0);    // timestamp hint terakhir
   const [showBackHint, setShowBackHint] = useState(false); // tampilkan toast "tekan lagi"
 
+  // --- Global guard helpers (di-window agar persist lintas render) ---
+  function ensureGuardSeededSync() {
+    if (typeof window === "undefined") return;
+    if (!window.__BACK_GUARD) window.__BACK_GUARD = { seeded: false, lock: false, disabled: false };
+    if (!window.__BACK_GUARD.seeded) {
+      try {
+        // seed 2 lapis guard supaya 2x back pertama selalu kembali ke kita
+        window.history.pushState({ __guard: 1, t: Date.now() }, "");
+        window.history.pushState({ __guard: 2, t: Date.now() }, "");
+        window.__BACK_GUARD.seeded = true;
+      } catch {}
+    }
+  }
+  function reAddGuardSync() {
+    if (typeof window === "undefined") return;
+    if (!window.__BACK_GUARD || window.__BACK_GUARD.disabled) return;
+    try {
+      // langsung pasang 1 guard sinkron (tanpa delay) agar "double back cepat" tidak tembus
+      window.history.pushState({ __guard: 2, t: Date.now() }, "");
+    } catch {}
+  }
+
   useEffect(() => {
   if (typeof window === "undefined") return;
 
-  // === SEED 2 GUARD (sekali saja) ===
-    if (!window.__guardSeeded) {
-      try {
-        window.history.pushState({ __guard: 1, t: Date.now() }, "");
-        window.history.pushState({ __guard: 2, t: Date.now() }, "");
-        window.__guardSeeded = true;
-      } catch {}
-    }
-
-    // Flag agar tidak restore guard saat handler sedang jalan
-    let inPopHandler = false;
-
-    const restoreGuard2 = (delay = 60) => {
-      if (inPopHandler) return; // hindari race
-      setTimeout(() => {
-        try {
-          window.history.pushState({ __guard: 2, t: Date.now() }, "");
-        } catch {}
-      }, delay);
-    };
+  // === SEED 2 GUARD (sekali saja, sinkron) ===
+    ensureGuardSeededSync();
 
   const handleBack = () => {
-    inPopHandler = true;
+    if (!window.__BACK_GUARD) window.__BACK_GUARD = { seeded: true, lock: false, disabled: false };
+      if (window.__BACK_GUARD.lock) return; // cegah reentrancy saat spam back
+      if (window.__BACK_GUARD.disabled) {
+        // sudah diputuskan keluar; biarkan browser lanjut
+        return;
+      }
+      window.__BACK_GUARD.lock = true;
+
+      // Pasang kembali 1 guard SECARA SINKRON lebih dulu.
+      // Ini kunci agar back kedua (cepat) tetap menabrak guard.
+      reAddGuardSync();
     // 1) jika sedang di SUB → tutup sub, restore guard#2
     if (sub) {
       trackEvent("Nav", "back", "close_sub");
-      // tutup sub via state
-      // (jangan panggil history.back() di sini)
-      // nanti kita restore guard#2
-      // eslint-disable-next-line no-undef
-      setSub(null);
-      restoreGuard2();
-      inPopHandler = false;
+      window.__BACK_GUARD.lock = false;
       return;
     }
 
     // 2) jika sedang di POLI → tutup poli, restore guard#2
     if (selected) {
       trackEvent("Nav", "back", "close_poli");
-      // eslint-disable-next-line no-undef
-      setSelected(null);
-      restoreGuard2();
-      inPopHandler = false;
+      window.__BACK_GUARD.lock = false;
       return;
     }
 
@@ -989,11 +994,13 @@ function RightPanel({
     const now = Date.now();
     if (now - backHintTsRef.current <= 2000) {
       trackEvent("Nav", "back", "exit_confirmed");
-      // Lepas listener dan benar-benar back (keluar dari site)
-      window.removeEventListener("popstate", onPop);
-      window.removeEventListener("hashchange", onHash);
-      window.history.back();
-      inPopHandler = false;
+      // Nonaktifkan guard sementara agar back benar-benar keluar.
+        window.__BACK_GUARD.disabled = true;
+        window.removeEventListener("popstate", onPop);
+        window.removeEventListener("hashchange", onHash);
+        // Ambil 2 langkah (biasanya kita menambah lagi 1 guard barusan).
+        try { window.history.go(-2); } catch { try { window.history.back(); } catch {} }
+        window.__BACK_GUARD.lock = false;
       return;
     }
     backHintTsRef.current = now;
@@ -1002,8 +1009,7 @@ function RightPanel({
     setTimeout(() => setShowBackHint(false), 1800);
 
     // tetap di halaman → restore guard#2 biar back berikutnya kembali ke kita
-    restoreGuard2();
-    inPopHandler = false;
+    window.__BACK_GUARD.lock = false;
   };
 
   const onPop = () => handleBack();
@@ -1013,7 +1019,14 @@ function RightPanel({
   window.addEventListener("hashchange", onHash);
 
   // ✅ Watchdog: setelah kembali ke tab, re-seed guard lagi
-  const onVis = () => { if (!document.hidden) restoreGuard2(80); };
+  const onVis = () => {
+      if (!document.hidden) {
+        // jika tadi sempat dinonaktifkan untuk keluar, aktifkan lagi saat kembali
+        if (window.__BACK_GUARD) window.__BACK_GUARD.disabled = false;
+        ensureGuardSeededSync();
+        reAddGuardSync();
+      }
+    };
   document.addEventListener("visibilitychange", onVis);
 
   return () => {
