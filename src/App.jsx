@@ -939,24 +939,29 @@ function RightPanel({
   useEffect(() => {
   if (typeof window === "undefined") return;
 
-  // ====== SEED 2-GUARD (sekali saja per mount) ======
-  // gunakan push + push (tanpa replace) agar back pertama selalu jatuh ke guard internal
-  if (!window.__guardSeeded) {
-    try {
-      window.history.pushState({ __guard: 1, t: Date.now() }, "");
-      window.history.pushState({ __guard: 2, t: Date.now() }, "");
-      window.__guardSeeded = true;
-    } catch {}
-  }
+  // === SEED 2 GUARD (sekali saja) ===
+    if (!window.__guardSeeded) {
+      try {
+        window.history.pushState({ __guard: 1, t: Date.now() }, "");
+        window.history.pushState({ __guard: 2, t: Date.now() }, "");
+        window.__guardSeeded = true;
+      } catch {}
+    }
 
-  const restoreGuard2 = () => {
-    // kembalikan guard#2 segera setelah popstate selesai
-    setTimeout(() => {
-      try { window.history.pushState({ __guard: 2, t: Date.now() }, ""); } catch {}
-    }, 0);
-  };
+    // Flag agar tidak restore guard saat handler sedang jalan
+    let inPopHandler = false;
+
+    const restoreGuard2 = (delay = 60) => {
+      if (inPopHandler) return; // hindari race
+      setTimeout(() => {
+        try {
+          window.history.pushState({ __guard: 2, t: Date.now() }, "");
+        } catch {}
+      }, delay);
+    };
 
   const handleBack = () => {
+    inPopHandler = true;
     // 1) jika sedang di SUB → tutup sub, restore guard#2
     if (sub) {
       trackEvent("Nav", "back", "close_sub");
@@ -966,6 +971,7 @@ function RightPanel({
       // eslint-disable-next-line no-undef
       setSub(null);
       restoreGuard2();
+      inPopHandler = false;
       return;
     }
 
@@ -975,6 +981,7 @@ function RightPanel({
       // eslint-disable-next-line no-undef
       setSelected(null);
       restoreGuard2();
+      inPopHandler = false;
       return;
     }
 
@@ -986,6 +993,7 @@ function RightPanel({
       window.removeEventListener("popstate", onPop);
       window.removeEventListener("hashchange", onHash);
       window.history.back();
+      inPopHandler = false;
       return;
     }
     backHintTsRef.current = now;
@@ -995,6 +1003,7 @@ function RightPanel({
 
     // tetap di halaman → restore guard#2 biar back berikutnya kembali ke kita
     restoreGuard2();
+    inPopHandler = false;
   };
 
   const onPop = () => handleBack();
@@ -1002,11 +1011,13 @@ function RightPanel({
 
   window.addEventListener("popstate", onPop);
   window.addEventListener("hashchange", onHash);
-
+  document.addEventListener("visibilitychange", onVis);
   return () => {
     window.removeEventListener("popstate", onPop);
     window.removeEventListener("hashchange", onHash);
+    document.removeEventListener("visibilitychange", onVis);
   };
+
 }, [selected, sub]);
 
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
