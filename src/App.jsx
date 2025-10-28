@@ -937,64 +937,79 @@ function RightPanel({
   const [showBackHint, setShowBackHint] = useState(false); // tampilkan toast "tekan lagi"
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    // Seed sekali saat pertama kali app tampil (apapun hash-nya)
-  if (!seededRef.current) {
-    try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {}
-    seededRef.current = true;
+  if (typeof window === "undefined") return;
+
+  // ====== SEED 2-GUARD (sekali saja per mount) ======
+  // guard#1: replace state saat ini (tidak menambah history)
+  // guard#2: push satu state supaya back selalu kembali ke guard#1 dulu
+  if (!window.__guardSeeded) {
+    try {
+      window.history.replaceState({ __guard: 1, t: Date.now() }, "", window.location.href);
+      window.history.pushState({ __guard: 2, t: Date.now() }, ""); // tambah satu entri
+      window.__guardSeeded = true;
+    } catch {}
   }
-    const handleBack = () => {
-      // 1) Jika sedang di sublayanan → tutup sub, re-seed, jangan keluar
+
+  const restoreGuard2 = () => {
+    // kembalikan guard#2 tanpa menambah banyak entri (push satu kali lagi)
+    // lakukan setelah event selesai agar tidak bentrok dengan popstate
+    setTimeout(() => {
+      try { window.history.pushState({ __guard: 2, t: Date.now() }, ""); } catch {}
+    }, 0);
+  };
+
+  const handleBack = () => {
+    // 1) jika sedang di SUB → tutup sub, restore guard#2
     if (sub) {
-      setSub(null);
       trackEvent("Nav", "back", "close_sub");
-      setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
+      // tutup sub via state
+      // (jangan panggil history.back() di sini)
+      // nanti kita restore guard#2
+      // eslint-disable-next-line no-undef
+      setSub(null);
+      restoreGuard2();
       return;
     }
-    // 2) Jika sedang di poli → tutup poli, re-seed
+
+    // 2) jika sedang di POLI → tutup poli, restore guard#2
     if (selected) {
-      setSelected(null);
       trackEvent("Nav", "back", "close_poli");
-      setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
+      // eslint-disable-next-line no-undef
+      setSelected(null);
+      restoreGuard2();
       return;
     }
-   // 3) Beranda → mekanisme "double back to exit" (2 detik)
-      const now = Date.now();
-      if (now - backHintTsRef.current <= 2000) {
-        trackEvent("Nav", "back", "exit_confirmed");
-        // Lepas listener, lanjutkan back asli (keluar)
-        window.removeEventListener("popstate", onPop);
-        window.removeEventListener("hashchange", onHash);
-        history.back();
-        return;
-      }
-// Back pertama → tampilkan hint + reseed
-      backHintTsRef.current = now;
-      setShowBackHint(true);
-      trackEvent("Nav", "back", "hint_shown");
-      setTimeout(() => setShowBackHint(false), 1800);
-      setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
-    };
-    const onPop = () => handleBack();
-    const onHash = () => handleBack(); // untuk jaga-jaga HashRouter
-    window.addEventListener("popstate", onPop);
-    window.addEventListener("hashchange", onHash);
-    return () => {
+
+    // 3) di BERANDA → pola double-back ≤2 detik
+    const now = Date.now();
+    if (now - backHintTsRef.current <= 2000) {
+      trackEvent("Nav", "back", "exit_confirmed");
+      // Lepas listener dan benar-benar back (keluar dari site)
       window.removeEventListener("popstate", onPop);
       window.removeEventListener("hashchange", onHash);
-    };
-  }, [selected, sub]);
-
-
-  // JAGA GUARD SETIAP KALI KEMBALI KE BERANDA VIA UI
-  // Ketika user menutup sub/poli dengan tombol UI (bukan tombol back),
-  // kita push satu guard state agar back berikutnya tetap memicu konfirmasi.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!selected && !sub) {
-      try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {}
+      window.history.back();
+      return;
     }
-  }, [selected, sub]);
+    backHintTsRef.current = now;
+    setShowBackHint(true);
+    trackEvent("Nav", "back", "hint_shown");
+    setTimeout(() => setShowBackHint(false), 1800);
+
+    // tetap di halaman → restore guard#2 biar back berikutnya kembali ke kita
+    restoreGuard2();
+  };
+
+  const onPop = () => handleBack();
+  const onHash = () => handleBack(); // jaga-jaga untuk HashRouter
+
+  window.addEventListener("popstate", onPop);
+  window.addEventListener("hashchange", onHash);
+
+  return () => {
+    window.removeEventListener("popstate", onPop);
+    window.removeEventListener("hashchange", onHash);
+  };
+}, [selected, sub]);
 
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
   useEffect(() => {
@@ -1277,7 +1292,7 @@ function RightPanel({
           </div>
         </InfoCard>
       </div>
-      
+
     {/* Toast "tekan lagi untuk keluar" */}
       {showBackHint && (
         <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-max max-w-[90%] px-3 py-2 rounded-full
@@ -1569,8 +1584,8 @@ export default function App() {
 
         <SurveyPopup
           formUrl="https://forms.gle/72k85XkYQTQZRfq38"
-          delayMs={40000}
-          cooldownDays={14}
+          delayMs={60000}
+          cooldownDays={7}
         />
 
         <footer className="py-6 text-center text-slate-600 dark:text-white/50 text-sm">
