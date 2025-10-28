@@ -9,7 +9,7 @@ export const DOCTORS_BY_POLI = {
   igd: "dr. Ranu Brata Kusuma",
   "ki-hamil": "dr. Anisah Rahma",
   "ki-nifas": "Bidan Ika Nurmalasari, A.Md. Keb.",
-  catin: "dr. Rebekka Sitorus",
+  catin: "dr. Cindy Audina Pradibta",
   imunisasi: "Dewi Sartika Gea, A.Md. Keb.",
   "kb-iva": "dr. Nurul Chaerani dan Bidan Marini Jagasa",
   tumbang: "Yuniar Selowati",
@@ -26,7 +26,7 @@ export const DOCTORS_BY_POLI = {
   "klinik-sanitasi": "Resya Karnioca, S.Tr.Kes.",
   uks: "Petugas UKS",
   "vaksin-dengue": "Perawat Vaksin",
-  "kesling_surveilans": "Dwitania Manvi, S.K.M.,",
+  "kesling_surveilans": "Yeyet Rahmayanti",
   "RB": "dr. Olivia Vistary, MARS. dan Bidan Rahayu Hartati.",
   ckg: "dr. Rakhmawaty",
   laboratorium: "Listia Nurlita R"
