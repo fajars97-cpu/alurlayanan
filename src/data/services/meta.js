@@ -42,8 +42,9 @@ export const EXTRA_INFO = {
   "Kontrol Berkala": "Informasi tambahan belum tersedia.",
 
   // Poli Gigi
-  "Cabut Gigi": "Informasi tambahan belum tersedia.",
-  "Scaling": "Informasi tambahan belum tersedia.",
+  "Poli Gigi": ["Silahkan mengisi form skrining kesehatan gigi Anda di https://tally.so/r/nG8EVp. ",
+    { img: "/infografis/skrining_gigi.webp", alt: "Skrining Kesehatan Gigi" },
+  ],
 
   // IGD
   "Tindakan Darurat": "Informasi tambahan belum tersedia.",

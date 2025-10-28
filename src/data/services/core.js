@@ -59,7 +59,7 @@ export const FLOW_STEPS = {
     title: "Langkah 7",
     name: "Menuju Laboratorium",
     description:
-      "Silahkan menuju laboratorium lantai 3 lalu taruh kertas antrian di box yang tersedia, tunggu panggilan.",
+      "Silahkan menuju laboratorium lantai 3 lalu taruh kertas antrian di bagian kasir di keranjang yang tersedia, tunggu hingga nomor antrian Anda dipanggil.",
     img: "/alur/7-menuju-laboratorium.webp",
   },
   8: {
@@ -353,14 +353,14 @@ export const FLOW_STEPS = {
     id: 49,
     title: "Langkah 49",
     name: "Pemeriksaan darah di Lab",
-    description: "Silahkan menuju laboratorium di lantai 3 untuk pengambilan sampel darah, taruh kertas antrian di box yang tersedia, tunggu panggilan.",
+    description: "Silahkan menuju laboratorium di lantai 3 untuk pengambilan sampel darah, taruh resi pendaftaran di keranjang yang tersedia, tunggu panggilan nomor Anda.",
     img: "/alur/49-menuju-lab-ckg.webp",
     },
     50: {
     id: 50,
     title: "Langkah 50",
     name: "Pemeriksaan darah di Lab",
-    description: "Silahkan masuk ke dalam ruang pengambilan darah di laboratorium setelah nama Anda dipanggil, ikuti instruksi petugas.",
+    description: "Silahkan masuk ke dalam ruang pengambilan darah di laboratorium setelah nomor Anda dipanggil, ikuti instruksi petugas.",
     img: "/alur/50-cek-lab-ckg.webp",
     },
     51: {
@@ -493,7 +493,7 @@ export const FLOW_STEPS = {
     id: 69,
     title: "Langkah 69",
     name: "Pengambilan Sampel Darah Ibu Hamil",
-    description: "Silahkan taruh rujukan internal pengecekan darah di laboratorium (dari tangga ke kiri), kemudian masuk ke dalam ruang pengambilan sampel apabila nama Anda telah dipanggil dan  ikuti arahan petugas selanjutnya (urutan rujukan internal bersifat fleksibel).",
+    description: "Silahkan taruh rujukan internal pengecekan darah di laboratorium (dari tangga ke kiri), kemudian masuk ke dalam ruang pengambilan sampel apabila nomor Anda telah dipanggil dan  ikuti arahan petugas selanjutnya (urutan rujukan internal bersifat fleksibel).",
     img: "/alur/69-pengambilan-sampel-darah-ibu-hamil.webp",
     },
     70: {
@@ -654,14 +654,14 @@ export const FLOW_STEPS = {
     id: 92,
     title: "Langkah 92",
     name: "Menaruh Formulir Laboratorium",
-    description: "Silahkan menuju laboratorium (lantai 3, dari tangga/ lift ke kiri) lalu taruh surat pengantar di keranjang yang disediakan. Tunggu hingga nama Anda dipanggil untuk masuk ke ruang pengambilan darah.",
+    description: "Silahkan menuju laboratorium (lantai 3, dari tangga/ lift ke kiri) lalu taruh surat pengantar di keranjang yang disediakan. Pasien akan diberikan nomor antrian lab, tunggu hingga nomor Anda dipanggil untuk masuk ke ruang pengambilan darah.",
     img: "/alur/92-formulir-lab.webp",
     },
     93: {
     id: 93,
     title: "Langkah 93",
     name: "Pengambilan Sampel Darah Catin",
-    description: "Silahkan menuju ruang pengambilan sampel darah laboratorium jika nama Anda telah dipanggil.",
+    description: "Silahkan menuju ruang pengambilan sampel darah laboratorium jika nomor Anda telah dipanggil.",
     img: "/alur/93-pengambilan-sampel-darah.webp",
     },
     94: {
@@ -696,14 +696,14 @@ export const FLOW_STEPS = {
     id: 98,
     title: "Langkah 98",
     name: "Menaruh Formulir Lab",
-    description: "Silahkan taruh formulir lab di tempat yang disediakan (laboratorium lantai 3, dari tangga/ lift ke kiri).",
+    description: "Silahkan taruh formulir lab di tempat yang disediakan (laboratorium lantai 3, dari tangga/ lift ke kiri). Pasien akan diberikan nomor antrian lab dan tunggu hingga nomor Anda dipanggil.",
     img: "/alur/98-menyerahkan-formulir-lab.webp",
     },
     99: {
     id: 99,
     title: "Langkah 99",
     name: "Pengambilan Sampel",
-    description: "Setelah nama Anda dipanggil, silahkan menuju ruang pengambilan sampel dan ikuti instruksi petugas.",
+    description: "Setelah nomor Anda dipanggil, silahkan menuju ruang pengambilan sampel dan ikuti instruksi petugas.",
     img: "/alur/99-pengambilan-darah.webp",
     },
     100: {
@@ -738,7 +738,7 @@ export const FLOW_STEPS = {
     id: 104,
     title: "Langkah 104",
     name: "Mengambil Hasil Lab",
-    description: "Bila hasil lab sudah keluar (lihat waktu tunggu hasil), silahkan ambil hasil pemeriksaan laboratorium di loket laboratorium",
+    description: "Bila hasil lab sudah keluar, silahkan ambil hasil pemeriksaan laboratorium di loket laboratorium dengan menyerahkan nomor antrian laboratorium.",
     img: "/alur/104-mengambil-hasil-lab.webp",
     },
     105: {
@@ -752,8 +752,8 @@ export const FLOW_STEPS = {
     id: 106,
     title: "Langkah 106",
     name: "Rujukan Puskesmas Pembantu",
-    description: "Jika Anda dirujuk dari puskesmas pembantu untuk melakukan pemeriksaan laboratorium, silahkan ke bagian kasir lantai 2 (di depan tangga) untuk melakukan pendaftaran dan pembayaran",
-    img: "/alur/106-membayar-kasir-lantai-2.webp",
+    description: "Jika Anda dirujuk dari puskesmas pembantu untuk melakukan pemeriksaan laboratorium, silahkan ke bagian kasir lantai 3 (dari tangga/ lift ke kiri) untuk melakukan pendaftaran dan pembayaran. Pasien selanjutnya akan diberikan nomor antrian laboratorium.",
+    img: "/alur/98-menyerahkan-formulir-lab.webp",
     },
     107: {
     id: 107,
