@@ -592,7 +592,7 @@ export const FLOW_STEPS = {
     title: "Langkah 83",
     name: "Menuju Poli PTM",
     description: "Silahkan menuju poli PTM di lantai 2, tunggu hingga nama Anda dipanggil.",
-    img: "/alur/82-pemeriksaan-gigi.webp",
+    img: "/alur/83-menuju-poli-ptm.webp",
     },
     84: {
     id: 84,
@@ -819,7 +819,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Pemeriksaan Kesehatan Gigi Dasar",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Cabut Gigi Tidak dengan Injeksi Per Gigi",
@@ -827,7 +827,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: true,
           ket: "Pencabutan gigi permanen",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Tambal Gigi Susu Per Gigi",
@@ -835,7 +835,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 50000,
           bpjs: true,
           ket: "Penambalan Gigi Susu",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Tambal Gigi Tetap Per Gigi",
@@ -843,7 +843,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 50000,
           bpjs: true,
           ket: "Penambalan Gigi Tetap",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Open Bur/ Trepanasi per Gigi",
@@ -851,7 +851,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: true,
           ket: "Penambalan Gigi Tetap",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Perawatan Syraf Gigi per Gigi",
@@ -859,7 +859,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: true,
           ket: "Perawatan Syraf Gigi",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Tambalan Sementara per Gigi",
@@ -867,7 +867,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 60000,
           bpjs: true,
           ket: "Tambalan Sementara Gigi",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Grinding per Gigi",
@@ -875,7 +875,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Grinding",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Buka Jahitan per Tindakan",
@@ -883,7 +883,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Buka Jahitan",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Cabut Gigi dengan Injeksi per Gigi",
@@ -891,7 +891,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 40000,
           bpjs: true,
           ket: "Cabut Gigi dengan Injeksi",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Incisi Abses per Abses",
@@ -899,7 +899,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Cabut Gigi dengan Injeksi",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
+          alur: [0, 1, 81, 3, 82, 4, 5],
         },
         {
           nama: "Scaling/ Pembersihan Karang Gigi",
@@ -907,7 +907,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: [30000, 180000],
           bpjs: false,
           ket: "Pembersihan karang gigi",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
         {
           nama: "Tambal Tetap per Gigi",
@@ -915,7 +915,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: false,
           ket: "Tambal Tetap",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
         {
           nama: "Cabut Gigi dengan Penyulit per Gigi",
@@ -923,7 +923,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 90000,
           bpjs: false,
           ket: "Tambal Tetap",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
         {
           nama: "Curretage/ Pocket Gigi",
@@ -931,7 +931,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 35000,
           bpjs: false,
           ket: "Curretage/ Pocket Gigi",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
         {
           nama: "Penanganan Trauma (1-3 jahitan)",
@@ -939,7 +939,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 25000,
           bpjs: false,
           ket: "Penanganan Trauma",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
         {
           nama: "Cabut Gigi dengan Injeksi Citojet (Dengan Indikasi)",
@@ -947,7 +947,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 100000,
           bpjs: false,
           ket: "Cabut Gigi",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
         {
           nama: "Tambalan Sinar per Gigi",
@@ -955,7 +955,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 90000,
           bpjs: false,
           ket: "Tambalan Sinar",
-          alur: [0, 1, 81, 3, 82, 83, 5],
+          alur: [0, 1, 81, 3, 82, 5],
         },
       ],
     },
