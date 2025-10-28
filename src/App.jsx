@@ -936,40 +936,39 @@ function RightPanel({
   const homeGuardRef = useRef(0);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // seed history sekali saat di beranda
-    if (!seededRef.current && (!location.hash || location.hash === "#/")) {
-      window.history.pushState({ _seed: true, t: Date.now() }, "", window.location.href);
-      seededRef.current = true;
-    }
+    // Seed sekali saat pertama kali app tampil (apapun hash-nya)
+  if (!seededRef.current) {
+    try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {}
+    seededRef.current = true;
+  }
     const onPop = (e) => {
-      // 1) jika sedang melihat sublayanan → tutup dulu
-      if (sub) {
-        e.preventDefault?.();
-        setSub(null);
-        trackEvent("Nav", "back", "close_sub");
-        setTimeout(() => window.history.pushState({ _trap: true }, ""), 0);
-        return;
-      }
-      // 2) jika sedang di dalam poli → tutup poli
-      if (selected) {
-        e.preventDefault?.();
-        setSelected(null);
-        trackEvent("Nav", "back", "close_poli");
-        setTimeout(() => window.history.pushState({ _trap: true }, ""), 0);
-        return;
-      }
-      // 3) sudah di beranda → konfirmasi keluar
-      e.preventDefault?.();
-      trackEvent("Nav", "back", "confirm_exit_shown");
-      const ok = window.confirm("Apakah Anda ingin keluar dari halaman ini?");
-      if (ok) {
-        trackEvent("Nav", "back", "exit_confirmed");
-        window.removeEventListener("popstate", onPop);
-        window.history.back();
-      } else {
-        trackEvent("Nav", "back", "exit_cancelled");
-        setTimeout(() => window.history.pushState({ _trap: true }, ""), 0);
-      }
+      // 1) Jika sedang di sublayanan → tutup sub, re-seed, jangan keluar
+    if (sub) {
+      setSub(null);
+      trackEvent("Nav", "back", "close_sub");
+      setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
+      return;
+    }
+    // 2) Jika sedang di poli → tutup poli, re-seed
+    if (selected) {
+      setSelected(null);
+      trackEvent("Nav", "back", "close_poli");
+      setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
+      return;
+    }
+    // 3) Beranda → tampilkan konfirmasi
+    trackEvent("Nav", "back", "confirm_exit_shown");
+    const ok = window.confirm("Apakah Anda ingin keluar dari halaman ini?");
+    if (ok) {
+      trackEvent("Nav", "back", "exit_confirmed");
+      // Lepas listener, lalu benar-benar keluar (biarkan browser handle)
+      window.removeEventListener("popstate", onPop);
+      window.history.back();
+      return;
+    }
+    // batal keluar → re-seed agar back berikutnya tetap jatuh ke handler
+    trackEvent("Nav", "back", "exit_cancelled");
+    setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
@@ -984,7 +983,7 @@ function RightPanel({
       const now = Date.now();
       // throttle supaya tidak spam pushState saat render berulang
       if (now - homeGuardRef.current > 500) {
-        window.history.pushState({ _guard: true, t: now }, "");
+        try { window.history.pushState({ _trap: true, t: now }, ""); } catch {}
         homeGuardRef.current = now;
       }
     }
