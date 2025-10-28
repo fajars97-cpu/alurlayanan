@@ -42,7 +42,7 @@ export const EXTRA_INFO = {
   "Kontrol Berkala": "Informasi tambahan belum tersedia.",
 
   // Poli Gigi
-  "Poli Gigi": ["Silahkan mengisi form skrining kesehatan gigi Anda di https://tally.so/r/nG8EVp. ",
+  "Poli Gigi": ["Silahkan mengisi form skrining kesehatan gigi Anda di https://tally.so/r/nG8EVp . ",
     { img: "/infografis/skrining_gigi.webp", alt: "Skrining Kesehatan Gigi" },
   ],
 

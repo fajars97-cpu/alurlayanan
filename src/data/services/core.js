@@ -822,14 +822,6 @@ export const SERVICES_BY_FACILITY = {
           alur: [0, 1, 81, 3, 82, 83, 4, 5],
         },
         {
-          nama: "Pemeriksaan Kesehatan Gigi Dasar",
-          ikon: "🦷",
-          tarif: 10000,
-          bpjs: true,
-          ket: "Pemeriksaan Kesehatan Gigi Dasar",
-          alur: [0, 1, 81, 3, 82, 83, 4, 5],
-        },
-        {
           nama: "Cabut Gigi Tidak dengan Injeksi Per Gigi",
           ikon: "🦷",
           tarif: 30000,
@@ -1892,7 +1884,7 @@ export const SERVICES_BY_FACILITY = {
           nama: "Pemeriksaan Mata",
           ikon: "👁️",
           tarif: 15000,
-          bpjs: false,
+          bpjs: true,
           ket: "Visus, refraksi dasar, pinhole",
           jadwal: {
           tz: "Asia/Jakarta",
