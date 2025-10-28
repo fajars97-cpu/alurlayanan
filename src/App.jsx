@@ -778,7 +778,7 @@ function ServiceCard({ s, onPick }) {
 }
 
 /* SubServiceCard */
-function SubServiceCard({ item, onPick, parentJadwal }) {
+function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
   const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
   const bpjsClass = item.bpjs ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
@@ -787,6 +787,7 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
   const { open, rest, soon } = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
   const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
   const weekly = jadwalLayanan ? summarizeWeekly(jadwalLayanan) : null;
+  const pj = item.penanggungJawab || item.pj || (DOCTORS_BY_POLI && poliId ? DOCTORS_BY_POLI[poliId] : null);
 
   return (
     <button
@@ -815,6 +816,12 @@ function SubServiceCard({ item, onPick, parentJadwal }) {
             {item.ket && (
               <div className="text-[13px] sm:text-sm text-slate-600 dark:text-white/70 mt-1 line-clamp-3">
                 {item.ket}
+              </div>
+            )}
+            {/* NEW: Penanggung jawab (layanan > poli) */}
+             {pj && (
+             <div className="mt-2 text-[12px] sm:text-[13px] text-slate-600 dark:text-white/60">
+                <span className="text-slate-500 dark:text-white/50">Penanggung jawab:</span> {pj}
               </div>
             )}
             {/* Jadwal ringkas per layanan */}
@@ -1121,6 +1128,7 @@ useEffect(() => {
                       item={{ ...item, nama: `${item.nama} — ${poli.nama}` }}
                       onPick={() => onPickSub(poli.id, index)}
                       parentJadwal={poli.jadwal}
+                      poliId={poli.id}
                     />
                   ))}
                 </div>
@@ -1160,8 +1168,14 @@ useEffect(() => {
         >
           {list.length > 0 ? (
             list.map((it, i) => (
-              <SubServiceCard key={i} item={it} onPick={setSub} parentJadwal={selected.jadwal} />
-            ))
+            <SubServiceCard
+            key={i}
+            item={it}
+            onPick={setSub}
+            parentJadwal={selected.jadwal}
+            poliId={selected.id}
+          />
+          ))
           ) : (
             <div className="text-slate-600 dark:text-white/60">Belum ada jenis layanan terdaftar.</div>
           )}
