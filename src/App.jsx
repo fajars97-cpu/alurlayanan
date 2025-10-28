@@ -1011,7 +1011,11 @@ function RightPanel({
 
   window.addEventListener("popstate", onPop);
   window.addEventListener("hashchange", onHash);
+
+  // ✅ Watchdog: setelah kembali ke tab, re-seed guard lagi
+  const onVis = () => { if (!document.hidden) restoreGuard2(80); };
   document.addEventListener("visibilitychange", onVis);
+
   return () => {
     window.removeEventListener("popstate", onPop);
     window.removeEventListener("hashchange", onHash);
