@@ -976,16 +976,21 @@ function RightPanel({
       // Pasang kembali 1 guard SECARA SINKRON lebih dulu.
       // Ini kunci agar back kedua (cepat) tetap menabrak guard.
       reAddGuardSync();
-    // 1) jika sedang di SUB → tutup sub, restore guard#2
+    // 1) jika sedang di SUB → tutup sub (mundur ke POLI)
     if (sub) {
       trackEvent("Nav", "back", "close_sub");
+      // mundur ke level poli
+      stopFlowAudio();
+      setSub(null);
       window.__BACK_GUARD.lock = false;
       return;
     }
 
-    // 2) jika sedang di POLI → tutup poli, restore guard#2
+    // 2) jika sedang di POLI → tutup poli (mundur ke BERANDA)
     if (selected) {
       trackEvent("Nav", "back", "close_poli");
+      stopFlowAudio();
+      setSelected(null);
       window.__BACK_GUARD.lock = false;
       return;
     }
