@@ -933,6 +933,7 @@ function RightPanel({
 
   // === Trap tombol Back: tutup sub/poli dulu, baru konfirmasi keluar di beranda
   const seededRef = useRef(false);
+  const homeGuardRef = useRef(0);
   useEffect(() => {
     if (typeof window === "undefined") return;
     // seed history sekali saat di beranda
@@ -973,6 +974,21 @@ function RightPanel({
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, [selected, sub, setSelected]);
+
+  // JAGA GUARD SETIAP KALI KEMBALI KE BERANDA VIA UI
+  // Ketika user menutup sub/poli dengan tombol UI (bukan tombol back),
+  // kita push satu guard state agar back berikutnya tetap memicu konfirmasi.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!selected && !sub) {
+      const now = Date.now();
+      // throttle supaya tidak spam pushState saat render berulang
+      if (now - homeGuardRef.current > 500) {
+        window.history.pushState({ _guard: true, t: now }, "");
+        homeGuardRef.current = now;
+      }
+    }
+  }, [selected, sub]);
 
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
   useEffect(() => {
