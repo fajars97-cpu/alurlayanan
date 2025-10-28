@@ -933,7 +933,9 @@ function RightPanel({
 
   // === Trap tombol Back: tutup sub/poli dulu, baru konfirmasi keluar di beranda
   const seededRef = useRef(false);
-  const homeGuardRef = useRef(0);
+  const backHintTsRef = useRef(0);    // timestamp hint terakhir
+  const [showBackHint, setShowBackHint] = useState(false); // tampilkan toast "tekan lagi"
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     // Seed sekali saat pertama kali app tampil (apapun hash-nya)
@@ -941,7 +943,7 @@ function RightPanel({
     try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {}
     seededRef.current = true;
   }
-    const onPop = (e) => {
+    const handleBack = () => {
       // 1) Jika sedang di sublayanan → tutup sub, re-seed, jangan keluar
     if (sub) {
       setSub(null);
@@ -956,23 +958,33 @@ function RightPanel({
       setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
       return;
     }
-    // 3) Beranda → tampilkan konfirmasi
-    trackEvent("Nav", "back", "confirm_exit_shown");
-    const ok = window.confirm("Apakah Anda ingin keluar dari halaman ini?");
-    if (ok) {
-      trackEvent("Nav", "back", "exit_confirmed");
-      // Lepas listener, lalu benar-benar keluar (biarkan browser handle)
-      window.removeEventListener("popstate", onPop);
-      window.history.back();
-      return;
-    }
-    // batal keluar → re-seed agar back berikutnya tetap jatuh ke handler
-    trackEvent("Nav", "back", "exit_cancelled");
-    setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
+   // 3) Beranda → mekanisme "double back to exit" (2 detik)
+      const now = Date.now();
+      if (now - backHintTsRef.current <= 2000) {
+        trackEvent("Nav", "back", "exit_confirmed");
+        // Lepas listener, lanjutkan back asli (keluar)
+        window.removeEventListener("popstate", onPop);
+        window.removeEventListener("hashchange", onHash);
+        history.back();
+        return;
+      }
+// Back pertama → tampilkan hint + reseed
+      backHintTsRef.current = now;
+      setShowBackHint(true);
+      trackEvent("Nav", "back", "hint_shown");
+      setTimeout(() => setShowBackHint(false), 1800);
+      setTimeout(() => { try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {} }, 0);
     };
+    const onPop = () => handleBack();
+    const onHash = () => handleBack(); // untuk jaga-jaga HashRouter
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, [selected, sub, setSelected]);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("hashchange", onHash);
+    };
+  }, [selected, sub]);
+
 
   // JAGA GUARD SETIAP KALI KEMBALI KE BERANDA VIA UI
   // Ketika user menutup sub/poli dengan tombol UI (bukan tombol back),
@@ -980,12 +992,7 @@ function RightPanel({
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!selected && !sub) {
-      const now = Date.now();
-      // throttle supaya tidak spam pushState saat render berulang
-      if (now - homeGuardRef.current > 500) {
-        try { window.history.pushState({ _trap: true, t: now }, ""); } catch {}
-        homeGuardRef.current = now;
-      }
+      try { window.history.pushState({ _trap: true, t: Date.now() }, ""); } catch {}
     }
   }, [selected, sub]);
 
@@ -1270,6 +1277,14 @@ function RightPanel({
           </div>
         </InfoCard>
       </div>
+      
+    {/* Toast "tekan lagi untuk keluar" */}
+      {showBackHint && (
+        <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-max max-w-[90%] px-3 py-2 rounded-full
+                        bg-black/80 text-white text-xs sm:text-sm shadow-lg">
+          Tekan sekali lagi untuk keluar
+        </div>
+      )}
     </div>
   );
 }
