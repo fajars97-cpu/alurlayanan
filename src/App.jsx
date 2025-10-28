@@ -931,96 +931,117 @@ function RightPanel({
 }) {
   const [sub, setSub] = useState(null);
 
-  // === Trap tombol Back (stabil & ringan) ===
-  const backHintTsRef = useRef(0);          // timestamp hint terakhir (untuk double-back di beranda)
-  const [showBackHint, setShowBackHint] = useState(false);
-  const guardRef = useRef({ seeded: false, lock: false, disabled: false });
+  // === Trap tombol Back (versi kuat & stabil) ===
+const GUARD_DEPTH = 8; // tahan spam back 8x berturut
+const guardRef = useRef({ seeded: false, depth: GUARD_DEPTH, lock: false, exitArmedAt: 0, disabled: false });
+const [showBackHint, setShowBackHint] = useState(false);
 
-  // seed 2 guard sinkron agar back pertama & kedua selalu kembali ke handler kita
-  const seedGuardsSync = () => {
-    if (guardRef.current.seeded || typeof window === "undefined") return;
-    try {
-      window.history.pushState({ __g: 1, t: Date.now() }, "");
-      window.history.pushState({ __g: 2, t: Date.now() }, "");
-      guardRef.current.seeded = true;
-    } catch {}
-  };
-  const reAddGuardSync = () => {
-    if (guardRef.current.disabled || typeof window === "undefined") return;
-    try { window.history.pushState({ __g: 2, t: Date.now() }, ""); } catch {}
-  };
+const seedGuards = () => {
+  if (typeof window === "undefined") return;
+  const g = guardRef.current;
+  if (g.seeded) return;
+  try {
+    // push N guard layer
+    for (let i = 0; i < GUARD_DEPTH; i++) {
+      window.history.pushState({ __guard: i + 1, t: Date.now() }, "");
+    }
+    g.seeded = true;
+    g.depth = GUARD_DEPTH;
+    g.disabled = false;
+    g.exitArmedAt = 0;
+  } catch {}
+};
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    seedGuardsSync();
+const pushOneGuardSync = () => {
+  if (typeof window === "undefined") return;
+  const g = guardRef.current;
+  if (g.disabled) return; // saat mau keluar, jangan tambah guard
+  try {
+    window.history.pushState({ __guard: "reseed", t: Date.now() }, "");
+    g.depth += 1;
+    // batasi agar tidak mem-bloat; tetap jaga >= GUARD_DEPTH
+    if (g.depth > GUARD_DEPTH * 2) g.depth = GUARD_DEPTH * 2;
+  } catch {}
+};
 
-    const handleBack = () => {
-      // cegah balapan event saat user menekan cepat berkali-kali
-      if (guardRef.current.lock) return;
-      if (guardRef.current.disabled) return; // saat mau keluar, biarkan browser yang lanjut
-      guardRef.current.lock = true;
+// hitung level navigasi saat ini
+const getLevel = () => (sub ? 2 : selected ? 1 : 0);
 
-      // kunci utama: pasang lagi 1 guard SECARA SINKRON di awal handler
-      reAddGuardSync();
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  seedGuards();
 
-      // 1) sedang di SUBSERVICE → kembali ke POLI
-      if (sub) {
-        try { trackEvent("Nav", "back", "sub_to_poli"); } catch {}
-        // pastikan audio/efek lain juga berhenti jika ada
-        if (typeof stopFlowAudio === "function") stopFlowAudio();        setSub(null);
-        guardRef.current.lock = false;
-        return;
-      }
-      // 2) sedang di POLI → kembali ke BERANDA
-      if (selected) {
-        try { trackEvent("Nav", "back", "poli_to_home"); } catch {}
-        if (typeof stopFlowAudio === "function") stopFlowAudio();
-        setSelected(null);
-        guardRef.current.lock = false;
-        return;
-      }
-      // 3) sudah di BERANDA → double-back untuk keluar
-      const now = Date.now();
-      if (now - backHintTsRef.current <= 2000) {
-        try { trackEvent("Nav", "back", "exit_confirmed"); } catch {}
-        // Nonaktifkan guard sementara dan benar-benar keluar.
-        guardRef.current.disabled = true;
-        window.removeEventListener("popstate", onPop);
-        window.removeEventListener("hashchange", onHash);
-        // Karena kita barusan menambah 1 guard sinkron, mundurkan 2 langkah supaya benar keluar.
-        try { window.history.go(-2); } catch { try { window.history.back(); } catch {} }
-        guardRef.current.lock = false;
-        return;
-      }
-      backHintTsRef.current = now;
-      setShowBackHint(true);
-      try { trackEvent("Nav", "back", "hint_shown"); } catch {}
-      setTimeout(() => setShowBackHint(false), 1800);
-      guardRef.current.lock = false;
-    };
+  const handleBack = () => {
+    const g = guardRef.current;
+    if (g.lock) return;
+    if (g.disabled) return; // sudah dalam mode keluar; biarkan browser lanjut
+    g.lock = true;
 
-    const onPop = () => handleBack();
-    const onHash = () => handleBack(); // jaga-jaga bila pakai HashRouter
+    // Selalu tambah 1 guard di awal supaya back kedua (cepat) tetap mentok ke sini
+    pushOneGuardSync();
 
-    window.addEventListener("popstate", onPop);
-    window.addEventListener("hashchange", onHash);
+    const level = getLevel();
 
-    // Saat kembali ke tab (visibilitychange), aktifkan kembali guard dan seed ulang
-    const onVis = () => {
-      if (document.hidden) return;
-      guardRef.current.disabled = false;
-      seedGuardsSync();
-      reAddGuardSync();
-    };
-    document.addEventListener("visibilitychange", onVis);
-
-    return () => {
+    // 1) SUBSERVICE → mundur ke POLI
+    if (level === 2) {
+      try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch {}
+      setSub(null);
+      g.lock = false;
+      return;
+    }
+    // 2) POLI → mundur ke BERANDA
+    if (level === 1) {
+      try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch {}
+      setSelected(null);
+      g.lock = false;
+      return;
+    }
+    // 3) BERANDA → double-back untuk keluar
+    const now = Date.now();
+    if (now - g.exitArmedAt <= 2000) {
+      // Tap kedua dalam ≤2 detik → benar-benar keluar
+      g.disabled = true; // jangan tambah guard lagi
+      // Lepas listener agar tidak intercept saat melompat melewati seluruh guard
       window.removeEventListener("popstate", onPop);
       window.removeEventListener("hashchange", onHash);
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  // tergantung pada state level navigasi
-  }, [selected, sub]);
+      // Lompat melewati seluruh guard + 1 (entry asli sebelum guard)
+      const steps = -(g.depth + 1);
+      try { window.history.go(steps); } catch { try { window.history.back(); } catch {} }
+      g.lock = false;
+      return;
+    }
+    // Tap pertama di beranda → tampilkan toast
+    g.exitArmedAt = now;
+    setShowBackHint(true);
+    setTimeout(() => setShowBackHint(false), 1800);
+    g.lock = false;
+  };
+
+  const onPop = () => handleBack();
+  const onHash = () => handleBack(); // jaga-jaga bila hash berubah
+
+  window.addEventListener("popstate", onPop);
+  window.addEventListener("hashchange", onHash);
+
+  // Saat kembali fokus / reload, aktifkan lagi guard agar tidak langsung keluar
+  const onVis = () => {
+    if (document.hidden) return;
+    const g = guardRef.current;
+    // reset mode keluar & re-seed jika perlu
+    g.disabled = false;
+    if (!g.seeded || g.depth < GUARD_DEPTH) seedGuards();
+    // tambahkan 1 guard untuk berjaga
+    pushOneGuardSync();
+  };
+  document.addEventListener("visibilitychange", onVis);
+
+  return () => {
+    window.removeEventListener("popstate", onPop);
+    window.removeEventListener("hashchange", onHash);
+    document.removeEventListener("visibilitychange", onVis);
+  };
+// tergantung posisi (agar mundur level bekerja)
+}, [selected, sub]);
 
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
   useEffect(() => {
