@@ -1101,7 +1101,61 @@ function RightPanel({
               <strong>Detail layanan:</strong> {sub.nama}
             </p>
             {(() => {
-  // Urutan prioritas:
+ 
+ /* =========================================================
+     Tangani tombol Back dari perangkat (Android/iOS browser)
+     - Jika sedang di sublayanan: back = tutup sublayanan
+     - Jika sedang di poli:       back = tutup poli
+     - Jika di halaman utama:     tampilkan konfirmasi keluar
+     ========================================================= */
+  useEffect(() => {
+    // Tambahkan 1 history state agar back pertama selalu masuk ke handler ini
+    // (hanya saat pertama mount)
+    const seeded = { _seed: true, t: Date.now() };
+    if (!window.__seededOnce) {
+      window.history.pushState(seeded, "");
+      window.__seededOnce = true;
+    }
+
+    const onPop = (e) => {
+      // Jika ada sublayanan aktif → tutup dulu
+      if (sub) {
+        e.preventDefault?.();
+        setSub(null);
+        trackEvent("Nav", "back", "close_sub");
+        // Dorong state lagi supaya tidak benar-benar mundur
+        window.history.pushState({ _trap: true }, "");
+        return;
+      }
+      // Jika ada poli aktif → tutup poli
+      if (selected) {
+        e.preventDefault?.();
+        setSelected(null);
+        trackEvent("Nav", "back", "close_poli");
+        window.history.pushState({ _trap: true }, "");
+        return;
+      }
+      // Sudah di beranda → tanya user sebelum keluar
+      e.preventDefault?.();
+      trackEvent("Nav", "back", "confirm_exit_shown");
+      const ok = window.confirm("Apakah Anda ingin keluar dari halaman ini?");
+      if (ok) {
+        trackEvent("Nav", "back", "exit_confirmed");
+        // Lepas handler agar back benar-benar berjalan default
+        window.removeEventListener("popstate", onPop);
+        window.history.back(); // lanjutkan keluar
+      } else {
+        trackEvent("Nav", "back", "exit_cancelled");
+        // Tetap di halaman dengan menambah state jebakan
+        window.history.pushState({ _trap: true }, "");
+      }
+    };
+
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [selected, sub]);
+ 
+ // Urutan prioritas:
   // 1) sub.info (jika hardcoded di data)
   // 2) EXTRA_INFO[<nama layanan>]
   // 3) EXTRA_INFO[<nama poli>]
