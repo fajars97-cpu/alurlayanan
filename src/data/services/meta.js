@@ -5,7 +5,7 @@
    Contoh awal — silakan lanjutkan/ubah sesuai data di services.js kamu. */
 export const DOCTORS_BY_POLI = {
   "poli-umum": "dr. Natasha Adjani",
-  "poli-gigi": "drg. Liza Noah Febriana Marpaung",
+  "poli-gigi": "drg. -",
   igd: "dr. Ranu Brata Kusuma",
   "ki-hamil": "dr. Anisah Rahma",
   "ki-nifas": "Bidan Ika Nurmalasari, A.Md. Keb.",
@@ -23,8 +23,6 @@ export const DOCTORS_BY_POLI = {
   gizi: "dr. Dewi Wulansari",
   kirana: "dr. Ine Dianawati Kusuma",
   "klinik-sanitasi": "Resya Karnioca, S.Tr.Kes.",
-  uks: "Petugas UKS",
-  "vaksin-dengue": "Perawat Vaksin",
   "kesling_surveilans": "Yeyet Rahmayanti",
   "RB": "dr. Olivia Vistary, MARS. dan Bidan Rahayu Hartati.",
   ckg: "dr. Rakhmawaty",
@@ -44,6 +42,7 @@ export const EXTRA_INFO = {
   "Poli Gigi": ["Silahkan mengisi form skrining kesehatan gigi Anda di https://tally.so/r/nG8EVp . ",
     { img: "/infografis/skrining_gigi.webp", alt: "Skrining Kesehatan Gigi" },
   ],
+  "Scaling/ Pembersihan Karang Gigi":"Tarif Rp90.000/ rahang.",
 
   // IGD
   "Tindakan Darurat": "Informasi tambahan belum tersedia.",

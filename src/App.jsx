@@ -937,6 +937,7 @@ function RightPanel({
   scrollReq,
 }) {
   const [sub, setSub] = useState(null);
+  const [catOpen, setCatOpen] = useState("anak"); // panel kategori yang dibuka (anak/dewasa/lainnya/null)
 
   // === Trap tombol Back (satu-trap deterministik) ===
 const EXIT_WINDOW_MS = 2000;
@@ -1162,24 +1163,113 @@ useEffect(() => {
         </div>
 
         <div className="mb-1 text-slate-700 dark:text-white/70">Jenis Layanan — {selected.nama}</div>
-        <div
-          ref={servicesGridRef}
-          className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        >
-          {list.length > 0 ? (
-            list.map((it, i) => (
+
+{(() => {
+  const items = Array.isArray(list) ? list : [];
+  const norm = (v) => (v || "").toString().trim().toLowerCase();
+  const hasKategori = items.some((it) => {
+    const k = norm(it.kategori);
+    return k === "anak" || k === "dewasa";
+  });
+
+  // === Fallback: tidak ada kategori → tampil flat seperti semula
+  if (!hasKategori) {
+    return (
+      <div
+        ref={servicesGridRef}
+        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      >
+        {items.length > 0 ? (
+          items.map((it, i) => (
             <SubServiceCard
-            key={i}
-            item={it}
-            onPick={setSub}
-            parentJadwal={selected.jadwal}
-            poliId={selected.id}
-          />
+              key={i}
+              item={it}
+              onPick={setSub}
+              parentJadwal={selected.jadwal}
+              poliId={selected.id}
+            />
           ))
-          ) : (
-            <div className="text-slate-600 dark:text-white/60">Belum ada jenis layanan terdaftar.</div>
-          )}
+        ) : (
+          <div className="text-slate-600 dark:text-white/60">Belum ada jenis layanan terdaftar.</div>
+        )}
+      </div>
+    );
+  }
+
+  // === Ada kategori → tampil accordion per grup
+  const anak = items.filter((it) => norm(it.kategori) === "anak");
+  const dewasa = items.filter((it) => norm(it.kategori) === "dewasa");
+  const lainnya = items.filter((it) => {
+    const k = norm(it.kategori);
+    return k !== "anak" && k !== "dewasa";
+  });
+
+  const Panel = ({ id, title, count, children }) => (
+    <div className="mb-3 border border-white/10 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setCatOpen(catOpen === id ? null : id)}
+        className="w-full text-left font-semibold px-4 py-3 bg-white/5 dark:bg-white/10 flex items-center justify-between"
+        aria-expanded={catOpen === id}
+      >
+        <span>{title}</span>
+        <span className="text-sm opacity-70">{count}</span>
+      </button>
+      {catOpen === id && (
+        <div className="p-4">
+          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {children}
+          </div>
         </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div ref={servicesGridRef} className="space-y-3">
+      {anak.length > 0 && (
+        <Panel id="anak" title="🧒 Layanan Anak-Anak" count={anak.length}>
+          {anak.map((it, i) => (
+            <SubServiceCard
+              key={`anak-${i}`}
+              item={it}
+              onPick={setSub}
+              parentJadwal={selected.jadwal}
+              poliId={selected.id}
+            />
+          ))}
+        </Panel>
+      )}
+
+      {dewasa.length > 0 && (
+        <Panel id="dewasa" title="👨‍🦰 Layanan Dewasa" count={dewasa.length}>
+          {dewasa.map((it, i) => (
+            <SubServiceCard
+              key={`dewasa-${i}`}
+              item={it}
+              onPick={setSub}
+              parentJadwal={selected.jadwal}
+              poliId={selected.id}
+            />
+          ))}
+        </Panel>
+      )}
+
+      {lainnya.length > 0 && (
+        <Panel id="lainnya" title="📦 Layanan Lainnya" count={lainnya.length}>
+          {lainnya.map((it, i) => (
+            <SubServiceCard
+              key={`lain-${i}`}
+              item={it}
+              onPick={setSub}
+              parentJadwal={selected.jadwal}
+              poliId={selected.id}
+            />
+          ))}
+        </Panel>
+      )}
+    </div>
+  );
+})()}
       </div>
     );
   }
