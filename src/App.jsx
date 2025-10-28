@@ -940,19 +940,17 @@ function RightPanel({
   if (typeof window === "undefined") return;
 
   // ====== SEED 2-GUARD (sekali saja per mount) ======
-  // guard#1: replace state saat ini (tidak menambah history)
-  // guard#2: push satu state supaya back selalu kembali ke guard#1 dulu
+  // gunakan push + push (tanpa replace) agar back pertama selalu jatuh ke guard internal
   if (!window.__guardSeeded) {
     try {
-      window.history.replaceState({ __guard: 1, t: Date.now() }, "", window.location.href);
-      window.history.pushState({ __guard: 2, t: Date.now() }, ""); // tambah satu entri
+      window.history.pushState({ __guard: 1, t: Date.now() }, "");
+      window.history.pushState({ __guard: 2, t: Date.now() }, "");
       window.__guardSeeded = true;
     } catch {}
   }
 
   const restoreGuard2 = () => {
-    // kembalikan guard#2 tanpa menambah banyak entri (push satu kali lagi)
-    // lakukan setelah event selesai agar tidak bentrok dengan popstate
+    // kembalikan guard#2 segera setelah popstate selesai
     setTimeout(() => {
       try { window.history.pushState({ __guard: 2, t: Date.now() }, ""); } catch {}
     }, 0);
