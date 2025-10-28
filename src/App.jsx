@@ -1255,7 +1255,7 @@ useEffect(() => {
       )}
 
       {lainnya.length > 0 && (
-        <Panel id="lainnya" title="📦 Layanan Lainnya" count={lainnya.length}>
+        <Panel id="lainnya" title="Umum" count={lainnya.length}>
           {lainnya.map((it, i) => (
             <SubServiceCard
               key={`lain-${i}`}
