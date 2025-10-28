@@ -930,6 +930,50 @@ function RightPanel({
   scrollReq,
 }) {
   const [sub, setSub] = useState(null);
+
+  // === Trap tombol Back: tutup sub/poli dulu, baru konfirmasi keluar di beranda
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // seed history sekali saat di beranda
+    if (!seededRef.current && (!location.hash || location.hash === "#/")) {
+      window.history.pushState({ _seed: true, t: Date.now() }, "", window.location.href);
+      seededRef.current = true;
+    }
+    const onPop = (e) => {
+      // 1) jika sedang melihat sublayanan → tutup dulu
+      if (sub) {
+        e.preventDefault?.();
+        setSub(null);
+        trackEvent("Nav", "back", "close_sub");
+        setTimeout(() => window.history.pushState({ _trap: true }, ""), 0);
+        return;
+      }
+      // 2) jika sedang di dalam poli → tutup poli
+      if (selected) {
+        e.preventDefault?.();
+        setSelected(null);
+        trackEvent("Nav", "back", "close_poli");
+        setTimeout(() => window.history.pushState({ _trap: true }, ""), 0);
+        return;
+      }
+      // 3) sudah di beranda → konfirmasi keluar
+      e.preventDefault?.();
+      trackEvent("Nav", "back", "confirm_exit_shown");
+      const ok = window.confirm("Apakah Anda ingin keluar dari halaman ini?");
+      if (ok) {
+        trackEvent("Nav", "back", "exit_confirmed");
+        window.removeEventListener("popstate", onPop);
+        window.history.back();
+      } else {
+        trackEvent("Nav", "back", "exit_cancelled");
+        setTimeout(() => window.history.pushState({ _trap: true }, ""), 0);
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [selected, sub, setSelected]);
+
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
   useEffect(() => {
     let t0 = performance.now();
@@ -1101,59 +1145,6 @@ function RightPanel({
               <strong>Detail layanan:</strong> {sub.nama}
             </p>
             {(() => {
- 
- /* =========================================================
-     Tangani tombol Back dari perangkat (Android/iOS browser)
-     - Jika sedang di sublayanan: back = tutup sublayanan
-     - Jika sedang di poli:       back = tutup poli
-     - Jika di halaman utama:     tampilkan konfirmasi keluar
-     ========================================================= */
-  useEffect(() => {
-    // Tambahkan 1 history state agar back pertama selalu masuk ke handler ini
-    // (hanya saat pertama mount)
-    const seeded = { _seed: true, t: Date.now() };
-    if (!window.__seededOnce) {
-      window.history.pushState(seeded, "");
-      window.__seededOnce = true;
-    }
-
-    const onPop = (e) => {
-      // Jika ada sublayanan aktif → tutup dulu
-      if (sub) {
-        e.preventDefault?.();
-        setSub(null);
-        trackEvent("Nav", "back", "close_sub");
-        // Dorong state lagi supaya tidak benar-benar mundur
-        window.history.pushState({ _trap: true }, "");
-        return;
-      }
-      // Jika ada poli aktif → tutup poli
-      if (selected) {
-        e.preventDefault?.();
-        setSelected(null);
-        trackEvent("Nav", "back", "close_poli");
-        window.history.pushState({ _trap: true }, "");
-        return;
-      }
-      // Sudah di beranda → tanya user sebelum keluar
-      e.preventDefault?.();
-      trackEvent("Nav", "back", "confirm_exit_shown");
-      const ok = window.confirm("Apakah Anda ingin keluar dari halaman ini?");
-      if (ok) {
-        trackEvent("Nav", "back", "exit_confirmed");
-        // Lepas handler agar back benar-benar berjalan default
-        window.removeEventListener("popstate", onPop);
-        window.history.back(); // lanjutkan keluar
-      } else {
-        trackEvent("Nav", "back", "exit_cancelled");
-        // Tetap di halaman dengan menambah state jebakan
-        window.history.pushState({ _trap: true }, "");
-      }
-    };
-
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, [selected, sub]);
  
  // Urutan prioritas:
   // 1) sub.info (jika hardcoded di data)
