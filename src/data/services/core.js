@@ -318,7 +318,7 @@ export const FLOW_STEPS = {
     id: 44,
     title: "Langkah 44",
     name: "Menuju Ruang Bersalin",
-    description: "Silahkan menuju ruang bersalin di lantai 1, ketuk, dan berikan resi pendaftaran kepada petugas, ikuti instruksi petugas.",
+    description: "Silahkan menuju ruang bersalin di lantai 1, ketuk, dan beritahu petugas jika ibu hamil sudah mengalami konstraksi. Setelah ibu hamil diperiksa petugas dan dapat dilakukan persalinan secara normal, suami dapat mendaftarkan ibu hamil ke loket.",
     img: "/alur/44-menuju-ruang-bersalin.webp",
     },
     45: {
@@ -783,6 +783,69 @@ export const FLOW_STEPS = {
     description: "Silahkan masuk ke ruang pemeriksaan apabila nama Anda telah dipanggil.",
     img: "/alur/110-pemeriksaan-gigi-anak.webp",
     },
+    111: {
+    id: 111,
+    title: "Langkah 111",
+    name: "Rujuk Ibu Hamil",
+    description: "Setelah pasien dilakukan pemeriksaan dan dinyatakan harus dirujuk, pasien akan dirujuk oleh Puskesmas sesuai pilihan FKRTL pasien, ketersediaan bed, atau atas pertimbangan lainnya.",
+    img: "/alur/111-rujuk-ibu-hamil.webp",
+    },
+    112: {
+    id: 112,
+    title: "Langkah 112",
+    name: "Skrining Bayi Baru Lahir",
+    description: "Bayi Baru Lahir akan mendapatkan pelayanan skrining SHK, G6PD, SHAK, dan PJB, apabila hasil skrining keluar dan diperlukan tindakan lebih lanjut, ibu akan dihubungi oleh petugas Puskesmas.",
+    img: "/alur/112-skrining-bayi-baru-lahir.webp",
+    },
+    113: {
+    id: 113,
+    title: "Langkah 113",
+    name: "KB IUD Post Placental",
+    description: "Jika pasien menghendaki untuk dilakukan pemasangan KB-IUD pasca persalinan, pemasangan dapat dilakukan langsung setelah persalinan.",
+    img: "/alur/112-skrining-bayi-baru-lahir.webp",
+    },
+    114: {
+    id: 114,
+    title: "Langkah 114",
+    name: "Perawatan Ibu dan Bayi di Ruang Rawat Inap",
+    description: "Setelah proses persalinan selesai, ibu dan bayi akan dipindah ke ruang rawat inap ruang bersalin.",
+    img: "/alur/112-skrining-bayi-baru-lahir.webp",
+    },
+    115: {
+    id: 115,
+    title: "Langkah 115",
+    name: "Pengurusan Permohonan Akte Kelahiran",
+    description: "Setelah proses persalinan selesai, suami/ keluarga dapat mengurus permohonan akte kelahiran di Puskesmas dengan menyerahkan persyaratan-persyaratan yang diminta.",
+    img: "/alur/115-pengurusan-permohonan-akte.webp",
+    },
+    116: {
+    id: 116,
+    title: "Langkah 116",
+    name: "Ibu Dirujuk Ke Poli Lain",
+    description: "Apabila pasien telah selesai melakukan pemeriksaan dan dirujuk ke poli gizi, silahkan menuju poli gizi di lantai 3 (dari tangga/ lift ke kiri, lalu ke kanan).",
+    img: "/alur/116-ibu-dirujuk-ke-poli-lain.webp",
+    },
+    117: {
+    id: 117,
+    title: "Langkah 117",
+    name: "Konseling Laktasi",
+    description: "Silahkan ketuk poli gizi dan serahkan kertas rujukan dari poli lain, ikuti instruksi petugas lebih lanjut.",
+    img: "/alur/117-konseling-laktasi.webp",
+    },
+    118: {
+    id: 118,
+    title: "Langkah 118",
+    name: "Konseling Laktasi",
+    description: "Silahkan ketuk poli gizi dan serahkan kertas rujukan dari poli lain, ikuti instruksi petugas lebih lanjut.",
+    img: "/alur/117-konseling-laktasi.webp",
+    },
+    120: {
+    id: 120,
+    title: "Langkah 120",
+    name: "Menuju Farmasi CKG",
+    description: "Jika diresepkan obat dari Poli CKG, silahkan menunggu di depan farmasi lantai 1 hingga nama Anda dipanggil untuk mengambil obat. Jika tidak diresepkan, layanan telah selesai silahkan pasien bisa pulang setelah mengembalikan nametag CKG.",
+    img: "/alur/120-menuju-farmasi-ckg.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -1137,11 +1200,11 @@ export const SERVICES_BY_FACILITY = {
       img: "ki-nifas.webp",
       layanan: [
         {
-          nama: "Pemeriksaan Ibu Nifas",
+          nama: "Pelayanan Ibu Nifas dan Bayi sampai Usia 28 Hari",
           ikon: "🍼",
           tarif: 10000,
           bpjs: true,
-          ket: "Pemantauan masa nifas",
+          ket: "Pemantauan masa nifas dan Neonatus",
           jadwal: {
             weekly: {
               Senin:  "08:00-15:00",
@@ -1427,6 +1490,18 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
+          jadwal: {
+            weekly: {
+              Senin:  "Tutup",
+              Selasa: "Tutup",
+              Rabu:   "08:00-12:00",
+              Kamis:  "08:00-12:00",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
           alur: [0, 1, 61, 64, 5],
         },
         {
@@ -1435,6 +1510,18 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
+          jadwal: {
+            weekly: {
+              Senin:  "Tutup",
+              Selasa: "Tutup",
+              Rabu:   "08:00-12:00",
+              Kamis:  "08:00-12:00",
+              Jumat:  "Tutup",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
           alur: [0, 1, 61, 62, 5],
         },
         {
@@ -1991,7 +2078,7 @@ export const SERVICES_BY_FACILITY = {
     },
     {
       id: "gizi",
-      nama: "Konsultasi Gizi",
+      nama: "Konseling Gizi",
       klaster: "Gizi",
       ikon: "🥗",
       lokasi: "Lantai 3",
@@ -2002,8 +2089,16 @@ export const SERVICES_BY_FACILITY = {
           ikon: "🥗",
           tarif: 15000,
           bpjs: true,
-          ket: "Diet & nutrisi",
+          ket: "Diet",
           alur: [0, 88, 65, 95],
+        },
+        {
+          nama: "Konseling Laktasi",
+          ikon: "👩‍🍼",
+          tarif: 15000,
+          bpjs: true,
+          ket: "ASI",
+          alur: [116, 117, 118],
         },
       ],
     },
@@ -2130,7 +2225,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Program CKG",
-          alur: [34, 33, 47, 48, 49, 50, 52, 51],
+          alur: [34, 33, 47, 48, 49, 50, 52, 120, 51],
         },
       ],
     },
@@ -2143,11 +2238,11 @@ export const SERVICES_BY_FACILITY = {
       img: "ruang-bersalin.webp",
       layanan: [
         {
-          nama: "Ruang Bersalin",
+          nama: "Pelayanan Ibu Bersalin Normal",
           ikon: "🤱",
           tarif: [700000, 900000],
           bpjs: true,
-          ket: "Ruang Bersalin",
+          ket: "Bersalin Normal",
            jadwal: {
             weekly: {
               Senin:  "00:00-24:00",
@@ -2160,7 +2255,87 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [0, 1, 44, 45, 46],
+          alur: [44,0, 1, 45, 46],
+        },
+        {
+          nama: "Pelayanan Ibu Bersalin Rujukan",
+          ikon: "🤱",
+          tarif: 0,
+          bpjs: true,
+          ket: "Bersalin Rujukan",
+           jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
+          alur: [44, 111],
+        },
+        {
+          nama: "Skrining Bayi Baru Lahir",
+          ikon: "🤱",
+          tarif: 0,
+          bpjs: true,
+          ket: "Bersalin Rujukan",
+           jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
+          alur: [112],
+        },
+        {
+          nama: "Pelayanan KB IUD Ibu Bersalin Post Placental",
+          ikon: "🤱",
+          tarif: 0,
+          bpjs: true,
+          ket: "KB",
+           jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
+          alur: [113],
+        },
+        {
+          nama: "Permohonan Akte Kelahiran",
+          ikon: "🤱",
+          tarif: 0,
+          bpjs: true,
+          ket: "KB",
+           jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
+          alur: [115],
         },
       ],
     },
