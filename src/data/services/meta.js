@@ -22,7 +22,7 @@ export const DOCTORS_BY_POLI = {
   mata: "dr. Asrie Rahayu",
   gizi: "dr. Dewi Wulansari",
   kirana: "dr. Ine Dianawati Kusuma",
-  "klinik-sanitasi": "Resya Karnioca, S.Tr.Kes.",
+  "Klinik Sanitasi": "Resya Karnioca, S.Tr.Kes.",
   "kesling_surveilans": "Yeyet Rahmayanti",
   "RB": "dr. Olivia Vistary, MARS. dan Bidan Rahayu Hartati.",
   ckg: "dr. Rakhmawaty",
