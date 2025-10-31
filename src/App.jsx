@@ -1320,125 +1320,119 @@ useEffect(() => {
       </div>
 
       <div className="mt-4 sm:mt-6">
-        <InfoCard title="Petugas Penanggung Jawab">
+  <InfoCard title="Petugas Penanggung Jawab">
+    {(() => {
+      // === 1) Resolve Penanggung Jawab: layanan > poli
+      const pjResolved =
+        sub?.penanggungJawab ||
+        sub?.pj ||
+        (DOCTORS_BY_POLI?.[selected.id] ?? null);
+
+      // === 2) Resolve Extra Info: layanan > EXTRA_INFO
+      //    Mendukung: sub.extraInfo (string/array/obj), sub.info (legacy),
+      //    dan kunci khusus sub.extraKey; jika tidak ada → cari di EXTRA_INFO.
+      const pickExtra = () => {
+        if (sub?.extraInfo !== undefined) return sub.extraInfo;
+        if (sub?.info !== undefined) return sub.info; // legacy
+        const key = sub?.extraKey || sub?.nama;
+        const tryKeys = [
+          key,
+          selected?.nama,
+          selected?.id,
+          `${selected?.nama} - ${sub?.nama}`,
+          `${selected?.nama}: ${sub?.nama}`,
+        ].filter(Boolean);
+        for (const k of tryKeys) {
+          if (EXTRA_INFO && Object.prototype.hasOwnProperty.call(EXTRA_INFO, k)) {
+            return EXTRA_INFO[k];
+          }
+        }
+        return null;
+      };
+      const extra = pickExtra();
+
+      const toSrc = (p) => {
+        if (!p) return null;
+        if (/^https?:\/\//.test(p)) return p;
+        const clean = String(p).replace(/^\/+/, "");
+        return asset(clean);
+      };
+
+      return (
+        <>
           <div className="font-semibold text-slate-900 dark:text-white mb-1">
-            {DOCTORS_BY_POLI[selected.id] ?? "—"}
+            {pjResolved ?? "—"}
           </div>
           <div className="text-slate-700 dark:text-white/70">
             <p className="mb-2">
               <strong>Detail layanan:</strong> {sub.nama}
             </p>
-            {(() => {
- 
- // Urutan prioritas:
-  // 1) sub.info (jika hardcoded di data)
-  // 2) EXTRA_INFO[<nama layanan>]
-  // 3) EXTRA_INFO[<nama poli>]
-  // 4) EXTRA_INFO[<id poli>]  (jika kamu pernah menyimpan pakai id)
-  // 5) EXTRA_INFO["Laboratorium"] dst (alias opsional)
-  const pickExtra = () => {
-    if (sub?.info) return sub.info;
-
-    const tryKeys = [
-      sub?.nama,               // "Darah Lengkap"
-      selected?.nama,          // "Laboratorium"
-      selected?.id,            // "laboratorium"
-      // alias opsional — tambahkan jika kamu punya pola kunci lain
-      `${selected?.nama} - ${sub?.nama}`,
-      `${selected?.nama}: ${sub?.nama}`,
-    ].filter(Boolean);
-
-    for (const k of tryKeys) {
-      if (EXTRA_INFO && Object.prototype.hasOwnProperty.call(EXTRA_INFO, k)) {
-        return EXTRA_INFO[k];
-      }
-    }
-    return null;
-  };
-
-  const extra = pickExtra();
-
-  const toSrc = (p) => {
-    if (!p) return null;
-    if (/^https?:\/\//.test(p)) return p;
-    const clean = String(p).replace(/^\/+/, "");
-    return asset(clean);
-  };
-
-  if (!extra) {
-    return (
-      <>
-        <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
-        <p className="mt-2">
-          Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
-          instruksi khusus untuk layanan <em>{sub.nama}</em>.
-        </p>
-      </>
-    );
-  }
-
-  if (typeof extra === "string") {
-    return <p>{linkify(extra)}</p>;
-  }
-
-  if (Array.isArray(extra)) {
-    return (
-      <div className="space-y-3">
-        {extra.map((item, i) => {
-          if (typeof item === "string") return <p key={`txt-${i}`}>{linkify(item)}</p>;
-          if (item && typeof item === "object" && item.img) {
-            return (
-              <div key={`img-${i}`} className="space-y-1">
-                <img
-                  src={toSrc(item.img)}
-                  alt={item.alt || sub.nama}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                  onError={onInfoError}
-                  loading="lazy"
-                />
-                {item.alt && (
-                  <div className="text-[12px] text-slate-600 dark:text-white/60 leading-snug">
-                    {item.alt}
-                  </div>
-                )}
+            {!extra ? (
+              <>
+                <p>Informasi tambahan belum tersedia. Silakan lengkapi sesuai ketentuan layanan.</p>
+                <p className="mt-2">
+                  Informasi ini bersifat contoh/dummy. Silakan ganti dengan persyaratan atau
+                  instruksi khusus untuk layanan <em>{sub.nama}</em>.
+                </p>
+              </>
+            ) : typeof extra === "string" ? (
+              <p>{linkify(extra)}</p>
+            ) : Array.isArray(extra) ? (
+              <div className="space-y-3">
+                {extra.map((item, i) => {
+                  if (typeof item === "string") return <p key={`txt-${i}`}>{linkify(item)}</p>;
+                  if (item && typeof item === "object" && item.img) {
+                    return (
+                      <div key={`img-${i}`} className="space-y-1">
+                        <img
+                          src={toSrc(item.img)}
+                          alt={item.alt || sub.nama}
+                          className="w-full rounded-xl border border-black/10 dark:border-white/10"
+                          onError={onInfoError}
+                          loading="lazy"
+                        />
+                        {item.alt && (
+                          <div className="text-[12px] text-slate-600 dark:text-white/60 leading-snug">
+                            {item.alt}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
               </div>
-            );
-          }
-          return null;
-        })}
-      </div>
-    );
-  }
-
-  if (extra && typeof extra === "object") {
-    const { text, images } = extra;
-    return (
-      <div className="space-y-3">
-        {text ? <p>{linkify(text)}</p> : null}
-        {Array.isArray(images) && images.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {images.map((src, i) => (
-              <img
-                key={`img2-${i}`}
-                src={toSrc(src)}
-                alt={sub.nama}
-                className="w-full rounded-xl border border-black/10 dark:border-white/10"
-                onError={onInfoError}
-                loading="lazy"
-              />
-            ))}
+            ) : (
+              // object: { text?, images? }
+              (() => {
+                const { text, images } = extra || {};
+                return (
+                  <div className="space-y-3">
+                    {text ? <p>{linkify(text)}</p> : null}
+                    {Array.isArray(images) && images.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {images.map((src, i) => (
+                          <img
+                            key={`img2-${i}`}
+                            src={toSrc(src)}
+                            alt={sub.nama}
+                            className="w-full rounded-xl border border-black/10 dark:border-white/10"
+                            onError={onInfoError}
+                            loading="lazy"
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })()
+            )}
           </div>
-        ) : null}
-      </div>
-    );
-  }
-
-  return null;
-})()}
-
-          </div>
-        </InfoCard>
-      </div>
+        </>
+      );
+    })()}
+  </InfoCard>
+</div>
 
     {/* Toast "tekan lagi untuk keluar" */}
       {showBackHint && (
