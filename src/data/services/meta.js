@@ -26,7 +26,8 @@ export const DOCTORS_BY_POLI = {
   "kesling_surveilans": "Yeyet Rahmayanti",
   "RB": "dr. Olivia Vistary, MARS. dan Bidan Rahayu Hartati.",
   ckg: "dr. Rakhmawaty",
-  laboratorium: "Listia Nurlita R"
+  laboratorium: "Listia Nurlita R",
+  farmasi: "Iie Sumiasih",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -100,6 +101,10 @@ export const EXTRA_INFO = {
 
   // ISPA
   "Pemeriksaan ISPA": "Informasi tambahan belum tersedia.",
+
+  // Farmasi
+  "Layanan Obat 24 Jam":"Tarif pendaftaran Puskesmas sudah termasuk obat yang diresepkan. Mohon untuk mengambil obat untuk layanan pagi atau siang tidak lebih dari pukul 19.00, jika lebih maka dianggap pasien tidak mengambil obat." ,
+  "Konseling Obat":"Konseling obat diberikan pada pasien lansia, poli farmasi (kebutuhan konsumsi obat dalam jumlah banyak (biasanya >5) pada waktu bersamaan, pasien ibu hamil, pasien dengan penggunaan obat secara khusus, kepatuhan obat, pasien dengan penyakit kronis, anak-anak, ibu hamil, dan peresepan obat dalam jangka panjang, atau kondisi lain yang membutuhkan konsultasi.",
 
   // Mata
   "Pemeriksaan Mata": "Pemeriksaan refraksi mata, pinhole, dan koreksi lensa. Bila ditemukan kelainan mata yang memerlukan penanganan lebih lanjut, pasien akan dirujuk ke dokter spesialis mata di rumah sakit rujukan.",

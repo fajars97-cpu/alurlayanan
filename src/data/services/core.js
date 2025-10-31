@@ -842,9 +842,23 @@ export const FLOW_STEPS = {
     120: {
     id: 120,
     title: "Langkah 120",
-    name: "Menuju Farmasi CKG",
+    name: "Menuju Farmasi",
     description: "Jika diresepkan obat dari Poli CKG, silahkan menunggu di depan farmasi lantai 1 hingga nama Anda dipanggil untuk mengambil obat. Jika tidak diresepkan, layanan telah selesai silahkan pasien bisa pulang setelah mengembalikan nametag CKG.",
     img: "/alur/120-menuju-farmasi-ckg.webp",
+    },
+    121: {
+    id: 121,
+    title: "Langkah 121",
+    name: "Menuju Farmasi",
+    description: "Jika diresepkan obat dari Poli lain, silahkan menunggu di depan farmasi lantai 1 hingga nama Anda dipanggil untuk mengambil obat. Farmasi puskesmas tidak melayani pembelian resep obat umum, hanya menerima resep dari poli Puskesmas Jagakarsa atau Puskesmas Pembantu di wilayah Kecamatan Jagakarsa",
+    img: "/alur/121-menuju-farmasi.webp",
+    },
+    122: {
+    id: 121,
+    title: "Langkah 122",
+    name: "Konseling Obat",
+    description: "Jika pasien membutuhkan konseling obat atas pertimbangan tertentu, pasien dipersilahkan meminta layanan konseling obat kepada petugas",
+    img: "/alur/122-konseling-obat.webp",
     },
 };
 
@@ -1133,11 +1147,11 @@ export const SERVICES_BY_FACILITY = {
           ket: "Pelayanan Umum 24 Jam",
           jadwal: {
             weekly: {
-              Senin:  "16:00-06:00",
-              Selasa: "16:00-06:00",
-              Rabu:   "16:00-06:00",
-              Kamis:  "16:00-06:00",
-              Jumat:  "16:00-06:00",
+              Senin:  ["00:00-06:00", "14:00-06:00"],
+              Selasa: "14:00-06:00",
+              Rabu:   "14:00-06:00",
+              Kamis:  "14:00-06:00",
+              Jumat:  "14:00-06:00",
               Sabtu:  "00:00-24:00",
               Minggu: "00:00-24:00",
             },
@@ -1167,7 +1181,56 @@ export const SERVICES_BY_FACILITY = {
         },
       ],
     },
-
+    {
+      id: "farmasi",
+      nama: "Farmasi",
+      klaster: "Layanan Medik",
+      ikon: "💊",
+      lokasi: "Lantai 1",
+      img: "farmasi.webp",
+      layanan: [
+        {
+          nama: "Layanan Obat 24 Jam",
+          ikon: "⚡",
+          tarif: 0,
+          bpjs: true,
+          ket: "Pelayanan Obat 24 Jam",
+          jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
+          alur: [121],
+        },
+        {
+          nama: "Konseling Obat",
+          ikon: "💊⚕️",
+          tarif: 0,
+          bpjs: true,
+          ket: "Konseling Obat",
+          jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
+          alur: [121, 122]
+        },
+      ],
+    },
     // 🔹 Kebidanan & Anak
     {
       id: "ki-hamil",
