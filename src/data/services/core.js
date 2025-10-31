@@ -836,8 +836,8 @@ export const FLOW_STEPS = {
     id: 118,
     title: "Langkah 118",
     name: "Konseling Laktasi",
-    description: "Silahkan ketuk poli gizi dan serahkan kertas rujukan dari poli lain, ikuti instruksi petugas lebih lanjut.",
-    img: "/alur/117-konseling-laktasi.webp",
+    description: "Layanan telah selesai, silahkan pasien pulang dan jangan lupa kontrol ulang bila dijadwalkan.",
+    img: "/alur/118-layanan-selesai-ibu-bayi.webp",
     },
     120: {
     id: 120,
@@ -866,6 +866,13 @@ export const FLOW_STEPS = {
     name: "Menuju Poli Gizi",
     description: "Apabila Anda dirujuk ke poli gizi, silahkan ke poli gizi lantai 3 (dari tangga/ lift ke kiri) lalu silahkan tunggu di dekat poli gizi hingga nama Anda dipanggil.",
     img: "/alur/123-menuju-poli-gizi.webp",
+    },
+    124: {
+    id: 124,
+    title: "Langkah 124",
+    name: "Layanan Selesai",
+    description: "Layanan telah selesai, silahkan pasien bisa pulang dan jangan lupa untuk kontrol sesuai instruksi petugas",
+    img: "/alur/124-pasien-gizi-pulang.webp",
     },
 };
 
@@ -2186,7 +2193,7 @@ export const SERVICES_BY_FACILITY = {
           "2025-12-26": "Tutup", // cuti bersama
            },
          },
-          alur: [123, 65, 95],
+          alur: [123, 65, 124],
         },
         {
           nama: "Konseling Laktasi",
