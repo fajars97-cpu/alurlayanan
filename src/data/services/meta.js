@@ -4,8 +4,8 @@
 /* Isi dengan mapping penanggung jawab poli (string atau array nama).
    Contoh awal — silakan lanjutkan/ubah sesuai data di services.js kamu. */
 export const DOCTORS_BY_POLI = {
-  "poli-umum": "dr. Natasha Adjani",
-  "poli-gigi": "drg. -",
+  "poli-umum": "dr. Dewi Wulansari",
+  "poli-gigi": "drg. Tresa Vanuarin Simanungkalit",
   igd: "dr. Ranu Brata Kusuma",
   "ki-hamil": "dr. Anisah Rahma",
   "ki-nifas": "Bidan Ika Nurmalasari, A.Md. Keb.",
@@ -19,7 +19,7 @@ export const DOCTORS_BY_POLI = {
   ptm: "dr. Azzahra Azmi",
   pm: "dr. Uli Siger",
   ims: "dr. Marta Basarida",
-  mata: "dr. Asrie Rahayu",
+  mata: "dr. Dewi Wulansari",
   gizi: "dr. Dewi Wulansari",
   kirana: "dr. Ine Dianawati Kusuma",
   "Klinik Sanitasi": "Resya Karnioca, S.Tr.Kes.",
@@ -28,6 +28,7 @@ export const DOCTORS_BY_POLI = {
   ckg: "dr. Rakhmawaty",
   laboratorium: "Listia Nurlita R",
   farmasi: "Iie Sumiasih",
+  haji: "dr. Dewi Wulansari",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -103,7 +104,7 @@ export const EXTRA_INFO = {
   "Pemeriksaan ISPA": "Informasi tambahan belum tersedia.",
 
   // Farmasi
-  "Layanan Obat 24 Jam":"Tarif pendaftaran Puskesmas sudah termasuk obat yang diresepkan. Mohon untuk mengambil obat untuk layanan pagi atau siang tidak lebih dari pukul 19.00, jika lebih maka dianggap pasien tidak mengambil obat." ,
+  "Layanan Obat 24 Jam":"Tarif pendaftaran Puskesmas sudah termasuk obat yang diresepkan. Mohon untuk mengambil obat untuk layanan pagi atau siang tidak lebih dari pukul 19.00, jika lebih maka dianggap pasien tidak mengambil obat. Farmasi puskesmas tidak melayani pembelian resep obat umum, hanya menerima resep dari poli Puskesmas Jagakarsa atau Puskesmas Pembantu di wilayah Kecamatan Jagakarsa" ,
   "Konseling Obat":"Konseling obat diberikan pada pasien lansia, poli farmasi (kebutuhan konsumsi obat dalam jumlah banyak (biasanya >5) pada waktu bersamaan, pasien ibu hamil, pasien dengan penggunaan obat secara khusus, kepatuhan obat, pasien dengan penyakit kronis, anak-anak, ibu hamil, dan peresepan obat dalam jangka panjang, atau kondisi lain yang membutuhkan konsultasi.",
 
   // Mata

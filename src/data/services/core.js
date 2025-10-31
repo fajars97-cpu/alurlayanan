@@ -675,7 +675,7 @@ export const FLOW_STEPS = {
     id: 95,
     title: "Langkah 95",
     name: "Layanan Selesai",
-    description: "Layanan selesai. Pasien boleh pulang atau mendapat instruksi kontrol berikutnya.",
+    description: "Layanan selesai. Pasien boleh pulang dan sertifikat dan hasil laboratorium akan dikirimkan melalui pesan Whatsapp.",
     img: "/alur/95-pasien-catin-pulang.webp",
     },
     96: {
@@ -850,7 +850,7 @@ export const FLOW_STEPS = {
     id: 121,
     title: "Langkah 121",
     name: "Menuju Farmasi",
-    description: "Jika diresepkan obat dari Poli lain, silahkan menunggu di depan farmasi lantai 1 hingga nama Anda dipanggil untuk mengambil obat. Farmasi puskesmas tidak melayani pembelian resep obat umum, hanya menerima resep dari poli Puskesmas Jagakarsa atau Puskesmas Pembantu di wilayah Kecamatan Jagakarsa",
+    description: "Jika diresepkan obat dari Poli lain, silahkan menunggu di depan farmasi lantai 1 hingga nama Anda dipanggil untuk mengambil obat.",
     img: "/alur/121-menuju-farmasi.webp",
     },
     122: {
@@ -1318,7 +1318,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Skrining pranikah",
-          alur: [0, 89, 90, 91, 92, 93, 94],
+          alur: [0, 89, 90, 91, 92, 93, 95],
         },
       ],
     },
@@ -1542,7 +1542,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pil KB",
           ikon: "💊",
-          tarif: 10000,
+          tarif: 5000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           alur: [0, 1, 61, 63, 5],
@@ -1570,7 +1570,7 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "IVA Test + HPV DNA",
           ikon: "🧬",
-          tarif: 10000,
+          tarif: 30000,
           bpjs: true,
           ket: "Sesuai kebutuhan",
           jadwal: {
@@ -1704,6 +1704,16 @@ export const SERVICES_BY_FACILITY = {
           tarif: 30000,
           bpjs: true,
           ket: "Tes Darah Lengkap",
+          alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+          },
+        },
+        {
+          nama: "Pemeriksaan Mikroskopik Malaria",
+          ikon: "🦟",
+          tarif: 10000,
+          bpjs: true,
+          ket: "Pemeriksaan Mikroskopik Malaria",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
                  Rujukan_Pustu: [106, 98, 99, 104, 107],
           },
