@@ -20,7 +20,7 @@ export const DOCTORS_BY_POLI = {
   pm: "dr. Uli Siger",
   ims: "dr. Marta Basarida",
   mata: "dr. Dewi Wulansari",
-  gizi: "dr. Dewi Wulansari",
+  gizi: "Miranti Mulya Diani, S. Tr.Gz",
   kirana: "dr. Ine Dianawati Kusuma",
   "Klinik Sanitasi": "Resya Karnioca, S.Tr.Kes.",
   "kesling_surveilans": "Yeyet Rahmayanti",
@@ -111,7 +111,7 @@ export const EXTRA_INFO = {
   "Pemeriksaan Mata": "Pemeriksaan refraksi mata, pinhole, dan koreksi lensa. Bila ditemukan kelainan mata yang memerlukan penanganan lebih lanjut, pasien akan dirujuk ke dokter spesialis mata di rumah sakit rujukan.",
 
   // Gizi
-  "Konsultasi Gizi": ["Melayani konseling terkait,","1. Tatalaksana Diet Penyakit","2. Konseling PMBA",],
+  "Gizi": ["Melayani konseling terkait,","1. Tatalaksana Diet Penyakit","2. Konseling PMBA",],
 
   // KI Hamil
   "Pemeriksaan Ibu Hamil": "Kunjungan kehamilan 1 (6-8 minggu), kunjungan kehamilan 2 (10-12 minggu), kunjungan kehamilan 3 (16 minggu), kunjungan kehamilan 4 (20 minggu), kunjungan kehamilan 5 (24 minggu), kunjungan kehamilan 6 (28 minggu), kunjungan kehamilan 7 (32 minggu), kunjungan kehamilan 8 (36 minggu), kunjungan kehamilan 9 (37-41 minggu) dilakukan di ruang KI hamil lantai 2, ikuti instruksi petugas.",

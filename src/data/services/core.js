@@ -821,7 +821,7 @@ export const FLOW_STEPS = {
     116: {
     id: 116,
     title: "Langkah 116",
-    name: "Ibu Dirujuk Ke Poli Lain",
+    name: "Rujukan Poli Lain",
     description: "Apabila pasien telah selesai melakukan pemeriksaan dan dirujuk ke poli gizi, silahkan menuju poli gizi di lantai 3 (dari tangga/ lift ke kiri, lalu ke kanan).",
     img: "/alur/116-ibu-dirujuk-ke-poli-lain.webp",
     },
@@ -854,11 +854,18 @@ export const FLOW_STEPS = {
     img: "/alur/121-menuju-farmasi.webp",
     },
     122: {
-    id: 121,
+    id: 122,
     title: "Langkah 122",
     name: "Konseling Obat",
     description: "Jika pasien membutuhkan konseling obat atas pertimbangan tertentu, pasien dipersilahkan meminta layanan konseling obat kepada petugas",
     img: "/alur/122-konseling-obat.webp",
+    },
+    123: {
+    id: 123,
+    title: "Langkah 123",
+    name: "Menuju Poli Gizi",
+    description: "Apabila Anda dirujuk ke poli gizi, silahkan ke poli gizi lantai 3 (dari tangga/ lift ke kiri) lalu silahkan tunggu di dekat poli gizi hingga nama Anda dipanggil.",
+    img: "/alur/123-menuju-poli-gizi.webp",
     },
 };
 
@@ -2151,7 +2158,7 @@ export const SERVICES_BY_FACILITY = {
     },
     {
       id: "gizi",
-      nama: "Konseling Gizi",
+      nama: "Gizi",
       klaster: "Gizi",
       ikon: "🥗",
       lokasi: "Lantai 3",
@@ -2163,7 +2170,23 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "Diet",
-          alur: [0, 88, 65, 95],
+          jadwal: {
+          tz: "Asia/Jakarta",
+          weekly: {
+           Senin: ["08:00-15:00"],
+           Selasa: ["08:00-15:00"],
+           Rabu: ["08:00-15:00"],
+           Kamis: ["08:00-15:00"],
+           Jumat: ["08:00-15:00"],
+           Sabtu: "Tutup",
+           Minggu: "Tutup",
+           },
+           exceptions: {
+          "2025-12-25": "Tutup", // libur Natal
+          "2025-12-26": "Tutup", // cuti bersama
+           },
+         },
+          alur: [123, 65, 95],
         },
         {
           nama: "Konseling Laktasi",
@@ -2171,6 +2194,17 @@ export const SERVICES_BY_FACILITY = {
           tarif: 15000,
           bpjs: true,
           ket: "ASI",
+          jadwal: {
+          tz: "Asia/Jakarta",
+          weekly: {
+           Senin: ["08:00-15:00"],
+           Selasa: ["08:00-15:00"],
+           Rabu: ["08:00-15:00"],
+           Kamis: ["08:00-15:00"],
+           Jumat: ["08:00-15:00"],
+           Sabtu: "Tutup",
+           Minggu: "Tutup",
+           }},
           alur: [116, 117, 118],
         },
       ],
