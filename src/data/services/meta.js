@@ -111,11 +111,13 @@ export const EXTRA_INFO = {
   "Pemeriksaan Mata": "Pemeriksaan refraksi mata, pinhole, dan koreksi lensa. Bila ditemukan kelainan mata yang memerlukan penanganan lebih lanjut, pasien akan dirujuk ke dokter spesialis mata di rumah sakit rujukan.",
 
   // Gizi
-  "Gizi": ["Melayani konseling terkait,",
-    "1. Tatalaksana Diet Penyakit",
-    "2. Konseling Pemberian Makanan Bayi dan Anak",
-    "3. Tatalaksana Gizi Buruk",
-    "4. Konseling Ibu Hamil Kurang Energi Kronis"],
+  "Konseling Gizi": [
+  "Melayani konseling terkait,",
+  "1. Tatalaksana Diet Penyakit",
+  "2. Konseling Pemberian Makanan Bayi dan Anak (PMBA)",
+  "3. Tatalaksana Gizi Buruk",
+  "4. Konseling Ibu Hamil Kurang Energi Kronis"
+],
 
   // KI Hamil
   "Pemeriksaan Ibu Hamil": "Kunjungan kehamilan 1 (6-8 minggu), kunjungan kehamilan 2 (10-12 minggu), kunjungan kehamilan 3 (16 minggu), kunjungan kehamilan 4 (20 minggu), kunjungan kehamilan 5 (24 minggu), kunjungan kehamilan 6 (28 minggu), kunjungan kehamilan 7 (32 minggu), kunjungan kehamilan 8 (36 minggu), kunjungan kehamilan 9 (37-41 minggu) dilakukan di ruang KI hamil lantai 2, ikuti instruksi petugas.",
@@ -162,7 +164,7 @@ export const EXTRA_INFO = {
     "- Fotocopy KTP-el kedua orang tua",
     "- Fotocopy KTP-el 2 orang saksi (saksi harus warga DKI Jakarta)",
     "- Fotocopy Buku Nikah",
-    "- Fotocopy KK",
+    "- KK Asli",
     "- Surat Keterangan Lahir dari Puskesmas",
     "- Nama bayi sudah ditentukan",
     { img: "/infografis/rb1.jpg", alt: "Ruang Bersalin" },
