@@ -816,7 +816,7 @@ export const FLOW_STEPS = {
     title: "Langkah 115",
     name: "Pengurusan Permohonan Akte Kelahiran",
     description: "Setelah proses persalinan selesai, suami/ keluarga dapat mengurus permohonan akte kelahiran di Puskesmas dengan menyerahkan persyaratan-persyaratan yang diminta.",
-    img: "/alur/115-pengurusan-permohonan-akte.webp",
+    img: "/alur/115-permohonan-akte.webp",
     },
     116: {
     id: 116,
