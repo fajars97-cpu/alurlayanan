@@ -1046,14 +1046,14 @@ export const FLOW_STEPS = {
     id: 149,
     title: "Langkah 149",
     name: "Konsultasi Hasil Pemeriksaan Penunjang",
-    description: "Jika Anda telah mendapatkan hasil pemeriksaan penunjang lainnya, silahkan kembali ke ruang CKG, ketuk dan sampaikan kepada perawat bahwa Anda ingin konsultasi hasil pemeriksaan (laboratorium, IVA-test dan HPV DNA, dll)",
+    description: "Jika Anda telah mendapatkan hasil pemeriksaan penunjang lainnya, silahkan kembali ke ruang CKG, ketuk dan sampaikan kepada perawat bahwa Anda ingin konsultasi hasil pemeriksaan (laboratorium, Mata, dll)",
     img: "/alur/149-bacahasil.webp",
     },
     150: {
     id: 150,
     title: "Langkah 150",
     name: "Daftar Ulang Pemeriksaan",
-    description: "Jika Anda dirujuk ke poli lain di hari yang berbeda dengan hari pertama pendaftaran/ baca hasil di hari berbeda, silahkan langsung ke bagian pendaftaran CKG lantai 3 (depan tangga), dan bilang kepada petugas untuk mendaftarkan ulang ke poli rujukan yang ingin didatangi",
+    description: "Jika Anda dirujuk ke poli lain di hari yang berbeda dengan hari pertama pendaftaran/ baca hasil di hari berbeda, silahkan langsung ke bagian pendaftaran CKG lantai 3 (depan tangga), dan sampaikan kepada petugas untuk mendaftarkan ulang ke poli rujukan yang ingin didatangi",
     img: "/alur/150-pendaftaran-ulang.webp",
     },
 };
@@ -1901,7 +1901,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Darah Lengkap",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1911,7 +1911,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Pemeriksaan Mikroskopik Malaria",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1921,7 +1921,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Laju Endap Darah",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1931,7 +1931,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Golongan Darah",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1941,7 +1941,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Glukosa Darah",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1951,7 +1951,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Glukosa Darah",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1961,7 +1961,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Aspartate Aminotransferase",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1971,7 +1971,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Alanine Aminotransferase",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1981,7 +1981,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Cholesterol",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -1991,7 +1991,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Trigliserida",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2001,7 +2001,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "High Density Lipoprotein-Cholesterol",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2011,7 +2011,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Low Density Lipoprotein-Cholesterol",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2021,7 +2021,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Ureum",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2031,7 +2031,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Creatinin",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2041,7 +2041,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Asam Urat",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2051,7 +2051,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Dahak Bakteri Tahan Asam",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2061,7 +2061,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Pemeriksaan Jamur",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2071,7 +2071,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Pemeriksaan Mikroskopis Malaria",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2081,7 +2081,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Sediaan Gram GO",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2091,7 +2091,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Pemeriksaan Feces Lengkap",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2101,7 +2101,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Urine Lengkap",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2111,7 +2111,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Protein",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2121,7 +2121,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Reduksi",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2131,7 +2131,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Kehamilan",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2141,7 +2141,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Narkoba",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2151,7 +2151,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Narkoba",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2161,7 +2161,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Narkoba",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2171,7 +2171,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Narkoba",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2181,7 +2181,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Tes Narkoba",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2191,7 +2191,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Serologi",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2201,7 +2201,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Serologi",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2211,7 +2211,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Serologi",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2221,7 +2221,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Serologi",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
         {
@@ -2231,7 +2231,7 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Serologi",
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
-                 Rujukan_Pustu: [106, 98, 99, 104, 107],
+                 Rujukan_Pustu: [106, 99, 104, 107],
           },
         },
       ],
