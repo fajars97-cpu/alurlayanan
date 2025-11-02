@@ -750,10 +750,10 @@ function ServiceCard({ s, onPick }) {
      onPick(s);
    }}
    className={`group relative overflow-hidden rounded-2xl border
-   bg-slate-100/70 dark:bg-white/5
-   hover:bg-slate-200/80 dark:hover:bg-white/10
-   active:scale-[.98] transition text-left touch-manipulation
-   ${floorBorderClass(s.lokasi)}`}
+     bg-slate-100/70 dark:bg-white/5
+     hover:bg-slate-200/80 dark:hover:bg-white/10
+     active:scale-[.98] transition text-left touch-manipulation
+     ${floorBorderClass(s.lokasi)}`}
  >
       <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="h-36 sm:h-44 md:h-48 lg:h-52 grid place-items-center p-2 sm:p-3">
@@ -764,14 +764,16 @@ function ServiceCard({ s, onPick }) {
             className="block max-h-full max-w-full object-contain"
             loading="lazy"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
         </div>
       </div>
-      <div className="p-3">
-        <div className="flex items-center gap-2">
-          <div className="text-xl">{s.ikon}</div>
-          <div className="font-semibold truncate text-slate-900 dark:text-white">{s.nama}</div>
-        </div>
-        <div className="text-xs text-slate-600 mt-1 truncate dark:text-white/60">{s.klaster}</div>
+      {/* Teks & ikon diberi latar gelap semi transparan */}
+     <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/40 backdrop-blur-[1px]">
+       <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+         <div className="text-xl shrink-0">{s.ikon}</div>
+         <div className="font-semibold truncate">{s.nama}</div>
+       </div>
+       <div className="text-[12px] opacity-90 truncate">{s.klaster}</div>
       </div>
     </button>
   );
