@@ -514,7 +514,8 @@ function Drawer({ open, onClose, children }) {
             key="drawer"
             className="fixed inset-y-0 left-0 z-[9998] w-[86%] max-w-[22rem]
                        bg-white/80 dark:bg-slate-950/80 backdrop-blur
-                       border-r border-black/10 dark:border-white/10"
+                       border-r border-black/10 dark:border-white/10
+                       overflow-y-auto"
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -560,13 +561,15 @@ function Sidebar({
     <aside
       className="
         w-full md:w-80 shrink-0
-        bg-white/70 dark:bg-slate-950/70 backdrop-blur
+      bg-white/70 dark:bg-slate-950/70 backdrop-blur
         border-r border-black/5 dark:border-white/10
         flex flex-col
-        /* === Full-height & adaptif thd header === */
-        h-[calc(100svh-var(--topbar-h,56px))]
-        md:h-[calc(100svh-var(--topbar-h,56px))]
+        /* === Tinggi: mobile full-screen, desktop mengikuti tinggi sisa di bawah header === */
+        h-[100svh]                          /* mobile benar-benar penuh */
+        md:h-[calc(100svh-var(--topbar-h,56px))]  /* desktop: sisakan tinggi header */
         md:sticky md:top-[var(--topbar-h,56px)]
+        /* === Hilangkan celah visual di tepi atas saat menempel ke header === */
+        md:rounded-t-none md:border-t-0
         transition-colors duration-300
         rounded-none
       "

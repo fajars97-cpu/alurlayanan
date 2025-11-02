@@ -62,13 +62,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                    shadow-lg backdrop-blur-sm\r
                    hover:bg-slate-900 active:scale-95`,children:[T.jsx("span",{className:"-rotate-180",children:"➜"})," ",i]})})}function Iw({facilityName:a,query:i,setQuery:s,services:r,onPick:c,onScrollToServices:d,selected:f,highlightIds:h=[]}){const[p,m]=j.useState(null),g=v=>{c(v),m(M=>M===v.id?null:v.id)},b=j.useRef(null);return T.jsxs("aside",{className:`\r
         w-full md:w-80 shrink-0\r
-        bg-white/70 dark:bg-slate-950/70 backdrop-blur\r
+      bg-white/70 dark:bg-slate-950/70 backdrop-blur\r
         border-r border-black/5 dark:border-white/10\r
         flex flex-col\r
-        /* === Full-height & adaptif thd header === */\r
-        h-[calc(100svh-var(--topbar-h,56px))]\r
-        md:h-[calc(100svh-var(--topbar-h,56px))]\r
+        /* === Tinggi: mobile full-screen, desktop mengikuti tinggi sisa di bawah header === */\r
+        h-[100svh]                          /* mobile benar-benar penuh */\r
+        md:h-[calc(100svh-var(--topbar-h,56px))]  /* desktop: sisakan tinggi header */\r
         md:sticky md:top-[var(--topbar-h,56px)]\r
+        /* === Hilangkan celah visual di tepi atas saat menempel ke header === */\r
+        md:rounded-t-none md:border-t-0\r
         transition-colors duration-300\r
         rounded-none\r
       `,children:[T.jsxs("div",{className:"p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10",children:[T.jsx("div",{className:"size-8 rounded-xl bg-emerald-600 grid place-items-center",children:"🏥"}),T.jsx("div",{className:"font-semibold truncate text-slate-900 dark:text-white",children:"Jadwal & Tarif"})]}),T.jsxs("div",{className:"px-4 pt-3 text-xs text-slate-700 dark:text-white/70",children:["Fasilitas: ",T.jsx("span",{className:"text-slate-900 font-medium dark:text-white",children:a})]}),T.jsxs("div",{className:"p-4 space-y-3",children:[T.jsx("label",{className:"text-xs uppercase text-slate-600 dark:text-white/50",children:"Pencarian"}),T.jsxs("div",{className:"relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible",children:[T.jsx("input",{ref:b,type:"search",value:i,onChange:v=>s(v.target.value),onKeyDown:v=>{v.key==="Enter"&&i.trim()&&Oe("Search","submit",i.trim()),v.key==="Escape"&&i&&(s(""),requestAnimationFrame(()=>b.current?.focus()))},enterKeyHint:"search",placeholder:"Cari 'umum', 'imunisasi', 'cabut gigi' …",className:"w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5 border border-emerald-500/20 focus:border-emerald-500/60 outline-none pr-12 pl-4"}),i&&T.jsx("button",{type:"button",onClick:()=>{s(""),Oe("Search","clear"),requestAnimationFrame(()=>b.current?.focus())},"aria-label":"Hapus pencarian",className:`absolute inset-y-0 right-2 my-auto h-8 min-w-8 rounded-full\r
