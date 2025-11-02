@@ -65,7 +65,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         bg-white/70 dark:bg-slate-950/70 backdrop-blur\r
         border-r border-black/5 dark:border-white/10\r
         flex flex-col\r
-        h-full md:h-[calc(100svh-56px)]\r
+        /* === Full-height & adaptif thd header === */\r
+        h-[calc(100svh-var(--topbar-h,56px))]\r
+        md:h-[calc(100svh-var(--topbar-h,56px))]\r
+        md:sticky md:top-[var(--topbar-h,56px)]\r
         transition-colors duration-300\r
         rounded-none\r
       `,children:[T.jsxs("div",{className:"p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10",children:[T.jsx("div",{className:"size-8 rounded-xl bg-emerald-600 grid place-items-center",children:"🏥"}),T.jsx("div",{className:"font-semibold truncate text-slate-900 dark:text-white",children:"Jadwal & Tarif"})]}),T.jsxs("div",{className:"px-4 pt-3 text-xs text-slate-700 dark:text-white/70",children:["Fasilitas: ",T.jsx("span",{className:"text-slate-900 font-medium dark:text-white",children:a})]}),T.jsxs("div",{className:"p-4 space-y-3",children:[T.jsx("label",{className:"text-xs uppercase text-slate-600 dark:text-white/50",children:"Pencarian"}),T.jsxs("div",{className:"relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible",children:[T.jsx("input",{ref:b,type:"search",value:i,onChange:v=>s(v.target.value),onKeyDown:v=>{v.key==="Enter"&&i.trim()&&Oe("Search","submit",i.trim()),v.key==="Escape"&&i&&(s(""),requestAnimationFrame(()=>b.current?.focus()))},enterKeyHint:"search",placeholder:"Cari 'umum', 'imunisasi', 'cabut gigi' …",className:"w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5 border border-emerald-500/20 focus:border-emerald-500/60 outline-none pr-12 pl-4"}),i&&T.jsx("button",{type:"button",onClick:()=>{s(""),Oe("Search","clear"),requestAnimationFrame(()=>b.current?.focus())},"aria-label":"Hapus pencarian",className:`absolute inset-y-0 right-2 my-auto h-8 min-w-8 rounded-full\r
@@ -75,7 +78,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           px-4 pb-2 space-y-2\r
           overflow-y-auto overscroll-contain\r
           [scrollbar-width:thin]\r
-          md:max-h-[28rem]\r
           flex-1\r
         `,children:[T.jsx("div",{className:"text-xs uppercase text-slate-600 dark:text-white/50 mb-2",children:"Daftar Poli"}),r.map(v=>{const M=p===v.id,E=h.includes(v.id);Xw(v);const{open:B,rest:V,soon:z}=Hw(v),G=Yw(v),Y=new Map;G.forEach(({label:W,jadwal:te})=>{const ne=qw(te);Y.has(ne)||Y.set(ne,[]),Y.get(ne).push({label:W,jadwal:te})});const $=Array.from(Y.values()),ee=(v?.layanan||[]).length===1&&v.layanan[0]?.jadwal;return T.jsxs("div",{className:"space-y-2",children:[T.jsx("button",{onClick:()=>g(v),className:`group w-full text-left px-4 py-3.5 rounded-xl border transition
                 ${f?.id===v.id?"bg-emerald-500/15 border-emerald-500/70 ring-2 ring-emerald-400/40":E?"bg-emerald-400/10 border-emerald-400/50":"bg-slate-100/70 border-black/10 dark:bg-white/5 dark:border-white/10"}

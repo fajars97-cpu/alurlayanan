@@ -563,7 +563,10 @@ function Sidebar({
         bg-white/70 dark:bg-slate-950/70 backdrop-blur
         border-r border-black/5 dark:border-white/10
         flex flex-col
-        h-full md:h-[calc(100svh-56px)]
+        /* === Full-height & adaptif thd header === */
+        h-[calc(100svh-var(--topbar-h,56px))]
+        md:h-[calc(100svh-var(--topbar-h,56px))]
+        md:sticky md:top-[var(--topbar-h,56px)]
         transition-colors duration-300
         rounded-none
       "
@@ -627,7 +630,6 @@ function Sidebar({
           px-4 pb-2 space-y-2
           overflow-y-auto overscroll-contain
           [scrollbar-width:thin]
-          md:max-h-[28rem]
           flex-1
         "
       >
