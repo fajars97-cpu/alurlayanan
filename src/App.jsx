@@ -1617,48 +1617,41 @@ export default function App() {
           border-b border-black/5 dark:border-white/10
           transition-colors duration-300
         ">
-          <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 h-14 md:h-auto grid grid-cols-[auto_1fr_auto] items-center gap-3">
+            {/* Burger lebih besar; tetap membuka sidebar yang sama */}
             <button
-              className="md:hidden inline-flex items-center justify-center size-9 rounded-xl
-              border border-black/10 dark:border-white/10
-              bg-white/60 dark:bg-white/5
-              hover:bg-slate-200/80 dark:hover:bg-white/10"
+              className="md:hidden inline-grid place-items-center size-11 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/15 shrink-0"
               aria-label="Buka menu"
-              onClick={() => { setNavOpen(true); trackEvent("Drawer","open"); }}
+              onClick={() => { setNavOpen(true); trackEvent('Drawer','open'); }}
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                 <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
 
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg bg-emerald-600 grid place-items-center">🏥</div>
-              <div className="font-semibold">Informasi Layanan Puskesmas Jagakarsa</div>
+            {/* Judul dua baris kecil, bisa truncate */}
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center shrink-0">🏥</div>
+              <div className="min-w-0 leading-tight">
+                <div className="text-[12px] font-medium opacity-90 truncate">Informasi Layanan</div>
+                <div className="text-[14px] font-semibold truncate">Puskesmas Jagakarsa</div>
+              </div>
             </div>
 
-            <div className="ml-auto flex items-center gap-2">
-              <label className="text-xs text-slate-600 dark:text-white/60 hidden sm:block">Fasilitas</label>
+            {/* Select fasilitas: lebar dibatasi + ellipsis supaya header tidak melebar */}
+            <div className="relative shrink-0 w-[56vw] max-w-[260px] md:w-auto md:max-w-none">
               <select
                 value={facility}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setFacility(v);
-                  trackEvent("Facility", "change", v);
-                }}
-                className="
-                  h-9 rounded-lg px-2 text-sm outline-none
-                  bg-white text-slate-900 border border-black/10
-                  dark:bg-slate-800 dark:text-white dark:border-white/10
-                  focus:ring-2 focus:ring-emerald-500
-                  appearance-none
-                "
+                onChange={(e) => { const v = e.target.value; setFacility(v); trackEvent('Facility','change', v); }}
+                className="w-full h-10 rounded-xl pl-3 pr-8 text-[14px] outline-none
+                           bg-white text-slate-900 border border-black/10
+                           dark:bg-slate-800 dark:text-white dark:border-white/10
+                           focus:ring-2 focus:ring-emerald-500 appearance-none
+                           overflow-hidden text-ellipsis whitespace-nowrap"
               >
-                {FACILITIES.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
+                {FACILITIES.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
               </select>
+              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white/70 md:text-slate-500">▾</span>
             </div>
           </div>
         </header>
