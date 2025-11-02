@@ -756,12 +756,12 @@ function ServiceCard({ s, onPick }) {
      ${floorBorderClass(s.lokasi)}`}
  >
       <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
-        <div className="h-36 sm:h-44 md:h-48 lg:h-52 grid place-items-center p-2 sm:p-3">
+        <div className="relative overflow-hidden rounded-t-2xl">
           <img
             src={resolveInfografis(s)}
             onError={onInfoError}
             alt={s.nama}
-            className="block max-h-full max-w-full object-contain"
+            className="w-full aspect-[4/3] object-cover md:object-contain"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
