@@ -247,7 +247,7 @@ export const FLOW_STEPS = {
     34: {
     id: 34,
     title: "Langkah 34",
-    name: "Pos Security",
+    name: "Pengambilan Nomor dan Nametag",
     description: "Silahkan menuju pos security untuk mengambil nomor antrian dan name tag pasien CKG.",
     img: "/alur/34-pos-security.webp",
     },
@@ -388,7 +388,7 @@ export const FLOW_STEPS = {
     id: 54,
     title: "Langkah 54",
     name: "Menuju Poli Mata",
-    description: "Silahkan menuju poli mata di lantai 2 depan ruang poli umum, ketuk dan berikan resi pendaftaran/ surat rujukan kepada petugas, ikuti instruksi petugas.",
+    description: "Silahkan menuju poli mata di lantai 2 depan ruang poli umum, mohon menunggu hingga nama Anda dipanggil dan silahkan masuk ke dalam ruang pemeriksaan jika nama Anda dipanggil, ikuti instruksi petugas.",
     img: "/alur/54-menuju-poli-mata.webp",
     },
     55: {
@@ -401,7 +401,7 @@ export const FLOW_STEPS = {
     56: {
     id: 56,
     title: "Langkah 56",
-    name: "Pemeriksaan Selesai Anak Laki-Laki",
+    name: "Pemeriksaan Selesai",
     description: "Pemeriksaan telah selesai, pasien dan keluarga bisa pulang.",
     img: "/alur/56-selesai-bapak-anak-laki.webp",
     },
@@ -471,8 +471,8 @@ export const FLOW_STEPS = {
     66: {
     id: 66,
     title: "Langkah 66",
-    name: "Silahkan ke Nurse Station KI Hamil",
-    description: "Silahkan ke bagian nurse station ibu hamil di lantai 3 (dari tangga ke kanan) dan serahkan resi pendaftaran dan/ buku pink kepada petugas, ikuti arahan petugas.",
+    name: "Menuju Meja Perawat KI Hamil",
+    description: "Silahkan menuju meja perawat ruang kesehaatan ibu hamil di lantai 3 (dari tangga ke kanan) dan serahkan resi pendaftaran dan/ buku pink kepada petugas, ikuti arahan petugas.",
     img: "/alur/66-nurse-station-ibu-hamil.webp",
     },
     67: {
@@ -527,7 +527,7 @@ export const FLOW_STEPS = {
     74: {
     id: 74,
     title: "Langkah 74",
-    name: "Pemeriksaan dokter poli PM",
+    name: "Pemeriksaan Dokter Poli PM",
     description: "Setelah nama Anda dipanggil, silahkan measuk ke ruang poli PM, ikuti arahan petugas.",
     img: "/alur/74-pemeriksaan-poli-pm.webp",
     },
@@ -947,14 +947,14 @@ export const FLOW_STEPS = {
     135: {
     id: 135,
     title: "Langkah 135",
-    name: "Pendaftaran CKG Anak",
+    name: "Pengambian Nomor dan Nametag CKG",
     description: "Silahkan menuju petugas security, lalu sampaikan bahwa Anda ingin melakukan pemeriksaan CKG, Anda akan diberikan tanda pengenal lalu silahkan ke bagian pendaftaran CKG di lantai 3 (nurse station di depan tangga)",
     img: "/alur/135-pasien-ckg-security-anak.webp",
     },
     136: {
     id: 136,
     title: "Langkah 136",
-    name: "Pendaftaran CKG Anak Lantai 3",
+    name: "Pendaftaran CKG",
     description: "Silahkan ke bagian pendaftaran CKG, lalu daftarkan diri Anda sesuai nomor antrian, dan ikuti arahan petugas",
     img: "/alur/136-pendaftaran-ckg-anak.webp",
     },
@@ -1082,7 +1082,14 @@ export const FLOW_STEPS = {
 /* ===================== FACILITIES ===================== */
 export const FACILITIES = [
   { id: "pkm-jagakarsa", name: "Puskesmas Jagakarsa" },
-  { id: "pkm-lain",      name: "Puskesmas Lain (contoh)" },
+  { id: "pustu-jagakarsa1",      name: "Puskesmas Pembantu Jagakarsa 1" },
+  { id: "pustu-jagakarsa2",      name: "Puskesmas Pembantu Jagakarsa 2" },
+  { id: "pustu-tanjungbarat",      name: "Puskesmas Pembantu Tanjung Barat" },
+  { id: "pustu-srengsengsawah",      name: "Puskesmas Pembantu Srengseng Sawah" },
+  { id: "pustu-ciganjur",      name: "Puskesmas Pembantu Ciganjut" },
+  { id: "pustu-lentengagung1",      name: "Puskesmas Pembantu Lenteng Agung 1" },
+  { id: "pustu-lentengagung2",      name: "Puskesmas Pembantu Lenteng Agung 2" },
+  { id: "pustu-cipedak",      name: "Puskesmas Pembantu Cipedak (Coming Soon)" },
 ];
 
 /* ===================== SERVICES_BY_FACILITY ===================== */
