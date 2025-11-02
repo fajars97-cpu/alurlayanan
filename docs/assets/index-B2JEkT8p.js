@@ -99,9 +99,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           transition-colors duration-300\r
         `,children:[T.jsxs("header",{ref:$,className:`\r
     sticky top-0 z-30 backdrop-blur\r
-    bg-green-900 text-white\r
-    md:bg-white/70 md:text-inherit\r
-    dark:md:bg-slate-900/70\r
+    bg-transparent text-inherit\r
+    md:bg-transparent\r
+    dark:md:bg-transparent\r
     border-b border-black/5 dark:border-white/10\r
     transition-colors duration-300\r
   `,children:[T.jsxs("div",{className:"md:hidden max-w-7xl mx-auto px-3 sm:px-4 py-2 space-y-2",children:[T.jsxs("div",{className:"flex items-center gap-2",children:[T.jsx("div",{className:"size-8 rounded-xl bg-emerald-600 grid place-items-center shrink-0",children:"🏥"}),T.jsxs("div",{className:"leading-tight",children:[T.jsx("div",{className:"text-[11px] font-medium opacity-90",children:"INFORMASI LAYANAN"}),T.jsx("div",{className:"text-[14px] font-semibold",children:"PUSKESMAS JAGAKARSA"})]})]}),T.jsxs("div",{className:"grid grid-cols-[auto_1fr] items-center gap-2",children:[T.jsx("button",{className:"inline-grid place-items-center size-11 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/15","aria-label":"Buka menu",onClick:()=>{h(!0),Oe("Drawer","open")},children:T.jsx("svg",{viewBox:"0 0 24 24",width:"22",height:"22","aria-hidden":"true",children:T.jsx("path",{d:"M4 7h16M4 12h16M4 17h16",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round"})})}),T.jsxs("div",{className:"relative",children:[T.jsx("select",{value:c,onChange:K=>{const ae=K.target.value;d(ae),Oe("Facility","change",ae)},className:`w-full h-11 rounded-xl pl-3 pr-8 text-[14px] outline-none\r

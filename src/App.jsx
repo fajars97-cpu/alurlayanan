@@ -1615,9 +1615,9 @@ export default function App() {
   ref={headerRef}
   className="
     sticky top-0 z-30 backdrop-blur
-    bg-green-900 text-white
-    md:bg-white/70 md:text-inherit
-    dark:md:bg-slate-900/70
+    bg-transparent text-inherit
+    md:bg-transparent
+    dark:md:bg-transparent
     border-b border-black/5 dark:border-white/10
     transition-colors duration-300
   "
