@@ -755,21 +755,26 @@ function ServiceCard({ s, onPick }) {
      active:scale-[.98] transition text-left touch-manipulation
      ${floorBorderClass(s.lokasi)}`}
  >
+      {/* Gambar: tinggi tetap per breakpoint, gambar tidak dipotong (contain) */}
       <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
-        <div className="relative overflow-hidden rounded-t-2xl">
-          <img
-            src={resolveInfografis(s)}
-            onError={onInfoError}
-            alt={s.nama}
-            className="w-full aspect-[4/3] object-cover md:object-contain"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
+        <div className="relative p-2 sm:p-3">
+          {/* container tinggi tetap agar desktop tidak mengecil, mobile tidak terpotong */}
+          <div className="relative h-40 sm:h-48 md:h-56 lg:h-60 xl:h-64">
+            <img
+              src={resolveInfografis(s)}
+              onError={onInfoError}
+              alt={s.nama}
+              className="absolute inset-0 w-full h-full object-contain"
+              loading="lazy"
+            />
+            {/* Gradient bawah saja (±40% tinggi) agar teks kontras tanpa menutup gambar */}
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 sm:h-16 md:h-14 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          </div>
         </div>
       </div>
-      {/* Teks & ikon diberi latar gelap semi transparan */}
-     <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/40 backdrop-blur-[1px]">
-       <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+      {/* Teks & ikon: bar bawah dengan latar gelap tipis */}
+      <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:py-3 bg-black/40 backdrop-blur-[1px]">
+        <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] leading-tight">
          <div className="text-xl shrink-0">{s.ikon}</div>
          <div className="font-semibold truncate">{s.nama}</div>
        </div>
