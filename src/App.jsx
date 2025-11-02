@@ -564,12 +564,14 @@ function Sidebar({
       bg-white/70 dark:bg-slate-950/70 backdrop-blur
         border-r border-black/5 dark:border-white/10
         flex flex-col
-        /* === Tinggi: mobile full-screen, desktop mengikuti tinggi sisa di bawah header === */
-        h-[100svh]                          /* mobile benar-benar penuh */
-        md:h-[calc(100svh-var(--topbar-h,56px))]  /* desktop: sisakan tinggi header */
+        /* === Tinggi: mobile full-screen (dvh), desktop sisakan tinggi header === */
+        min-h-[100dvh] h-[100dvh]
+        md:h-[calc(100dvh-var(--topbar-h,56px))]
         md:sticky md:top-[var(--topbar-h,56px)]
-        /* === Hilangkan celah visual di tepi atas saat menempel ke header === */
-        md:rounded-t-none md:border-t-0
+        /* === Tempel ke header (hilangkan gap & border atas) === */
+        md:-mt-px md:rounded-t-none md:border-t-0
+        /* Stabilkan tata letak saat scrollbar muncul */
+        [scrollbar-gutter:stable]
         transition-colors duration-300
         rounded-none
       "

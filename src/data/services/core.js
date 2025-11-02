@@ -1086,7 +1086,7 @@ export const FACILITIES = [
   { id: "pustu-jagakarsa2",      name: "Puskesmas Pembantu Jagakarsa 2" },
   { id: "pustu-tanjungbarat",      name: "Puskesmas Pembantu Tanjung Barat" },
   { id: "pustu-srengsengsawah",      name: "Puskesmas Pembantu Srengseng Sawah" },
-  { id: "pustu-ciganjur",      name: "Puskesmas Pembantu Ciganjut" },
+  { id: "pustu-ciganjur",      name: "Puskesmas Pembantu Ciganjur" },
   { id: "pustu-lentengagung1",      name: "Puskesmas Pembantu Lenteng Agung 1" },
   { id: "pustu-lentengagung2",      name: "Puskesmas Pembantu Lenteng Agung 2" },
   { id: "pustu-cipedak",      name: "Puskesmas Pembantu Cipedak (Coming Soon)" },
