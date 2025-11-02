@@ -1056,6 +1056,27 @@ export const FLOW_STEPS = {
     description: "Jika Anda dirujuk ke poli lain di hari yang berbeda dengan hari pertama pendaftaran/ baca hasil di hari berbeda, silahkan langsung ke bagian pendaftaran CKG lantai 3 (depan tangga), dan sampaikan kepada petugas untuk mendaftarkan ulang ke poli rujukan yang ingin didatangi",
     img: "/alur/150-pendaftaran-ulang.webp",
     },
+    151: {
+    id: 151,
+    title: "Langkah 151",
+    name: "Pasien Gawat Darurat",
+    description: "Jika terjadi kondisi darurat, silahkan mendatangi petugas puskesmas terdekat seperti security untuk meminta bantuan dalam penanganan kondisi darurat. Petugas akan langsung membantu pasien untuk mendapatkan tindakan langsung oleh tenaga kesehatan yang bertugas di IGD Puskesmas",
+    img: "/alur/151-pasien-igd.webp",
+    },
+    152: {
+    id: 152,
+    title: "Langkah 152",
+    name: "Pemeriksaan Pasien Gawat Darurat",
+    description: "Ikuti arahan petugas selama pasien ditangani, jika memungkinkan pihak yang menemani silahkan untuk mendaftarkan pasien ke loket, jika tidak, Anda dapat minta tolong petugas untuk melakukan pendaftaran pasien dengan menyerahkan identitas pasien",
+    img: "/alur/152-pemeriksaan-pasien-igd.webp",
+    },
+    153: {
+    id: 153,
+    title: "Langkah 153",
+    name: "Layanan Selesai",
+    description: "Ikuti arahan petugas terkait perlu tidaknya pasien mendapat tindakan lanjut atau diperbolehkan pulang, jika diperbolehkan pulang dan mendapatkan resep obat, silahkan pihak yang menemani mengambil obat di bagian farmasi dan pasien bisa pulang",
+    img: "/alur/153-pasien-pulang.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -1323,7 +1344,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [0, 1, 28, 4, 5],
+          alur: [151, 152, 1, 153],
         },
       ],
     },
