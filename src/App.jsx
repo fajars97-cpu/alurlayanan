@@ -1,6 +1,8 @@
 // src/App.jsx
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { trackEvent, trackTiming } from "./ga.js";
+import { initGA } from "./ga";
+import GAListener from "./gaListener";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 
@@ -12,6 +14,7 @@ import {
   EXTRA_INFO,
   FLOW_STEPS,
 } from "./data/services";
+import { BrowserRouter } from "react-router-dom";
 
 // === Floor helpers ===
  function getFloorNumber(lokasi) {
@@ -1547,6 +1550,11 @@ export default function App() {
     };
   }, []);
 
+  // === Inisialisasi Google Analytics (sekali saat mount) ===
+  useEffect(() => {
+    try { initGA(); } catch {}
+  }, []);
+
   useEffect(() => {
     if (query.trim().length > 0) {
       setSelected(null);
@@ -1616,6 +1624,8 @@ export default function App() {
   }, []);
 
   return (
+    <BrowserRouter>
+    <GAListener />
     <div className="
           min-h-screen
           text-slate-900 dark:text-white
@@ -1785,5 +1795,6 @@ export default function App() {
           © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
         </footer>
       </div>
+      </BrowserRouter>
   );
 }
