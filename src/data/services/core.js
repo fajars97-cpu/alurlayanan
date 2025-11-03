@@ -1100,7 +1100,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "poli-umum",
       nama: "Poli Umum",
-      klaster: "Pelayanan Medik",
+      klaster: "Dewasa 18-60 Tahun (Lt 2)",
       ikon: "🩺",
       lokasi: "Lantai 2",
       img: "poli-umum.webp",
@@ -1130,7 +1130,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "poli-gigi",
       nama: "Poli Gigi",
-      klaster: "Pelayanan Medik",
+      klaster: "Umum (Lt 2)",
       ikon: "🦷",
       lokasi: "Lantai 2",
       img: "poli-gigi.webp",
@@ -1138,6 +1138,16 @@ export const SERVICES_BY_FACILITY = {
         {
           nama: "Pemeriksaan Kesehatan Gigi Dasar",
           ikon: "🦷",
+          kategori: "anak",
+          tarif: 10000,
+          bpjs: true,
+          ket: "Pemeriksaan Kesehatan Gigi Dasar",
+          alur: [0, 1, 81, 82, 4, 5],
+        },
+        {
+          nama: "Pemeriksaan Kesehatan Gigi Dasar",
+          ikon: "🦷",
+          kategori: "dewasa",
           tarif: 10000,
           bpjs: true,
           ket: "Pemeriksaan Kesehatan Gigi Dasar",
@@ -1328,7 +1338,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "igd",
       nama: "IGD",
-      klaster: "Gawat Darurat",
+      klaster: "Gawat Darurat (Lt 1)",
       ikon: "🚑",
       lokasi: "Lantai 1",
       img: "igd.webp",
@@ -1358,7 +1368,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "pelayanan-24",
       nama: "Pelayanan 24 Jam",
-      klaster: "Layanan Medik",
+      klaster: "Umum (Lt 1)",
       ikon: "🚑",
       lokasi: "Lantai 1",
       img: "igd.webp",
@@ -1408,7 +1418,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "farmasi",
       nama: "Farmasi",
-      klaster: "Layanan Medik",
+      klaster: "Umum (Lt 1)",
       ikon: "💊",
       lokasi: "Lantai 1",
       img: "farmasi.webp",
@@ -1459,7 +1469,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "ki-hamil",
       nama: "KI Hamil",
-      klaster: "Kebidanan",
+      klaster: "Ibu dan Anak (Lt 3)",
       ikon: "🤰",
       lokasi: "Lantai 3",
       img: "ki-hamil.webp",
@@ -1481,7 +1491,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "ki-nifas",
       nama: "KI Nifas",
-      klaster: "Kebidanan",
+      klaster: "Ibu dan Anak (Lt 1)",
       ikon: "🍼",
       lokasi: "Lantai 1",
       img: "ki-nifas.webp",
@@ -1531,7 +1541,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "catin",
       nama: "Catin",
-      klaster: "Kebidanan",
+      klaster: "Umum (Lt 2)",
       ikon: "💍",
       lokasi: "Lantai 2",
       img: "poli-catin.webp",
@@ -1549,7 +1559,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "imunisasi",
       nama: "Imunisasi",
-      klaster: "Anak",
+      klaster: "Ibu dan Anak (Lt 3)",
       ikon: "💉",
       lokasi: "Lantai 3",
       img: "poli-imunisasi.webp",
@@ -1742,7 +1752,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "kb-iva",
       nama: "KB & IVA",
-      klaster: "Kebidanan",
+      klaster: "Ibu dan Anak",
       ikon: "👩‍⚕️",
       lokasi: "Lantai 2",
       img: "poli-kb.webp",
@@ -1824,7 +1834,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "tumbang",
       nama: "Tumbang",
-      klaster: "Anak",
+      klaster: "Ibu dan Anak",
       ikon: "🧒",
       lokasi: "Lantai 3",
       img: "poli-tumbang.webp",
@@ -1861,7 +1871,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "mtbs",
       nama: "MTBS",
-      klaster: "Anak",
+      klaster: "Anak Balita 0-5 Tahun (Lt 3)",
       ikon: "👶",
       lokasi: "Lantai 3",
       img: "poli-mtbs.webp",
@@ -1881,7 +1891,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "pkpr",
       nama: "PKPR",
-      klaster: "Remaja",
+      klaster: "Remaja 5 - 18 Tahun (Lt 3)",
       ikon: "🎒",
       lokasi: "Lantai 3",
       img: "poli-pkpr.webp",
@@ -1899,7 +1909,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "lansia",
       nama: "Lansia",
-      klaster: "Lansia",
+      klaster: "Lansia >60 Tahun (Lt 1)",
       ikon: "🧓",
       lokasi: "Lantai 1",
       img: "poli-lansia.webp",
@@ -1917,7 +1927,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "laboratorium",
       nama: "Laboratorium",
-      klaster: "Lintas Klaster",
+      klaster: "Umum (Lt 3)",
       ikon: "🧪",
       lokasi: "Lantai 3",
       img: "laboratorium.webp",
@@ -2268,7 +2278,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "ptm",
       nama: "PTM",
-      klaster: "Penyakit Tidak Menular",
+      klaster: "Penyakit Tidak  (Lt 2)",
       ikon: "❤️‍🩹",
       lokasi: "Lantai 2",
       img: "poli-ptm.webp",
@@ -2288,7 +2298,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "pm",
       nama: "PM",
-      klaster: "Penyakit Menular",
+      klaster: "Penyakit Menular (Lt 1)",
       ikon: "🧫",
       lokasi: "Lantai 1",
       img: "poli-pm.webp",
@@ -2306,7 +2316,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "ims",
       nama: "IMS/ Lestari",
-      klaster: "Penyakit Menular",
+      klaster: "Penyakit Menular (Lt 2)",
       ikon: "⚕️",
       lokasi: "Lantai 2",
       img: "poli-ims.webp",
@@ -2324,7 +2334,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "mata",
       nama: "Mata",
-      klaster: "Pelayanan Medik",
+      klaster: "Umum (Lt 2)",
       ikon: "👁️",
       lokasi: "Lantai 2",
       img: "poli-mata.webp",
@@ -2358,7 +2368,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "haji",
       nama: "Haji",
-      klaster: "Pelayanan Medik",
+      klaster: "Umum (Lt 2)",
       ikon: "🕋",
       lokasi: "Lantai 2",
       img: "poli-haji.webp",
@@ -2376,7 +2386,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "gizi",
       nama: "Gizi",
-      klaster: "Gizi",
+      klaster: "Umum (Lt 3)",
       ikon: "🥗",
       lokasi: "Lantai 3",
       img: "poli-gizi.webp",
@@ -2429,7 +2439,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "kirana",
       nama: "KIRANA Konseling",
-      klaster: "Konseling",
+      klaster: "Umum (Lt 2)",
       ikon: "🧠",
       lokasi: "Lantai 2",
       img: "poli-kirana.webp",
@@ -2447,7 +2457,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "kesling_surveilans",
       nama: "Kesehatan Lingkungan & Surveilans",
-      klaster: "Kesling & Surveilans",
+      klaster: "Umum (Lt 3)",
       ikon: "🧼",
       lokasi: "Lantai 3",
       img: "kesehatan-lingkungan.webp",
@@ -2538,7 +2548,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "ckg",
       nama: "Cek Kesehatan Gratis",
-      klaster: "Pelayanan Medik",
+      klaster: "Umum (Lt 3)",
       ikon: "🩺",
       lokasi: "Lantai 3",
       img: "poli-ckg.webp",
@@ -2559,7 +2569,7 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "RB",
       nama: "Ruang Bersalin",
-      klaster: "Pelayanan Medik",
+      klaster: "Ibu dan Anak (Lt 1)",
       ikon: "🤱",
       lokasi: "Lantai 1",
       img: "ruang-bersalin.webp",
