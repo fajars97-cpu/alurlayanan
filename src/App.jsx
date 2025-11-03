@@ -1624,7 +1624,7 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <>
     <GAListener />
     <div className="
           min-h-screen
@@ -1795,6 +1795,6 @@ export default function App() {
           © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
         </footer>
       </div>
-      </BrowserRouter>
+      </>
   );
 }
