@@ -15,6 +15,54 @@ import {
   FLOW_STEPS,
 } from "./data/services";
 
+const FACILITY_MAPS = {
+  "pkm-jagakarsa": {
+    q: "Puskesmas Kecamatan Jagakarsa, Jakarta Selatan",
+    placeId: "ChIJh0hzBdb2aS4R4PO8Z8W3qAc",
+  },
+  "pustu-jagakarsa1": {
+    q: "Puskesmas Pembantu Jagakarsa 1, Jakarta Selatan",
+    placeId: "ChIJhx1iQY_2aS4R5DQxC2O7Fmc",
+  },
+  "pustu-jagakarsa2": {
+    q: "Puskesmas Pembantu Jagakarsa 2, Jakarta Selatan",
+    placeId: "ChIJP65UZY_2aS4RkGMCwUvWKuQ",
+  },
+  "pustu-tanjungbarat": {
+    q: "Puskesmas Pembantu Tanjung Barat, Jakarta Selatan",
+    placeId: "ChIJs4P3PZ72aS4RtJAZZrPOyqY",
+  },
+  "pustu-srengsengsawah": {
+    q: "Puskesmas Pembantu Srengseng Sawah, Jakarta Selatan",
+    placeId: "ChIJcZlqRZ72aS4RscnUgc6uv9I",
+  },
+  "pustu-ciganjur": {
+    q: "Puskesmas Pembantu Ciganjur, Jakarta Selatan",
+    placeId: "ChIJk5JZUY_2aS4ReCJjBnhZFPk",
+  },
+  "pustu-lentengagung1": {
+    q: "Puskesmas Pembantu Lenteng Agung 1, Jakarta Selatan",
+    placeId: "ChIJo6EsaY_2aS4Rs7qssvHWfZk",
+  },
+  "pustu-lentengagung2": {
+    q: "Puskesmas Pembantu Lenteng Agung 2, Jakarta Selatan",
+    placeId: "ChIJ39tLZY_2aS4R_xsT4TKH-ps",
+  },
+};
+
+
+function mapEmbedSrc(facilityId) {
+  const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS["pkm-jagakarsa"];
+  return `https://www.google.com/maps?q=${encodeURIComponent(item.q)}&output=embed`;
+}
+
+function reviewLink(facilityId) {
+  const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS.jagakarsa;
+  return item.placeId
+    ? `https://search.google.com/local/writereview?placeid=${item.placeId}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.q)}`;
+}
+
 // === Floor helpers ===
  function getFloorNumber(lokasi) {
    if (!lokasi) return null;
@@ -1823,9 +1871,41 @@ export default function App() {
           cooldownDays={7}
         />
 
-        <footer className="py-6 text-center text-slate-600 dark:text-white/50 text-sm">
-          © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
-        </footer>
+        <footer className="mt-8 border-t border-white/10">
+  <div className="max-w-7xl mx-auto px-4 py-6 grid gap-4 md:grid-cols-[1fr_18rem] items-start">
+    <div className="w-full aspect-[16/10] rounded-xl overflow-hidden ring-1 ring-black/10 dark:ring-white/10">
+      <iframe
+        title="Lokasi fasilitas"
+        loading="lazy"
+        src={mapEmbedSrc(facility)}
+        className="w-full h-full border-0"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
+    </div>
+
+    <div className="text-sm text-slate-700 dark:text-white/70 space-y-3">
+      <div className="font-semibold text-slate-900 dark:text-white">
+        Lokasi: {facilityName}
+      </div>
+      <a
+        href={reviewLink(facility)}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() =>
+          gaEvent("click_review", { facility_id: facility, facility_name: facilityName })
+        }
+        className="inline-flex items-center justify-center rounded-xl px-4 py-2
+                   bg-emerald-600 text-white hover:bg-emerald-700
+                   border border-emerald-500/40 shadow-sm"
+      >
+        ⭐ Review us on Google
+      </a>
+      <div className="text-xs text-slate-500 dark:text-white/50">
+        © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
+      </div>
+    </div>
+  </div>
+</footer>
       </div>
       </>
   );
