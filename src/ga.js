@@ -15,14 +15,24 @@ export const trackPage = (path) => {
   ReactGA.send({ hitType: "pageview", page: path });
 };
 
-// Event utility (seragam di seluruh app)
-export const trackEvent = (category, action, label, value) => {
- try {
-    ReactGA.event({ category, action, label, value });
+// GA4: helper event bernama (native)
+export const gaEvent = (name, params = {}) => {
+  try { ReactGA.event(name, params); } catch {}
+};
+
+// Back-compat helper: bentuk lama (category, action, label, value, params)
+// Akan dikonversi ke event_name: "<category>_<action>"
+export const trackEvent = (category, action, label, value, params = {}) => {
+  try {
+    const name = `${category}_${action}`.toLowerCase(); // contoh: "navigation_select_poli"
+    const payload = {};
+    if (label !== undefined) payload.label = label;
+    if (value !== undefined) payload.value = value;
+    ReactGA.event(name, { ...payload, ...params });
   } catch {}
 };
 
-// catat durasi (ms) sebagai event
+// Catat durasi (ms) sebagai event GA4
 export const trackTiming = (name, ms, extra = {}) => {
-  try { ReactGA.event({ category: "Timing", action: name, value: ms, ...extra }); } catch {}
+  try { ReactGA.event(name, { value: ms, ...extra }); } catch {}
 };

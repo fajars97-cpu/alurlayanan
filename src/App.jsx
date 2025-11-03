@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { trackEvent, trackTiming } from "./ga.js";
+import { trackEvent, trackTiming, gaEvent } from "./ga.js";
 import { initGA } from "./ga";
 import GAListener from "./gaListener";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,7 +14,6 @@ import {
   EXTRA_INFO,
   FLOW_STEPS,
 } from "./data/services";
-import { BrowserRouter } from "react-router-dom";
 
 // === Floor helpers ===
  function getFloorNumber(lokasi) {
@@ -553,6 +552,7 @@ function Sidebar({
   onScrollToServices,
   selected,
   highlightIds = [],
+  onSearchSubmit,
 }) {
   const [expandedId, setExpandedId] = useState(null);
   const toggle = (s) => {
@@ -598,7 +598,7 @@ function Sidebar({
          onChange={(e) => setQuery(e.target.value)}
          onKeyDown={(e) => {
           if (e.key === "Enter" && query.trim()) {
-            trackEvent("Search", "submit", query.trim());
+            onSearchSubmit?.(query.trim());
           }
           if (e.key === "Escape" && query) {
          setQuery("");
@@ -757,6 +757,7 @@ function ServiceCard({ s, onPick }) {
     <button
    onClick={() => {
      trackEvent("Navigation", "select_poli", s.id);
+     gaEvent("select_poli", { poli_id: s.id, poli_name: s.nama });
      onPick(s);
    }}
    className={`group relative overflow-hidden rounded-2xl border
@@ -1498,6 +1499,14 @@ export default function App() {
   const [navOpen, setNavOpen] = useState(false);
   const [scrollReq, setScrollReq] = useState(null); // { poliId, ts }
   const [jump, setJump] = useState(null);
+  const lastQueryRef = useRef(null);
+  const searchStartRef = useRef(0);
+  const onSearchSubmit = (q) => {
+  trackEvent("Search", "submit", q);                 // legacy (laporan lama tetap jalan)
+  lastQueryRef.current = q;                          // simpan query terakhir
+  searchStartRef.current = performance.now();        // start timer TTFI
+  gaEvent("search_query", { query: q });             // GA4 native
+};
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -1607,6 +1616,28 @@ export default function App() {
     setJump({ poliId, idx });
     setNavOpen(false);
     trackEvent("Navigation", "select_service", `${poliId}#${idx}`);
+    const svc = p.layanan?.[idx];
+    gaEvent("select_service", { poli_id: p.id, poli_name: p.nama, service_name: svc?.nama });
+    if (lastQueryRef.current) {
+      gaEvent("search_result_click", {
+        query: lastQueryRef.current,
+        poli_id: p.id,
+        poli_name: p.nama,
+        service_name: svc?.nama,
+      });
+      if (searchStartRef.current) {
+        const ms = Math.round(performance.now() - searchStartRef.current);
+        gaEvent("search_ttfi_ms", {
+          query: lastQueryRef.current,
+          poli_id: p.id,
+          poli_name: p.nama,
+          service_name: svc?.nama,
+          value: ms,
+        });
+     }
+      // reset only the timestamp; keep lastQuery for subsequent clicks if same query is still active
+      searchStartRef.current = 0;
+    }
   }
 
   useEffect(() => {
@@ -1769,6 +1800,7 @@ export default function App() {
               }}
               selected={selected}
               highlightIds={matchPoliIds}
+              onSearchSubmit={onSearchSubmit}
             />
           </div>
 
