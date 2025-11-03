@@ -18,35 +18,35 @@ import {
 const FACILITY_MAPS = {
   "pkm-jagakarsa": {
     q: "Puskesmas Kecamatan Jagakarsa, Jakarta Selatan",
-    placeId: "ChIJh0hzBdb2aS4R4PO8Z8W3qAc",
-  },
-  "pustu-jagakarsa1": {
-    q: "Puskesmas Pembantu Jagakarsa 1, Jakarta Selatan",
-    placeId: "ChIJhx1iQY_2aS4R5DQxC2O7Fmc",
-  },
-  "pustu-jagakarsa2": {
-    q: "Puskesmas Pembantu Jagakarsa 2, Jakarta Selatan",
-    placeId: "ChIJP65UZY_2aS4RkGMCwUvWKuQ",
+    placeId: "ChIJS7JbYn_uaS4R6E4MCNb0w30",
   },
   "pustu-tanjungbarat": {
     q: "Puskesmas Pembantu Tanjung Barat, Jakarta Selatan",
-    placeId: "ChIJs4P3PZ72aS4RtJAZZrPOyqY",
+    placeId: "ChIJLT_m2IjtaS4R8osHFY8j0KI",
   },
   "pustu-srengsengsawah": {
     q: "Puskesmas Pembantu Srengseng Sawah, Jakarta Selatan",
-    placeId: "ChIJcZlqRZ72aS4RscnUgc6uv9I",
+    placeId: "ChIJaSqhiRzvaS4RQo8FMv98JRQ",
   },
   "pustu-ciganjur": {
     q: "Puskesmas Pembantu Ciganjur, Jakarta Selatan",
-    placeId: "ChIJk5JZUY_2aS4ReCJjBnhZFPk",
+    placeId: "ChIJUJyJjbGPuaS4RpBSozGg8cdk",
   },
   "pustu-lentengagung1": {
-    q: "Puskesmas Pembantu Lenteng Agung 1, Jakarta Selatan",
-    placeId: "ChIJo6EsaY_2aS4Rs7qssvHWfZk",
+    q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
+    placeId: "ChIJG7hq5cPtaS4Rr4cJtZMPfPA",
   },
   "pustu-lentengagung2": {
-    q: "Puskesmas Pembantu Lenteng Agung 2, Jakarta Selatan",
-    placeId: "ChIJ39tLZY_2aS4R_xsT4TKH-ps",
+    q: "Puskesmas Kelurahan Lenteng Agung 2, Jakarta Selatan",
+    placeId: "ChIJJu0YkBaHtaS4RPIGNluJKnMMc",
+  },
+  "pustu-jagakarsa1": {
+    q: "Puskesmas Pembantu Jagakarsa 1, Jakarta Selatan",
+    placeId: "ChIJa7s6RtjtaS4RZ_bLfIC-iRI", 
+  },
+  "pustu-jagakarsa2": {
+    q: "Puskesmas Pembantu Jagakarsa 2, Jakarta Selatan",
+    placeId: "ChIJZc1NWgXyaS4REQfStgT5oHQ",
   },
 };
 
