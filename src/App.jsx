@@ -21,8 +21,8 @@ const FACILITY_MAPS = {
     placeId: "ChIJS7JbYn_uaS4R6E4MCNb0w30",
   },
   "pustu-tanjungbarat": {
-    q: "Puskesmas Pembantu Tanjung Barat, Jakarta Selatan",
-    placeId: "ChIJLT_m2IjtaS4R8osHFY8j0KI",
+    q: "Puskesmas Tanjung Barat, Jakarta Selatan",
+    placeId: "ChIJLT_m2IjtaS4RB0sHFY8j0KI",
   },
   "pustu-srengsengsawah": {
     q: "Puskesmas Pembantu Srengseng Sawah, Jakarta Selatan",
@@ -33,7 +33,7 @@ const FACILITY_MAPS = {
     placeId: "ChIJUJyJjbGPuaS4RpBSozGg8cdk",
   },
   "pustu-lentengagung1": {
-    q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
+     q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
     placeId: "ChIJG7hq5cPtaS4Rr4cJtZMPfPA",
   },
   "pustu-lentengagung2": {
