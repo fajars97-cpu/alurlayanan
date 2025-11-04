@@ -531,6 +531,14 @@ const StatusPill = ({ open, rest, soon }) => {
     </span>
   );
 };
+
+// Sign Puasa
+const PuasaPill = () => (
+  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight bg-amber-500/10 border border-amber-400/30 text-amber-700 dark:text-amber-300">
+    Harus Puasa
+  </span>
+);
+
 /* ===== Sticky Back (reusable) ===== */
 function StickyBack({ onClick, label = "Kembali" }) {
   return (
@@ -1644,6 +1652,13 @@ export default function App() {
   useEffect(() => {
     try { initGA(); } catch {}
   }, []);
+
+  // Register service worker (offline cache ringan)
+useEffect(() => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+}, []);
 
   useEffect(() => {
     if (query.trim().length > 0) {
