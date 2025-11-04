@@ -1872,8 +1872,11 @@ export default function App() {
         />
 
         <footer className="mt-8 border-t border-white/10">
-  <div className="max-w-7xl mx-auto px-4 py-6 grid gap-4 md:grid-cols-[1fr_18rem] items-start">
-    <div className="w-full aspect-[16/10] rounded-xl overflow-hidden ring-1 ring-black/10 dark:ring-white/10">
+  <div className="max-w-7xl mx-auto px-4 py-6 grid gap-6
+                          md:grid-cols-[minmax(0,1fr)_18rem]
+                          lg:grid-cols-[minmax(0,720px)_20rem] items-start">
+    <div className="w-full rounded-xl overflow-hidden ring-1 ring-black/10 dark:ring-white/10
+                            aspect-[16/10] md:aspect-auto md:h-72 lg:h-80 xl:h-96">
       <iframe
         title="Lokasi fasilitas"
         loading="lazy"
