@@ -31,6 +31,7 @@ const FACILITY_MAPS = {
   "pustu-ciganjur": {
     q: "Puskesmas Pembantu Ciganjur, Jakarta Selatan",
     placeId: "ChIJU_yjbGPuaS4RpBSozGg8cdk",
+     reviewPreferred: "place",
   },
   "pustu-lentengagung1": {
      q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
@@ -39,6 +40,7 @@ const FACILITY_MAPS = {
   "pustu-lentengagung2": {
     q: "Puskesmas Kelurahan Lenteng Agung 2, Jakarta Selatan",
     placeId: "ChIJu0YkBaHtaS4RPlGNuJKnMMc",
+    reviewPreferred: "search", 
   },
   "pustu-jagakarsa1": {
     q: "Puskesmas Kelurahan Jagakarsa, Jakarta Selatan",
@@ -57,10 +59,23 @@ function mapEmbedSrc(facilityId) {
 }
 
 function reviewLink(facilityId) {
-  const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS.jagakarsa;
-  return item.placeId
-    ? `https://search.google.com/local/writereview?placeid=${item.placeId}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.q)}`;
+  const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS["pkm-jagakarsa"];
+  const q = encodeURIComponent((item.q || "").trim());
+  const pid = (item.placeId || "").trim();
+
+  // Helper pembentuk URL:
+  const placeUrl  = pid ? `https://www.google.com/maps/place/?q=place_id:${pid}` : null;
+  const searchPid = pid ? `https://www.google.com/maps/search/?api=1&query=${q}&query_place_id=${pid}` : null;
+  const searchQ   = `https://www.google.com/maps/search/?api=1&query=${q}`;
+
+  // 1) Mode preferensi per-fasilitas (jika kamu set)
+  if (item.reviewPreferred === "place"  && placeUrl)  return placeUrl;
+  if (item.reviewPreferred === "search" && searchPid) return searchPid;
+
+  // 2) Urutan fallback paling stabil
+  if (placeUrl)  return placeUrl;   // buka panel tempat by place_id (paling kuat)
+  if (searchPid) return searchPid;  // buka hasil pencarian dengan query_place_id
+  return searchQ;                   // fallback terakhir: cari berdasar nama
 }
 
 // === Floor helpers ===
@@ -971,7 +986,7 @@ function FlowCard({ step, index }) {
       {(step?.name || step?.description) && (
         <div className="px-3 pb-3">
           {step?.name && <div className="text-sm font-semibold text-slate-900 dark:text-white">{step.name}</div>}
-          {step?.description && <p className="text-xs text-slate-700 dark:text-white/70 mt-1">{step.description}</p>}
+          {step?.description && <p className="text-sm text-slate-700 dark:text-white/70 mt-1">{step.description}</p>}
         </div>
       )}
     </button>
