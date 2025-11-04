@@ -1074,8 +1074,22 @@ export const FLOW_STEPS = {
     id: 153,
     title: "Langkah 153",
     name: "Layanan Selesai",
-    description: "Ikuti arahan petugas terkait perlu tidaknya pasien mendapat tindakan lanjut atau diperbolehkan pulang, jika diperbolehkan pulang dan mendapatkan resep obat, silahkan pihak yang menemani mengambil obat di bagian farmasi dan pasien bisa pulang",
+    description: "Apabila pasien diperbolehkan pulang dan mendapatkan resep obat, silahkan pihak yang menemani mengambil obat di bagian farmasi dan pasien bisa pulang",
     img: "/alur/153-pasien-pulang.webp",
+    },
+    154: {
+    id: 154,
+    title: "Langkah 154",
+    name: "Pasien Dirujuk",
+    description: "Apabila pasien menurut pertimbangan petugas diperlukan penanganan lebih lanjut di fasilitas kesehatan rujukan tingkat lanjut, pasien akan dirujuk menggunakan kendaraan operasional Puskesmas",
+    img: "/alur/154-pasien-gawat-darurat-rujuk.webp",
+    },
+    155: {
+    id: 155,
+    title: "Langkah 155",
+    name: "Pemeriksaan USG Payudara (Tergantung Paket Pemeriksaan/ Indikasi)",
+    description: "Silahkan pasien menuju ruang KI Hamil (Lt 3) untuk mendapatkan pemeriksaan USG Payudara, silahkan ke bagian meja perawat dan sampaikan surat rujukan yang diberikan, silahkan ikuti arahan petugas lebih lanjut",
+    img: "/alur/155-pemeriksaan-usg-payudara.webp",
     },
 };
 
@@ -1361,7 +1375,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [151, 152, 1, 153],
+          alur: [151, 152, 1, 153, 154],
         },
       ],
     },
@@ -2568,7 +2582,7 @@ export const SERVICES_BY_FACILITY = {
           ket: "Program CKG",
           puasa: true,
           alur: {Dewasa_Pria: [34, 33, 47, 48, 49, 50, 125, 126, 127, 52, 51],
-                 Dewasa_Wanita: [128, 129, 130, 131, 132, 139, 143, 145, 147, 148, 133, 134],
+                 Dewasa_Wanita: [128, 129, 130, 131, 132, 139, 155, 143, 145, 147, 148, 133, 134],
                  Anak_Anak: [135, 136, 137, 138, 140, 141, 142, 144, 149, 146],
                  Pemeriksaan_Beda_Hari: [150],}
         },

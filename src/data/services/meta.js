@@ -48,10 +48,25 @@ export const EXTRA_INFO = {
   "Scaling/ Pembersihan Karang Gigi":"Tarif Rp90.000/ rahang.",
 
   // IGD
-  "Tindakan Darurat": "Informasi tambahan belum tersedia.",
+  "Tindakan Darurat": ["Berdasarkan Permenkes No. 47 Tahun 2018 Pasal 3 Ayat 2, berikut adalah kriteria gawat darurat medis:",
+  "1. Gangguan pernapasan: Kesulitan bernapas atau henti napas.",
+  "2. Gangguan sirkulasi: Denyut jantung tidak normal, tekanan darah ekstrem, atau henti jantung.",
+  "3. Penurunan kesadaran: Tidak responsif atau hilang kesadaran mendadak.",
+  "4. Gangguan neurologis akut: Kejang yang tidak berhenti atau gejala stroke.",
+  "5. Gangguan perdarahan: Perdarahan hebat yang tidak dapat dihentikan.",
+  "6. Trauma berat: Cedera kepala, tulang belakang, atau luka serius akibat kecelakaan.",
+  "7. Kondisi lain yang mengancam nyawa: Seperti keracunan atau reaksi alergi berat (anafilaksis).",
+  "Pasien yang mengalami kondisi ini berhak mendapatkan prioritas penanganan."],
 
   // Layanan 24 Jam
-  "Pemeriksaan Jenazah (24 Jam)": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
+  "Pemeriksaan Jenazah (24 Jam)": ["Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal dan dinyatakan meninggal secara wajar.", 
+    "Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal, dengan membawa dokumen sebagai berikut:", 
+    "1.Fotokopi KTP almarhum/ah,", 
+    "2. Fotokopi KK,",
+    "3. Surat Keterangan dari RT/RW setempat", 
+    "4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
+    "5. Fotocopy KTP yang mengurus Surat Keterangan Melapor Kematian"],
+    "Pelayanan 24 Jam": ["Poliklinik 24 Jam, melayani pengobatan umum semua usia.", "Tidak melayani pengobatan gigi dan perpanjang rujukan BPJS. Pelayanan rujukan BPJS Senin - Jumat di masing-masing poli pelayanan","Petugas yang berjaga terbatas (shift malam 1 dokter dan 1 perawat, shift Sabtu dan Minggu pagi 2 dokter dan 2 perawat), harap bersabar dalam menunggu antrian"],
  
   // Catin
   "Pemeriksaan Calon Pengantin": ["1. Pernikahan (akad) akan dilaksanakan sampai 3 bulan ke depan, bila lebih dari itu proses pengajuan akan ditolak.",
@@ -105,7 +120,11 @@ export const EXTRA_INFO = {
   "Pemeriksaan ISPA": "Informasi tambahan belum tersedia.",
 
   // Farmasi
-  "Layanan Obat 24 Jam":"Tarif pendaftaran Puskesmas sudah termasuk obat yang diresepkan. Mohon untuk mengambil obat untuk layanan pagi/siang tidak lebih dari pukul 19.00, jika lebih maka dianggap pasien tidak mengambil obat. Farmasi puskesmas tidak melayani pembelian resep obat umum, hanya menerima resep dari poli Puskesmas Jagakarsa atau Puskesmas Pembantu di wilayah Kecamatan Jagakarsa" ,
+  "Layanan Obat 24 Jam": ["Tarif pendaftaran Puskesmas sudah termasuk obat yang diresepkan.", 
+    "Farmasi puskesmas tidak melayani pembelian resep obat umum, hanya menerima resep dari poli Puskesmas Jagakarsa atau Puskesmas Pembantu di wilayah Kecamatan Jagakarsa",
+    "Resep prioritas: Lansia, Ibu Hamil, Pasien Disabilitas.",
+    "Waktu tunggu obat non racik +- 30 menit, obat racik +-60 menit",
+    "Mohon untuk mengambil obat untuk layanan pagi/siang tidak lebih dari pukul 19.00, jika lebih maka dianggap pasien tidak mengambil obat."],
   "Konseling Obat":"Konseling obat diberikan pada pasien lansia, polifarmasi (kebutuhan konsumsi obat dalam jumlah banyak (biasanya >5) pada waktu bersamaan), pasien ibu hamil, pasien dengan penggunaan obat secara khusus, kepatuhan obat, pasien dengan penyakit kronis, anak-anak, ibu hamil, dan peresepan obat dalam jangka panjang, atau kondisi lain yang membutuhkan konsultasi.",
 
   // Mata
@@ -132,7 +151,13 @@ export const EXTRA_INFO = {
   "Klinik Sanitasi": "Upaya mengintegrasikan pelayanan kesehatan promotif, preventif, dan kuratif, di tingkat puskesmas yang difokuskan pada masalah kesehatan lingkungan untuk mencegah dan menanggulangi penyakit berbasis lingkungan",
   "Laporan DBD & Cikungunya": "Bila menemukan kejadian DBD / Cikungunya di wilayah Jagakarsa silahkan menghubungi petugas Puskesmas untuk tindak lanjut. No telp pelaporan EDHO: 082186758984",
   "Laporan Kematian Jenazah Sudah Dikuburkan": "Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa",
-  "Laporan Kematian Jenazah Belum Dikuburkan": "Surat Keterangan Penyebab Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal dengan membawa 1.Fotokopi KTP almarhum/ah, 2. Fotokopi KK, 3. Surat Keterangan dari RT/RW setempat, 4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
+  "Laporan Kematian Jenazah Belum Dikuburkan": ["Surat Keterangan Melapor Kematian, dikeluarkan oleh Puskesmas sesuai KTP almarhum/ lokasi meninggal dan dinyatakan meninggal secara wajar.", 
+    "Form dan Persyaratan bisa diunduh di website https://bit.ly/SKMKpkmjagakarsa. Keluarga lapor ke puskesmas/ pustu sesuai lokasi meninggal, dengan membawa dokumen sebagai berikut:", 
+    "1.Fotokopi KTP almarhum/ah,", 
+    "2. Fotokopi KK,",
+    "3. Surat Keterangan dari RT/RW setempat", 
+    "4. Surat Keterangan Domisili jika ktp alm tidak sesuai dengan tempat meninggal namun meninggal di wilayah Jagakarsa",
+    "5. Fotocopy KTP yang mengurus Surat Keterangan Melapor Kematian"],
   "Laporan Penyakit Potensi KLB/ Wabah Difteri": "Penyakit bakteri yang menyerang tenggorokan dengan gejala demam ringan, sakit tenggorokan, terdapat selaput pada tenggorokan yang bisa membengkak. No telp pelaporan EDHO: 082186758984",
   "Laporan Penyakit Potensi KLB/ Wabah Pertusis (Batuk Rejan)": "Penyakit batuk 100 hari akibat bakteri dengan gejala batuk hebat bertahap, disertai suara whoop dan bisa sampai muntah. No telp pelaporan EDHO: 082186758984",
   "Laporan Penyakit Potensi KLB/ Wabah Campak": "Penyakit virus yang sangat menular dengan gejala demam tinggi, batuk pilek, mata merah, muncul bintik putih dalam mulut dan ruam merah pada kulit. No telp pelaporan EDHO: 082186758984",
