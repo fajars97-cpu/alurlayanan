@@ -17,7 +17,7 @@ import {
 
 const FACILITY_MAPS = {
   "pkm-jagakarsa": {
-    q: "Puskesmas Kecamatan Jagakarsa, Jakarta Selatan",
+    q: "PUSKESMAS KECAMATAN JAGAKARASA, Jakarta Selatan",
     placeId: "ChIJS7JbYn_uaS4R6E4MCNb0w30",
   },
   "pustu-tanjungbarat": {
@@ -34,18 +34,18 @@ const FACILITY_MAPS = {
   },
   "pustu-lentengagung1": {
      q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
-    placeId: "ChIJG7hq5cPtaS4Rr4cJtZMPfPA",
+    placeId: "ChIJG7hq5cPtaS4R7r4cJtZMPFA",
   },
   "pustu-lentengagung2": {
     q: "Puskesmas Kelurahan Lenteng Agung 2, Jakarta Selatan",
     placeId: "ChIJJu0YkBaHtaS4RPIGNluJKnMMc",
   },
   "pustu-jagakarsa1": {
-    q: "Puskesmas Pembantu Jagakarsa 1, Jakarta Selatan",
+    q: "Puskesmas Kelurahan Jagakarsa, Jakarta Selatan",
     placeId: "ChIJa7s6RtjtaS4RZ_bLfIC-iRI", 
   },
   "pustu-jagakarsa2": {
-    q: "Puskesmas Pembantu Jagakarsa 2, Jakarta Selatan",
+    q: "Puskesmas Kelurahan Jagakarsa II, Jakarta Selatan",
     placeId: "ChIJZc1NWgXyaS4REQfStgT5oHQ",
   },
 };
