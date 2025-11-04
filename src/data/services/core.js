@@ -12,7 +12,7 @@ export const FLOW_STEPS = {
     title: "Langkah 1",
     name: "Daftar / Loket",
     description:
-      "Silahkan mendaftar di loket/pendaftaran. Serahkan identitas atau kartu BPJS bila ada.",
+      "Silahkan mendaftar di loket/pendaftaran. Serahkan identitas atau kartu BPJS.",
     img: "/alur/1-menuju-loket.webp",
     audio: "/voices/alur-loket.mp3", // audio tetap didefinisikan di data
   },
@@ -1090,6 +1090,13 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan USG Payudara (Tergantung Paket Pemeriksaan/ Indikasi)",
     description: "Silahkan pasien menuju ruang KI Hamil (Lt 3) untuk mendapatkan pemeriksaan USG Payudara, silahkan ke bagian meja perawat dan sampaikan surat rujukan yang diberikan, silahkan ikuti arahan petugas lebih lanjut",
     img: "/alur/155-pemeriksaan-usg-payudara.webp",
+    },
+    157: {
+    id: 157,
+    title: "Langkah 157",
+    name: "Mengambil Nomor Antrian",
+    description: "Silahkan mengambil nomor antrian loket Layanan 24 Jam di lobby Puskesmas. Tunggu hingga nomor Anda dipanggil di loket.",
+    img: "/alur/157-mesin-nomor-antrian.webp",
     },
 };
 
