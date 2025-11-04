@@ -535,7 +535,7 @@ const StatusPill = ({ open, rest, soon }) => {
 // Sign Puasa
 const PuasaPill = () => (
   <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight bg-amber-500/10 border border-amber-400/30 text-amber-700 dark:text-amber-300">
-    Puasa 10-12 Jam
+    Diharuskan Puasa 10-12 Jam
   </span>
 );
 
@@ -932,7 +932,7 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
                 <span className="text-slate-500 dark:text-white/50">Penanggung jawab:</span> {pj}
               </div>
             )}
-            
+
         {/* ===== Jadwal ringkas dipindah ke BAWAH ikon (full-width) ===== */}
         <div className="mt-2 text-[12px] sm:text-[13px] leading-snug">
           {jadwalLayanan ? (
