@@ -30,7 +30,7 @@ const FACILITY_MAPS = {
   },
   "pustu-ciganjur": {
     q: "Puskesmas Pembantu Ciganjur, Jakarta Selatan",
-    placeId: "ChIJUJyJjbGPuaS4RpBSozGg8cdk",
+    placeId: "ChIJU_yjbGPuaS4RpBSozGg8cdk",
   },
   "pustu-lentengagung1": {
      q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
@@ -38,7 +38,7 @@ const FACILITY_MAPS = {
   },
   "pustu-lentengagung2": {
     q: "Puskesmas Kelurahan Lenteng Agung 2, Jakarta Selatan",
-    placeId: "ChIJJu0YkBaHtaS4RPIGNluJKnMMc",
+    placeId: "ChIJu0YkBaHtaS4RPlGNuJKnMMc",
   },
   "pustu-jagakarsa1": {
     q: "Puskesmas Kelurahan Jagakarsa, Jakarta Selatan",
