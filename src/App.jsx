@@ -946,6 +946,12 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
                 <div className="italic text-slate-600 dark:text-white/60">Ikuti jadwal default poli</div>
               )}
             </div>
+             {/* Sign Harus Puasa */}
+            {item?.puasa && (
+              <div className="mt-2">
+                <PuasaPill />
+              </div>
+            )}
           </div>
         </div>
       </div>
