@@ -867,12 +867,14 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
 
   const jadwalLayanan = item.jadwal || null;
-  const { open, rest, soon } = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
-  const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
+  const effectiveJadwal = jadwalLayanan || parentJadwal;
+  const { open, rest, soon } = getOpenStatus({ jadwal: effectiveJadwal });
+  const today = effectiveJadwal ? todayText(effectiveJadwal) : null;
+
+  // === Jadwal ringkas: hanya hari yang buka ===
   const renderCompactSchedule = (jadwal) => {
-    if (!jadwal?.weekly && !Object.keys(jadwal || {}).length) return null;
-    const eff = getEffectiveJadwal({ jadwal });
-    const openDays = Object.entries(eff).filter(([_, jam]) => jam && !/tutup/i.test(jam));
+    if (!jadwal) return null;
+    const openDays = Object.entries(jadwal).filter(([_, jam]) => jam && !/tutup/i.test(jam));
     if (!openDays.length) return null;
     return (
       <div className="mt-1 space-y-0.5 text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">
@@ -882,7 +884,7 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
             <span>{jam}</span>
           </div>
         ))}
-     </div>
+      </div>
     );
   };
   const pj = item.penanggungJawab || item.pj || (DOCTORS_BY_POLI && poliId ? DOCTORS_BY_POLI[poliId] : null);
@@ -922,20 +924,18 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
                 <span className="text-slate-500 dark:text-white/50">Penanggung jawab:</span> {pj}
               </div>
             )}
-            {/* Jadwal ringkas per layanan */}
+            {/* Jadwal ringkas per layanan (gunakan jadwal poli jika service tidak punya) */}
             <div className="mt-2 text-[12px] sm:text-[13px] leading-snug">
-              {jadwalLayanan ? (
+              {effectiveJadwal && (
                 <>
                   <div className="text-slate-700 dark:text-white/70">
                     <span className="text-slate-600 dark:text-white/50">Hari Ini:</span> {today}
                   </div>
                   <div className="text-slate-700 dark:text-white/70">
                     <div className="font-semibold mt-1 text-slate-600 dark:text-white/50">Jadwal Buka</div>
-                    {renderCompactSchedule(jadwalLayanan)}
+                    {renderCompactSchedule(effectiveJadwal)}
                   </div>
                 </>
-              ) : (
-                <div className="italic text-slate-600 dark:text-white/60">Ikuti jadwal default poli</div>
               )}
             </div>
           </div>
