@@ -646,7 +646,7 @@ function Sidebar({
     >
       <div className="p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10">
         <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
-        <div className="font-semibold truncate text-slate-900 dark:text-white">Jadwal & Tarif</div>
+        <div className="font-semibold truncate text-slate-900 dark:text-white">Jadwal Layanan</div>
       </div>
 
       <div className="px-4 pt-3 text-xs text-slate-700 dark:text-white/70">
@@ -869,7 +869,22 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
   const jadwalLayanan = item.jadwal || null;
   const { open, rest, soon } = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
   const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
-  const weekly = jadwalLayanan ? summarizeWeekly(jadwalLayanan) : null;
+  const renderCompactSchedule = (jadwal) => {
+    if (!jadwal?.weekly && !Object.keys(jadwal || {}).length) return null;
+    const eff = getEffectiveJadwal({ jadwal });
+    const openDays = Object.entries(eff).filter(([_, jam]) => jam && !/tutup/i.test(jam));
+    if (!openDays.length) return null;
+    return (
+      <div className="mt-1 space-y-0.5 text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">
+        {openDays.map(([hari, jam]) => (
+          <div key={hari} className="flex justify-between">
+            <span className="text-slate-500 dark:text-white/50">{hari}</span>
+            <span>{jam}</span>
+          </div>
+        ))}
+     </div>
+    );
+  };
   const pj = item.penanggungJawab || item.pj || (DOCTORS_BY_POLI && poliId ? DOCTORS_BY_POLI[poliId] : null);
 
   return (
@@ -914,8 +929,9 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
                   <div className="text-slate-700 dark:text-white/70">
                     <span className="text-slate-600 dark:text-white/50">Hari Ini:</span> {today}
                   </div>
-                  <div className="break-words text-slate-700 dark:text-white/70">
-                    <span className="text-slate-600 dark:text-white/50">Jadwal Buka:</span> {weekly}
+                  <div className="text-slate-700 dark:text-white/70">
+                    <div className="font-semibold mt-1 text-slate-600 dark:text-white/50">Jadwal Buka</div>
+                    {renderCompactSchedule(jadwalLayanan)}
                   </div>
                 </>
               ) : (
