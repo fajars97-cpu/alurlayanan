@@ -19,36 +19,42 @@ const FACILITY_MAPS = {
   "pkm-jagakarsa": {
     q: "PUSKESMAS KECAMATAN JAGAKARASA, Jakarta Selatan",
     placeId: "ChIJS7JbYn_uaS4R6E4MCNb0w30",
+    supportsDirectReview: true,
   },
   "pustu-tanjungbarat": {
     q: "Puskesmas Tanjung Barat, Jakarta Selatan",
     placeId: "ChIJLT_m2IjtaS4RB0sHFY8j0KI",
+    supportsDirectReview: true,
   },
   "pustu-srengsengsawah": {
     q: "Puskesmas Pembantu Srengseng Sawah, Jakarta Selatan",
     placeId: "ChIJaSqhiRzvaS4RQo8FMv98JRQ",
+    supportsDirectReview: true,
   },
   "pustu-ciganjur": {
     q: "Puskesmas Pembantu Ciganjur, Jakarta Selatan",
     placeId: "ChIJU_yjbGPuaS4RpBSozGg8cdk",
-     reviewPreferred: "place",
+    supportsDirectReview: true,
   },
   "pustu-lentengagung1": {
      q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
     placeId: "ChIJG7hq5cPtaS4R7r4cJtZMPFA",
+    supportsDirectReview: true,
   },
   "pustu-lentengagung2": {
     q: "Puskesmas Kelurahan Lenteng Agung 2, Jakarta Selatan",
     placeId: "ChIJu0YkBaHtaS4RPlGNuJKnMMc",
-    reviewPreferred: "search", 
+    supportsDirectReview: true,
   },
   "pustu-jagakarsa1": {
     q: "Puskesmas Kelurahan Jagakarsa, Jakarta Selatan",
-    placeId: "ChIJa7s6RtjtaS4RZ_bLfIC-iRI", 
+    placeId: "ChIJa7s6RtjtaS4RZ_bLfIC-iRI",
+    supportsDirectReview: true, 
   },
   "pustu-jagakarsa2": {
     q: "Puskesmas Kelurahan Jagakarsa II, Jakarta Selatan",
     placeId: "ChIJZc1NWgXyaS4REQfStgT5oHQ",
+    supportsDirectReview: true,
   },
 };
 
@@ -60,22 +66,18 @@ function mapEmbedSrc(facilityId) {
 
 function reviewLink(facilityId) {
   const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS["pkm-jagakarsa"];
-  const q = encodeURIComponent((item.q || "").trim());
+  const q   = encodeURIComponent((item.q || "").trim());
   const pid = (item.placeId || "").trim();
 
-  // Helper pembentuk URL:
-  const placeUrl  = pid ? `https://www.google.com/maps/place/?q=place_id:${pid}` : null;
-  const searchPid = pid ? `https://www.google.com/maps/search/?api=1&query=${q}&query_place_id=${pid}` : null;
-  const searchQ   = `https://www.google.com/maps/search/?api=1&query=${q}`;
+  // Jika fasilitas mendukung direct review → popup langsung
+  if (item.supportsDirectReview && pid)
+    return `https://search.google.com/local/writereview?placeid=${pid}&hl=id`;
 
-  // 1) Mode preferensi per-fasilitas (jika kamu set)
-  if (item.reviewPreferred === "place"  && placeUrl)  return placeUrl;
-  if (item.reviewPreferred === "search" && searchPid) return searchPid;
+  // Jika tidak, buka panel tempat (stabil)
+  if (pid)
+    return `https://www.google.com/maps/place/?q=place_id:${pid}`;
 
-  // 2) Urutan fallback paling stabil
-  if (placeUrl)  return placeUrl;   // buka panel tempat by place_id (paling kuat)
-  if (searchPid) return searchPid;  // buka hasil pencarian dengan query_place_id
-  return searchQ;                   // fallback terakhir: cari berdasar nama
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
 }
 
 // === Floor helpers ===
