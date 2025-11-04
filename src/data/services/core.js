@@ -1098,6 +1098,27 @@ export const FLOW_STEPS = {
     description: "Silahkan mengambil nomor antrian loket Layanan 24 Jam di lobby Puskesmas. Tunggu hingga nomor Anda dipanggil di loket.",
     img: "/alur/157-mesin-nomor-antrian.webp",
     },
+    158: {
+    id: 158,
+    title: "Langkah 158",
+    name: "Pemeriksaan Jenazah",
+    description: "Petugas akan mendatangi langsung rumah duka untuk melakukan pemeriksaan jenazah.",
+    img: "/alur/158-pemeriksaan-jenazah.webp",
+    },
+    159: {
+    id: 159,
+    title: "Langkah 159",
+    name: "Pendaftaran Pemeriksaan Jenazah",
+    description: "Silahkan menuju ke petugas security dan sampaikan bahwa ingin melakukan pendaftaran pemeriksaan jenazah, petugas akan memberikan nota layanan yang selanjutnya dibawa ke kasir.",
+    img: "/alur/159-pendaftaran-jenazah.webp",
+    },
+    160: {
+    id: 160,
+    title: "Langkah 160",
+    name: "Pembayaran Tarif Pemeriksaan Jenazah",
+    description: "Silahkan menuju kasir lantai 1 untuk melakukan pembayaran tarif pemeriksaan jenazah. Selanjutnya petugas akan mendatangi Anda dan bersama Anda pergi ke rumah duka.",
+    img: "/alur/160-menuju-loket.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -1412,7 +1433,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [0, 1, 28, 4, 5],
+          alur: [157, 1, 28, 4, 5],
         },
         {
           nama: "Pemeriksaan Jenazah (24 Jam)",
@@ -1432,7 +1453,7 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [0, 1, 28, 19]
+          alur: [159, 160, 158, 19]
         },
       ],
     },
