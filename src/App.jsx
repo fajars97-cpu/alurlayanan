@@ -924,15 +924,15 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
                 {item.ket}
               </div>
             )}
-            {/* NEW: Penanggung jawab (layanan > poli) */}
+          </div>
+        </div>
+        {/* NEW: Penanggung jawab (layanan > poli) */}
              {pj && (
              <div className="mt-2 text-[12px] sm:text-[13px] text-slate-600 dark:text-white/60">
                 <span className="text-slate-500 dark:text-white/50">Penanggung jawab:</span> {pj}
               </div>
             )}
             
-          </div>
-        </div>
         {/* ===== Jadwal ringkas dipindah ke BAWAH ikon (full-width) ===== */}
         <div className="mt-2 text-[12px] sm:text-[13px] leading-snug">
           {jadwalLayanan ? (
