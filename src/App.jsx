@@ -828,11 +828,7 @@ function Sidebar({
 function ServiceCard({ s, onPick }) {
   return (
     <button
-   onClick={() => {
-     trackEvent("Navigation", "select_poli", s.id);
-     gaEvent("select_poli", { poli_id: s.id, poli_name: s.nama });
-     onPick(s);
-   }}
+   onClick={() => onPick(s)}
    className={`group relative overflow-hidden rounded-2xl border
      bg-slate-100/70 dark:bg-white/5
      hover:bg-slate-200/80 dark:hover:bg-white/10
@@ -1050,6 +1046,7 @@ function RightPanel({
   setJump,
   searchQuery,
   scrollReq,
+  onPickPoli,
 }) {
   const [sub, setSub] = useState(null);
   const [catOpen, setCatOpen] = useState("anak"); // panel kategori yang dibuka (anak/dewasa/lainnya/null)
@@ -1254,7 +1251,7 @@ useEffect(() => {
                 <div className="mb-3 text-slate-700 dark:text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filtered.map((s) => (
-                    <ServiceCard key={s.id} s={s} onPick={setSelected} />
+                    <ServiceCard key={s.id} s={s} onPick={onPickPoli} />
                   ))}
                 </div>
               </>
@@ -1604,6 +1601,29 @@ export default function App() {
   searchStartRef.current = performance.now();        // start timer TTFI
   gaEvent("search_query", { query: q });             // GA4 native
 };
+// === Handler pilih POLI (klik kartu poli) ===
+const onPickPoli = (s) => {
+  // event poli
+  trackEvent("Navigation", "select_poli", s.id);
+  gaEvent("select_poli", { poli_id: s.id, poli_name: s.nama });
+
+  // Time To Find (ms): sejak pencarian dikirim sampai klik poli pertama
+  if (lastQueryRef.current && searchStartRef.current > 0) {
+    const ms = Math.round(performance.now() - searchStartRef.current);
+    gaEvent("time_to_find_ms", {
+      query: lastQueryRef.current,
+      ms,
+      poli_id: s.id,
+      poli_name: s.nama,
+    });
+    lastQueryRef.current = null;
+    searchStartRef.current = 0;
+  }
+
+  // ubah state pilihan
+  setSelected(s);
+};
+
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -1918,6 +1938,7 @@ useEffect(() => {
             setJump={setJump}
             searchQuery={query}
             scrollReq={scrollReq}
+             onPickPoli={onPickPoli}
           />
         </div>
 
