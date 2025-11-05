@@ -829,10 +829,25 @@ function ServiceCard({ s, onPick }) {
   return (
     <button
    onClick={() => {
-     trackEvent("Navigation", "select_poli", s.id);
-     gaEvent("select_poli", { poli_id: s.id, poli_name: s.nama });
-     onPick(s);
-   }}
+   trackEvent("Navigation", "select_poli", s.id);
+   gaEvent("select_poli", { poli_id: s.id, poli_name: s.nama });
+
+   // === Time To Find (TTFI) dari pencarian → pilih poli
+   if (lastQueryRef.current && searchStartRef.current > 0) {
+     const ms = Math.round(performance.now() - searchStartRef.current);
+     gaEvent("time_to_find_ms", {
+       query: lastQueryRef.current,
+       ms,
+       poli_id: s.id,
+       poli_name: s.nama,
+     });
+     // reset agar hanya tercatat sekali per siklus pencarian
+     lastQueryRef.current = null;
+     searchStartRef.current = 0;
+   }
+
+   onPick(s);
+ }}
    className={`group relative overflow-hidden rounded-2xl border
      bg-slate-100/70 dark:bg-white/5
      hover:bg-slate-200/80 dark:hover:bg-white/10
