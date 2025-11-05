@@ -893,7 +893,15 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
 
   return (
     <button
-      onClick={() => onPick(item)}
+      onClick={() => {
+        // Hit layanan saat MASUK ke detail
+        trackEvent("Navigation", "select_service", `${poliId}#${item?.nama || ""}`);
+        gaEvent("select_service", {
+          poli_id: poliId,
+          service_name: item?.nama,
+        });
+        onPick(item);
+      }}
       className="relative w-full text-left rounded-2xl border
       border-black/10 dark:border-white/10
       bg-slate-100/70 dark:bg-white/5
