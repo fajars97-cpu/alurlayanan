@@ -123,8 +123,8 @@ export const EXTRA_INFO = {
   "Layanan Obat 24 Jam": ["Tarif pendaftaran Puskesmas sudah termasuk obat yang diresepkan.", 
     "Farmasi puskesmas tidak melayani pembelian resep obat umum, hanya menerima resep dari poli Puskesmas Jagakarsa atau Puskesmas Pembantu di wilayah Kecamatan Jagakarsa",
     "Resep prioritas: Lansia, Ibu Hamil, Pasien Disabilitas.",
-    "Waktu tunggu obat non racik +- 30 menit, obat racik +-60 menit",
-    "Mohon untuk mengambil obat untuk layanan pagi/siang tidak lebih dari pukul 19.00, jika lebih maka dianggap pasien tidak mengambil obat."],
+    "Waktu tunggu obat non racik +- 30 menit, obat racik +-60 menit, kesabaran Anda adalah ketelitian kami dalam memberikan pelayanan",
+    "Mohon untuk mengambil obat untuk layanan pagi/siang tidak lebih dari pukul 19.00, jika lebih maka harus berobat lagi untuk mendapatkan obat."],
   "Konseling Obat":"Konseling obat diberikan pada pasien lansia, polifarmasi (kebutuhan konsumsi obat dalam jumlah banyak (biasanya >5) pada waktu bersamaan), pasien ibu hamil, pasien dengan penggunaan obat secara khusus, kepatuhan obat, pasien dengan penyakit kronis, anak-anak, ibu hamil, dan peresepan obat dalam jangka panjang, atau kondisi lain yang membutuhkan konsultasi.",
 
   // Mata
