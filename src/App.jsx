@@ -6,6 +6,16 @@ import GAListener from "./gaListener";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 
+// Scroll ke bagian atas halaman (handle fallback kalau browser tidak support smooth)
+const scrollToTopSmooth = () => {
+  if (typeof window === "undefined") return;
+  try {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch {
+    window.scrollTo(0, 0);
+  }
+};
+
 // === Import data ===
 import {
   FACILITIES,
@@ -1059,6 +1069,13 @@ function RightPanel({
   const [sub, setSub] = useState(null);
   const [catOpen, setCatOpen] = useState("anak"); // panel kategori yang dibuka (anak/dewasa/lainnya/null)
 
+  // Jika user memilih salah satu layanan (sub), auto scroll ke atas
+  useEffect(() => {
+    if (sub) {
+      scrollToTopSmooth();
+    }
+  }, [sub]);
+
   // === Trap tombol Back (satu-trap deterministik) ===
 const EXIT_WINDOW_MS = 2000;
 const [showBackHint, setShowBackHint] = useState(false);
@@ -1639,6 +1656,7 @@ const onPickPoli = (s) => {
 
   // ubah state pilihan
   setSelected(s);
+  scrollToTopSmooth();
 };
 
   const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
@@ -1779,6 +1797,7 @@ useEffect(() => {
       // reset only the timestamp; keep lastQuery for subsequent clicks if same query is still active
       searchStartRef.current = 0;
     }
+    scrollToTopSmooth();
   }
 
   useEffect(() => {
