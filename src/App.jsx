@@ -1184,12 +1184,21 @@ useEffect(() => {
 
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
   useEffect(() => {
-    let t0 = performance.now();
-    return () => {
-      const ms = Math.round(performance.now() - t0);
-      if (sub) trackTiming("view_service_ms", ms, { label: sub?.nama });
-    };
-  }, [sub]);
+    if (!sub) return;
+
+  const t0 = performance.now();
+
+  return () => {
+    const ms = Math.round(performance.now() - t0);
+    // "view_service_ms" sekarang mengirim parameter view_ms (diatur di trackTiming)
+    trackTiming("view_service_ms", ms, {
+      label: sub.nama,
+      poli_id: selected?.id,
+      poli_name: selected?.nama,
+      service_name: sub.nama,
+    });
+  };
+}, [sub, selected]);
   const servicesGridRef = useRef(null);
 
   useEffect(() => setSub(null), [selected]);
@@ -1946,7 +1955,7 @@ useEffect(() => {
             setJump={setJump}
             searchQuery={query}
             scrollReq={scrollReq}
-             onPickPoli={onPickPoli}
+            onPickPoli={onPickPoli}
           />
         </div>
 
