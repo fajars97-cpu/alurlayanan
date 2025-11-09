@@ -33,6 +33,18 @@ export const trackEvent = (category, action, label, value, params = {}) => {
 };
 
 // Catat durasi (ms) sebagai event GA4
+// - Untuk "view_service_ms" → gunakan parameter khusus "view_ms"
+// - Untuk timing lain → fallback ke parameter umum "ms"
 export const trackTiming = (name, ms, extra = {}) => {
-  try { ReactGA.event(name, { value: ms, ...extra }); } catch {}
+  try {
+    const payload = { ...extra };
+
+    if (name === "view_service_ms") {
+      payload.view_ms = ms;     // <-- inilah parameter yang akan dipakai custom metric View Duration
+    } else {
+      payload.ms = ms;          // aman untuk metric timing lain (mis. Search Time to Find)
+    }
+
+    ReactGA.event(name, payload);
+  } catch {}
 };
