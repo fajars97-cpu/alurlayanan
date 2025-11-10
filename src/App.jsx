@@ -700,38 +700,38 @@ function Sidebar({
   />
 
   {query && (
-    <button
-      type="button"
-      onClick={() => {
-        setQuery("");
-        trackEvent("Search", "clear_click");
-        requestAnimationFrame(() => searchRef.current?.focus());
-      }}
-      aria-label="Hapus kata pencarian"
-      className="absolute right-2 top-1/2 -translate-y-1/2
-                 h-8 w-8 rounded-full
-                 bg-rose-600 text-white
-                 flex items-center justify-center
-                 shadow-sm hover:bg-rose-500 active:scale-95"
+  <button
+    type="button"
+    onClick={() => {
+      setQuery("");
+      trackEvent("Search", "clear_click");
+      requestAnimationFrame(() => searchRef.current?.focus());
+    }}
+    aria-label="Hapus kata pencarian"
+    className="absolute right-3 top-1/2 -translate-y-1/2
+               h-7 w-7 rounded-full
+               bg-emerald-500/20 text-emerald-300
+               hover:bg-emerald-500/30 hover:text-emerald-100
+               active:scale-95 transition-all
+               flex items-center justify-center"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="15"
+      height="15"
+      aria-hidden="true"
     >
-      {/* Ikon trash can */}
-      <svg
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        aria-hidden="true"
-      >
-        <path
-          d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6v8m4-8v8M6 7h12l-1 12H7L6 7z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
-  )}
+      <path
+        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6v8m4-8v8M6 7h12l-1 12H7L6 7z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </button>
+)}
 </div>
       </div>
 
