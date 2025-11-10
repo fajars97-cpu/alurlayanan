@@ -672,48 +672,67 @@ function Sidebar({
       </div>
 
       <div className="p-4 space-y-3">
-        <label className="text-xs uppercase text-slate-600 dark:text-white/50">Pencarian</label>
-         <div className="relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible">
-        <input
-         ref={searchRef}
-         type="search"
-         value={query}
-         onChange={(e) => setQuery(e.target.value)}
-         onKeyDown={(e) => {
-          if (e.key === "Enter" && query.trim()) {
-            onSearchSubmit?.(query.trim());
-          }
-          if (e.key === "Escape" && query) {
-         setQuery("");
-         // opsional: bersihkan pilihan hasil
-         // setSelected(null);
-         requestAnimationFrame(() => searchRef.current?.focus());
-         }
-         }}
-         enterKeyHint="search"
-         placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' …"
-         className="w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5 border border-emerald-500/20 focus:border-emerald-500/60 outline-none pr-12 pl-4"
+        <label className="text-xs uppercase text-slate-600 dark:text-white/50">
+  Pencarian
+</label>
+
+<div className="relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible">
+  <input
+    ref={searchRef}
+    type="text" // ganti dari "search" → hilangkan tombol clear bawaan browser
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" && query.trim()) {
+        onSearchSubmit?.(query.trim());
+      }
+      if (e.key === "Escape" && query) {
+        setQuery("");
+        trackEvent("Search", "clear_esc");
+        requestAnimationFrame(() => searchRef.current?.focus());
+      }
+    }}
+    enterKeyHint="search"
+    placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' …"
+    className="w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5
+               border border-emerald-500/20 focus:border-emerald-500/60
+               outline-none pr-12 pl-4 text-sm sm:text-[15px]"
+  />
+
+  {query && (
+    <button
+      type="button"
+      onClick={() => {
+        setQuery("");
+        trackEvent("Search", "clear_click");
+        requestAnimationFrame(() => searchRef.current?.focus());
+      }}
+      aria-label="Hapus kata pencarian"
+      className="absolute right-2 top-1/2 -translate-y-1/2
+                 h-8 w-8 rounded-full
+                 bg-rose-600 text-white
+                 flex items-center justify-center
+                 shadow-sm hover:bg-rose-500 active:scale-95"
+    >
+      {/* Ikon trash can */}
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        aria-hidden="true"
+      >
+        <path
+          d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6v8m4-8v8M6 7h12l-1 12H7L6 7z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        {query && (
-        <button
-        type="button"
-        onClick={() => {
-         setQuery("");
-         trackEvent("Search", "clear");
-         // opsional: reset pilihan
-         // setSelected(null);
-         requestAnimationFrame(() => searchRef.current?.focus());
-         }}
-        aria-label="Hapus pencarian"
-        className="absolute inset-y-0 right-2 my-auto h-8 min-w-8 rounded-full
-                  bg-slate-900/80 text-white dark:bg-white/10 dark:text-white
-                  border border-white/20 shadow-sm backdrop-blur-sm
-                  flex items-center justify-center text-base"
-        >
-        ×
-        </button>
-        )}
-       </div>
+      </svg>
+    </button>
+  )}
+</div>
       </div>
 
       <div
