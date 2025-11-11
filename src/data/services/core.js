@@ -1119,6 +1119,34 @@ export const FLOW_STEPS = {
     description: "Silahkan menuju kasir lantai 1 untuk melakukan pembayaran tarif pemeriksaan jenazah. Selanjutnya petugas akan mendatangi Anda dan bersama Anda pergi ke rumah duka.",
     img: "/alur/160-menuju-loket.webp",
     },
+    161: {
+    id: 161,
+    title: "Langkah 161",
+    name: "Pemeriksaan CKG USG Payudara (Tergantung Paket Pemeriksaan/ Indikasi)",
+    description: "Pemeriksaan USG Payudara dapat dilakukan sebagai bagian dari layanan Cek Kesehatan Gratis, sesuai dengan paket pemeriksaan atau indikasi medis",
+    img: "/alur/161-rujuk-usg-payudara.webp",
+    },
+    162: {
+    id: 162,
+    title: "Langkah 162",
+    name: "Menuju Nurse Station Kesehatan Ibu Hamil",
+    description: "Silahkan menuju meja perawat poli KI Hamil di lantai 3 (dari tangga ke kanan) lalu serahkan kertas rujukan kepada petugas",
+    img: "/alur/162-menuju-nurse-station.webp",
+    },
+    163: {
+    id: 163,
+    title: "Langkah 163",
+    name: "Pemeriksaan USG Payudara",
+    description: "Jika nama Anda telah dipanggil, silahkan masuk ke dalam ruang pemeriksaan, dan ikuti instruksi petugas",
+    img: "/alur/155-pemeriksaan-usg-payudara.webp",
+    },
+    164: {
+    id: 164,
+    title: "Langkah 164",
+    name: "Pemeriksaan USG Selesai",
+    description: "Pemeriksaan USG telah selesai, silahkan melanjutkan pemeriksaan penunjang lainnya atau kembali ke poli CKG untuk menyerahkan hasil pemeriksaan",
+    img: "/alur/163-pemeriksaan-selesai.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -1527,6 +1555,14 @@ export const SERVICES_BY_FACILITY = {
             pemeriksaan_1:        [0, 1, 66, 67, 68, 69, 70, 4, 71], 
             pemeriksaan_selanjutnya : [0, 1, 66, 67, 4, 71],  
             },
+        },
+        {
+          nama: "Pemeriksaan USG Payudaraa",
+          ikon: "👩‍💼",
+          tarif: 0,
+          bpjs: true,
+          ket: "Cek Kesehatan Gratis",
+          alur: [161,162, 163, 164]
         },
       ],
     },
