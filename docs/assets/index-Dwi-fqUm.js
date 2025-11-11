@@ -87,13 +87,13 @@ Please change the parent <Route path="${K}"> to <Route path="${K==="/"?"*":`${K}
         transition-colors duration-300\r
         rounded-none\r
       `,children:[w.jsxs("div",{className:"p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10",children:[w.jsx("div",{className:"size-8 rounded-xl bg-emerald-600 grid place-items-center",children:"🏥"}),w.jsx("div",{className:"font-semibold truncate text-slate-900 dark:text-white",children:"Jadwal Layanan"})]}),w.jsxs("div",{className:"px-4 pt-3 text-xs text-slate-700 dark:text-white/70",children:["Fasilitas: ",w.jsx("span",{className:"text-slate-900 font-medium dark:text-white",children:a})]}),w.jsxs("div",{className:"p-4 space-y-3",children:[w.jsx("label",{className:"text-xs uppercase text-slate-600 dark:text-white/50",children:"Pencarian"}),w.jsxs("div",{className:"relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible",children:[w.jsx("input",{ref:v,type:"text",value:i,onChange:j=>s(j.target.value),onKeyDown:j=>{j.key==="Enter"&&i.trim()&&p?.(i.trim()),j.key==="Escape"&&i&&(s(""),Le("Search","clear_esc"),requestAnimationFrame(()=>v.current?.focus()))},enterKeyHint:"search",placeholder:"Cari 'umum', 'imunisasi', 'cabut gigi' …",className:`w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5\r
-               border border-emerald-500/20 focus:border-emerald-500/60\r
-               outline-none pr-12 pl-4 text-sm sm:text-[15px]`}),i&&w.jsx("button",{type:"button",onClick:()=>{s(""),Le("Search","clear_click"),requestAnimationFrame(()=>v.current?.focus())},"aria-label":"Hapus kata pencarian",className:`absolute right-3 top-1/2 -translate-y-1/2\r
-               h-7 w-7 rounded-full\r
-               bg-emerald-500/20 text-emerald-300\r
-               hover:bg-emerald-500/30 hover:text-emerald-100\r
+              border border-emerald-500/20 focus:border-emerald-500/60\r
+              outline-none pr-16 pl-4 text-sm sm:text-[15px]`}),i&&w.jsx("button",{type:"button",onClick:()=>{s(""),Le("Search","clear_click"),requestAnimationFrame(()=>v.current?.focus())},"aria-label":"Hapus kata pencarian",className:`absolute right-4 top-1/2 -translate-y-1/2\r
+               h-6 w-6 rounded-full\r
+               bg-emerald-500/18 text-emerald-300\r
+               hover:bg-emerald-500/30 hover:text-emerald-50\r
                active:scale-95 transition-all\r
-               flex items-center justify-center`,children:w.jsx("svg",{viewBox:"0 0 24 24",width:"15",height:"15","aria-hidden":"true",children:w.jsx("path",{d:"M9 3h6l1 2h4v2H4V5h4l1-2zm1 6v8m4-8v8M6 7h12l-1 12H7L6 7z",fill:"none",stroke:"currentColor",strokeWidth:"1.6",strokeLinecap:"round",strokeLinejoin:"round"})})})]})]}),w.jsxs("div",{className:`\r
+               flex items-center justify-center`,children:w.jsx("svg",{viewBox:"0 0 24 24",width:"14",height:"14","aria-hidden":"true",children:w.jsx("path",{d:"M9 3h6l1 2h4v2H4V5h4l1-2zm1 6v8m4-8v8M6 7h12l-1 12H7L6 7z",fill:"none",stroke:"currentColor",strokeWidth:"1.5",strokeLinecap:"round",strokeLinejoin:"round"})})})]})]}),w.jsxs("div",{className:`\r
           px-4 pb-2 space-y-2\r
           overflow-y-auto overscroll-contain\r
           [scrollbar-width:thin]\r

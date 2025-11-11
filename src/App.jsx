@@ -695,8 +695,8 @@ function Sidebar({
     enterKeyHint="search"
     placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' …"
     className="w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5
-               border border-emerald-500/20 focus:border-emerald-500/60
-               outline-none pr-12 pl-4 text-sm sm:text-[15px]"
+              border border-emerald-500/20 focus:border-emerald-500/60
+              outline-none pr-16 pl-4 text-sm sm:text-[15px]"
   />
 
   {query && (
@@ -708,30 +708,30 @@ function Sidebar({
       requestAnimationFrame(() => searchRef.current?.focus());
     }}
     aria-label="Hapus kata pencarian"
-    className="absolute right-3 top-1/2 -translate-y-1/2
-               h-7 w-7 rounded-full
-               bg-emerald-500/20 text-emerald-300
-               hover:bg-emerald-500/30 hover:text-emerald-100
+    className="absolute right-4 top-1/2 -translate-y-1/2
+               h-6 w-6 rounded-full
+               bg-emerald-500/18 text-emerald-300
+               hover:bg-emerald-500/30 hover:text-emerald-50
                active:scale-95 transition-all
                flex items-center justify-center"
   >
     <svg
       viewBox="0 0 24 24"
-      width="15"
-      height="15"
+      width="14"
+      height="14"
       aria-hidden="true"
     >
       <path
         d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6v8m4-8v8M6 7h12l-1 12H7L6 7z"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
   </button>
-)}
+  )}
 </div>
       </div>
 
