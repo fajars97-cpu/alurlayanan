@@ -708,7 +708,7 @@ function Sidebar({
       requestAnimationFrame(() => searchRef.current?.focus());
     }}
     aria-label="Hapus kata pencarian"
-    className="absolute right-1 top-1/2 -translate-y-1/2
+    className="absolute right-6 top-1/2 -translate-y-1/2
                h-6 w-6 rounded-full
                bg-emerald-500/18 text-emerald-300
                hover:bg-emerald-500/30 hover:text-emerald-50
