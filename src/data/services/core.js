@@ -633,7 +633,7 @@ export const FLOW_STEPS = {
     id: 89,
     title: "Langkah 89",
     name: "Menuju Loket",
-    description: "Setelah mendapatkan jadwal melalui wa, silahkan datang ke puskesmas, mengambil antrian loket, dan mendaftar di loket pendaftaran.",
+    description: "Jika nomor loket Anda dipanggil, silahkan menuju loket dan mendaftar di loket pendaftaran, jika bersama pasangan maka yang didaftarkan untuk 2 orang.",
     img: "/alur/89-loket-catin.webp",
     },
     90: {
@@ -1145,7 +1145,21 @@ export const FLOW_STEPS = {
     title: "Langkah 164",
     name: "Pemeriksaan USG Selesai",
     description: "Pemeriksaan USG telah selesai, silahkan melanjutkan pemeriksaan penunjang lainnya atau kembali ke poli CKG untuk menyerahkan hasil pemeriksaan",
-    img: "/alur/163-pemeriksaan-selesai.webp",
+    img: "/alur/164-pemeriksaan-selesai.webp",
+    },
+    165: {
+    id: 165,
+    title: "Langkah 165",
+    name: "Pemeriksaan CKG Selesai",
+    description: "Pemeriksaan CKG telah selesai, jangan lupa untuk melakukan Cek Kesehatan Gratis tahun depan dan ajak keluarga dan sanak saudara",
+    img: "/alur/165-pasien-ckg-wanita-pulang.webp",
+    },
+    166: {
+    id: 166,
+    title: "Langkah 166",
+    name: "Pendaftaran Catin",
+    description: "Calon Pengantin yang memiliki KTP domisili Kecamatan Jagakarsa, bisa mendaftarkan diri dulu melalui https://bit.ly/daftarLIONTIN , jika mendapat konfirmasi jadwal, silahkan datang ke puskesmas",
+    img: "/alur/166-pendaftaran-catin.webp",
     },
 };
 
@@ -1630,7 +1644,7 @@ export const SERVICES_BY_FACILITY = {
           tarif: 10000,
           bpjs: true,
           ket: "Skrining pranikah",
-          alur: [0, 89, 90, 91, 92, 93, 95],
+          alur: [166, 0, 89, 90, 91, 92, 93, 95],
         },
       ],
     },
