@@ -1369,25 +1369,77 @@ useEffect(() => {
     return k !== "anak" && k !== "dewasa";
   });
 
-  const Panel = ({ id, title, count, children }) => (
-    <div className="mb-3 border border-white/10 rounded-xl overflow-hidden">
-      <button
-        onClick={() => setCatOpen(catOpen === id ? null : id)}
-        className="w-full text-left font-semibold px-4 py-3 bg-white/5 dark:bg-white/10 flex items-center justify-between"
-        aria-expanded={catOpen === id}
+  const Panel = ({ id, title, count, children }) => {
+  const open = catOpen === id;
+  const onToggle = () => setCatOpen(open ? null : id);
+  const onKey = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
+  return (
+    <div className="mb-3 rounded-2xl border border-white/10 bg-white/5 dark:bg-white/10 overflow-hidden">
+      {/* Header: jelas bisa diklik */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onToggle}
+        onKeyDown={onKey}
+        aria-expanded={open}
+        aria-controls={`${id}-panel`}
+        className="group w-full px-4 py-3.5 cursor-pointer select-none
+                   flex items-center gap-3 justify-between
+                   hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
       >
-        <span>{title}</span>
-        <span className="text-sm opacity-70">{count}</span>
-      </button>
-      {catOpen === id && (
-        <div className="p-4">
-          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {children}
-          </div>
+        <div className="min-w-0 flex items-center gap-2">
+          <span className="font-semibold truncate">{title}</span>
+          {/* badge jumlah layanan */}
+          <span className="shrink-0 text-[11px] px-2 py-0.5 rounded-full
+                           bg-slate-200/70 text-slate-800 border border-black/10
+                           dark:bg-white/10 dark:text-white/80 dark:border-white/15">
+            {count}
+          </span>
         </div>
-      )}
+        {/* chevron dengan rotasi saat terbuka */}
+        <svg
+          className={`shrink-0 transition-transform duration-200 opacity-80 group-hover:opacity-100
+                      ${open ? "rotate-180" : ""}`}
+          width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+
+      {/* Body: animasi sederhana agar terasa dropdown */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={`${id}-panel`}
+            key={`${id}-content`}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+            className="p-4 pt-3"
+          >
+            <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
+};
 
   return (
     <div ref={servicesGridRef} className="space-y-3">
