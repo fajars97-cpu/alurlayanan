@@ -1690,6 +1690,18 @@ export const SERVICES_BY_FACILITY = {
           tarif: 0,
           bpjs: true,
           ket: "Pendaftaran Online",
+          jadwal: {
+            weekly: {
+              Senin:  "00:00-24:00",
+              Selasa: "00:00-24:00",
+              Rabu:   "00:00-24:00",
+              Kamis:  "00:00-24:00",
+              Jumat:  "00:00-24:00",
+              Sabtu:  "00:00-24:00",
+              Minggu: "00:00-24:00",
+            },
+            exceptions: {}
+          },
           alur: [167, 168, 169],
         },
       ],
