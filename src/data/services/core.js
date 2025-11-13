@@ -809,7 +809,7 @@ export const FLOW_STEPS = {
     title: "Langkah 114",
     name: "Perawatan Ibu dan Bayi di Ruang Rawat Inap",
     description: "Setelah proses persalinan selesai, ibu dan bayi akan dipindah ke ruang rawat inap ruang bersalin.",
-    img: "/alur/114-bumil-masuk-ruang-perawatan.webp.webp",
+    img: "/alur/114-bumil-masuk-ruang-perawatan.webp",
     },
     115: {
     id: 115,
@@ -1160,6 +1160,34 @@ export const FLOW_STEPS = {
     name: "Pendaftaran Catin",
     description: "Calon Pengantin yang memiliki KTP domisili Kecamatan Jagakarsa, bisa mendaftarkan diri dulu melalui https://bit.ly/daftarLIONTIN , jika mendapat konfirmasi jadwal, silahkan datang ke puskesmas",
     img: "/alur/166-pendaftaran-catin.webp",
+    },
+    167: {
+    id: 167,
+    title: "Langkah 167",
+    name: "Pendaftaran Online",
+    description: "Pasien dapat mendaftarkan online dari aplikasi mobile jkn dan jak sehat",
+    img: "/alur/167-pendaftaran-online.webp",
+    },
+    168: {
+    id: 168,
+    title: "Langkah 168",
+    name: "Cetak Resi Pendaftaran Online",
+    description: "Setelah mendaftar, silahkan menuju bagian security untuk mencetak resi pendaftaran",
+    img: "/alur/168-cetak-resi-online.webp",
+    },
+    168: {
+    id: 168,
+    title: "Langkah 168",
+    name: "Cetak Resi Pendaftaran Online",
+    description: "Setelah mendaftar, silahkan menuju bagian security untuk mencetak resi pendaftaran",
+    img: "/alur/168-cetak-resi-online.webp",
+    },
+    169: {
+    id: 169,
+    title: "Langkah 169",
+    name: "Menuju Nurse Station Poli/ Ruang Poli",
+    description: "Silahkan menuju bagian nurse station/ meja perawat poli yang dituju, ikuti instruksi petugas",
+    img: "/alur/169-menuju-nurse-station.webp",
     },
 };
 
@@ -1645,6 +1673,24 @@ export const SERVICES_BY_FACILITY = {
           bpjs: true,
           ket: "Skrining pranikah",
           alur: [166, 0, 89, 90, 91, 92, 93, 95],
+        },
+      ],
+    },
+    {
+      id: "pendaftaran_online",
+      nama: "Pendaftaran Online",
+      klaster: "-",
+      ikon: "💻🌐",
+      lokasi: "Lantai 1",
+      img: "pendaftaran-online.webp",
+      layanan: [
+        {
+          nama: "Pendaftaran Online",
+          ikon: "💻🌐",
+          tarif: 0,
+          bpjs: true,
+          ket: "Pendaftaran Online",
+          alur: [167, 168, 169],
         },
       ],
     },
