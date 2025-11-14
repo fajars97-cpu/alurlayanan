@@ -74,7 +74,8 @@ export const EXTRA_INFO = {
     "3. - Catin dengan usia >19 tahun bisa diajukan pembuatan sertifikat layak nikah.",
     "- Catin yang berusia 18 - 19 Tahun WAJIB menyertakan surat dispensasi menikah dari Pengadilan Agama/ Pengadilan Negeri",
     "- Catin berusia <18 tahun TIDAK BISA diajukan pembuatan sertifikat layak nikah, hanya bisa dilakukan pemeriksaan kesehatan saja.",
-    "Informasi lebih lanjut bisa mengklik link berikut: https://bit.ly/daftarLIONTIN"],
+    "Informasi lebih lanjut bisa mengklik link berikut: https://bit.ly/daftarLIONTIN",
+    "Sertifikat layak nikah dipersyaratkan untuk calon pengantin yang memiliki KTP DKI sesuai pergub, untuk KTP daerah lain bisa menggunakan surat keterangan sehat di Poli KEUR"],
 
   // KB & IVA
   "Konsultasi KB": "Konsultasi KB.",
