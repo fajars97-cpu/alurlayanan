@@ -1709,8 +1709,16 @@ export default function App() {
 // === Handler pilih POLI (klik kartu poli) ===
 const onPickPoli = (s) => {
   // event poli
-  trackEvent("Navigation", "select_poli", s.id);
-  gaEvent("select_poli", { poli_id: s.id, poli_name: s.nama });
+  const poliName = s.nama || s.label || s.title || "(tanpa nama)";
+
+  // kirim ke Universal (lama)
+  trackEvent("Navigation", "select_poli", poliName);
+
+  // kirim ke GA4
+  gaEvent("select_poli", {
+    poli_id: s.id ?? "unknown_id",
+    poli_name: poliName,
+  });
 
   // Time To Find (ms): sejak pencarian dikirim sampai klik poli pertama
   if (lastQueryRef.current && searchStartRef.current > 0) {
