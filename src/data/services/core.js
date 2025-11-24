@@ -419,6 +419,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan CKG Selesai",
     description: "Pemeriksaan CKG telah selesai, jangan lupa untuk kontrol kembali sesuai jadwal/ arahan petugas.",
     img: "/alur/51-layanan-ckg-selesai.webp",
+    audio: "/voices/51.mp3",
     },
     52: {
     id: 52,
@@ -426,6 +427,7 @@ export const FLOW_STEPS = {
     name: "Baca Hasil Pemeriksaan Darah CKG",
     description: "Silahkan menuju ruang pemeriksaan CKG di lantai 3 (dibalik nurse station), yang bertempat di ruang sanitasi, silahkan ketuk dan berikan hasil pemeriksaan darah Anda kepada petugas.",
     img: "/alur/52-baca-hasil-ckg.webp",
+    audio: "/voices/52.mp3",
     },
     53: {
     id: 53,
@@ -433,6 +435,7 @@ export const FLOW_STEPS = {
     name: "Rujukan Poli Lain",
     description: "Pemeriksaan mata dapat diakses oleh rujukan internal dari poli lain apabila ditemukan kelainan mata yang memerlukan penanganan lebih lanjut, pasien dapat langsung menuju poli tanpa harus ke loket.",
     img: "/alur/53-rujukan-poli-pkpr.webp",
+    audio: "/voices/53.mp3",
     },
     54: {
     id: 54,
@@ -440,6 +443,7 @@ export const FLOW_STEPS = {
     name: "Menuju Poli Mata",
     description: "Silahkan menuju poli mata di lantai 2 depan ruang poli umum, mohon menunggu hingga nama Anda dipanggil dan silahkan masuk ke dalam ruang pemeriksaan jika nama Anda dipanggil, ikuti instruksi petugas.",
     img: "/alur/54-menuju-poli-mata.webp",
+    audio: "/voices/55.mp3",
     },
     55: {
     id: 55,
@@ -447,6 +451,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Mata",
     description: "Silahkan masuk ke dalam ruang poli mata setelah nama Anda di panggil",
     img: "/alur/55-pemeriksaan-mata.webp",
+    audio: "/voices/56.mp3",
     },
     56: {
     id: 56,
@@ -454,6 +459,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Selesai",
     description: "Pemeriksaan telah selesai, pasien dan keluarga bisa pulang.",
     img: "/alur/56-selesai-bapak-anak-laki.webp",
+    audio: "/voices/56.mp3",
     },
     57: {
     id: 57,
@@ -461,6 +467,7 @@ export const FLOW_STEPS = {
     name: "Proses Tindik",
     description: "Silahkkan ikuti arahan petugas selama proses tindik.",
     img: "/alur/57-proses-tindik.webp",
+    audio: "/voices/57.mp3",
     },
     58: {
     id: 58,
@@ -468,6 +475,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruang Pemeriksaan Lansia",
     description: "Silahkan menuju ruang pemeriksaan lansia di lantai 1 di IGD (samping loket), silahkan memasuki ruangan pemeriksaan jika nama Anda telah dipanggil.",
     img: "/alur/58-menuju-ruang-pemeriksaan-lansia.webp",
+    audio: "/voices/58.mp3",
     },
     59: {
     id: 59,
@@ -475,6 +483,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Lansia",
     description: "Silahkan masuk ke dalam ruang pemeriksaan lansia setelah nama Anda dipanggil, ikuti instruksi petugas",
     img: "/alur/59-pemeriksaan-lansia.webp",
+    audio: "/voices/59.mp3",
     },
     60: {
     id: 60,
@@ -482,6 +491,7 @@ export const FLOW_STEPS = {
     name: "Layanan Pemeriksaan Lansia Selesai",
     description: "Layanan pemeriksaan lansia telah selesai, silahkan pulang dan jangan lupa untuk kontrol lansia sesuai jadwal/ arahan petugas.",
     img: "/alur/60-lansia-pulang.webp",
+    audio: "/voices/60.mp3",
     },
     61: {
     id: 61,
