@@ -15,7 +15,7 @@ export const FLOW_STEPS = {
     description:
       "Silahkan mendaftar di loket/pendaftaran. Serahkan identitas atau kartu BPJS.",
     img: "/alur/1-menuju-loket.webp",
-    audio: "/voices/alur-loket.mp3", // audio tetap didefinisikan di data
+    audio: "/voices/1.mp3", // audio tetap didefinisikan di data
   },
   2: {
     id: 2,
@@ -30,8 +30,9 @@ export const FLOW_STEPS = {
     id: 3,
     title: "Langkah 3",
     name: "Menuju Poli Gigi",
-    description: "Silahkan menuju ruang poli gigi di lantai apabila nama Anda telah dipanggil.",
+    description: "Silahkan menuju ruang poli gigi di lantai 2 dan tunggu nama Anda dipanggil.",
     img: "/alur/3-menuju-poli-gigi.webp",
+    audio: "/voices/3.mp3",
   },
   4: {
     id: 4,
@@ -40,6 +41,7 @@ export const FLOW_STEPS = {
     description:
       "Ambil obat/suplemen sesuai resep di unit farmasi lantai 1. Ikuti instruksi petugas farmasi.",
     img: "/alur/4-menuju-farmasi.webp",
+    audio: "/voices/4.mp3",
   },
   5: {
     id: 5,
@@ -48,13 +50,15 @@ export const FLOW_STEPS = {
     description:
       "Layanan selesai. Pasien boleh pulang atau mendapat instruksi kontrol berikutnya.",
     img: "/alur/5-selesai.webp",
+    audio: "/voices/5.mp3",
   },
   6: {
     id: 6,
     title: "Langkah 6",
     name: "Menuju Poli Umum",
-    description: "Silahkan menuju poli umum lantai 2 (ruangan dibalik nurse station)dan tunggu panggilan.",
+    description: "Silahkan menuju poli umum lantai 2 (ruangan dibalik nurse station) dan tunggu panggilan.",
     img: "/alur/12-menuju-poli-umum-pertama.webp",
+    audio: "/voices/6.mp3",
   },
   7: {
     id: 7,
@@ -63,6 +67,7 @@ export const FLOW_STEPS = {
     description:
       "Silahkan menuju laboratorium lantai 3 lalu taruh kertas antrian di bagian kasir di keranjang yang tersedia, tunggu hingga nomor antrian Anda dipanggil.",
     img: "/alur/7-menuju-laboratorium.webp",
+    audio: "/voices/7.mp3",
   },
   8: {
     id: 8,
@@ -70,6 +75,7 @@ export const FLOW_STEPS = {
     name: "Menunggu Hasil Lab",
     description: "Silahkan menunggu hasil lab sesuai waktu tunggu pemeriksaan, jika ada resep obat, bisa diambil di farmasi lantai 1.",
     img: "/alur/8-menunggu-hasil-lab.webp",
+    audio: "/voices/8.mp3",
   },
   9: {
     id: 9,
@@ -77,6 +83,7 @@ export const FLOW_STEPS = {
     name: "Menuju Nurse Station Poli Umum",
     description: "Silahkan menuju nurse station poli umum di lantai 2 (di depan tangga) dan serahkan resi pendaftaran.",
     img: "/alur/9-menuju-nurse-station-poli-umum.webp",
+    audio: "/voices/9.mp3",
   },
   10: {
     id: 10,
@@ -84,6 +91,7 @@ export const FLOW_STEPS = {
     name: "Melakukan pemeriksaan Poli Umum",
     description: "Silahkan masuk ke dalam ruang poli umum setelah nama Anda di panggil",
     img: "/alur/10-pemeriksaan-poli-umum.webp",
+    audio: "/voices/10.mp3",
     },
     11: {
     id: 11,
@@ -91,6 +99,7 @@ export const FLOW_STEPS = {
     name: "Menuju Perawat Poli Umum",
     description: "Silahkan masuk ke dalam ruang poli umum dan menuju perawat poli umum.",
     img: "/alur/11-perawat-poli-umum.webp",
+    audio: "/voices/11.mp3",
     },
      12: {
     id: 12,
@@ -98,6 +107,7 @@ export const FLOW_STEPS = {
     name: "Menuju Perawat Poli Umum",
     description: "Silahkan menuju ruang tunggu di depan ruang poli umum di balik nurse station.",
     img: "/alur/12-menuju-poli-umum-pertama.webp",
+    audio: "/voices/12.mp3",
     },
     13: {
     id: 13,
@@ -105,6 +115,7 @@ export const FLOW_STEPS = {
     name: "Pelaporan Kasus Campak",
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian campak.",
     img: "/alur/13-pelaporan-campak.webp",
+    audio: "/voices/13.mp3",
     },
     14: {
     id: 14,
@@ -112,6 +123,7 @@ export const FLOW_STEPS = {
     name: "Pelaporan Kasus Difteri",
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian difteri.",
     img: "/alur/14-pelaporan-difteri.webp",
+    audio: "/voices/14.mp3",
     },
     15: {
     id: 15,
@@ -119,6 +131,7 @@ export const FLOW_STEPS = {
     name: "Pelaporan Kasus Polio",
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian polio.",
     img: "/alur/15-pelaporan-polio.webp",
+    audio: "/voices/15.mp3",
     },
     16: {
     id: 16,
@@ -126,6 +139,7 @@ export const FLOW_STEPS = {
     name: "Pelaporan Kasus Pertusis (Batuk Rejan)",
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian pertusis.",
     img: "/alur/16-pelaporan-pertusis.webp",
+    audio: "/voices/16.mp3",
     },
     17: {
     id: 17,
@@ -133,13 +147,15 @@ export const FLOW_STEPS = {
     name: "Pelaporan Kasus Keracunan Pangan",
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian keracunan pangan.",
     img: "/alur/17-pelaporan-keracunan-pangan.webp",
+    audio: "/voices/17.mp3",
     },
     18: {
     id: 18,
     title: "Langkah 18",
     name: "Petugas Puskesmas Menerima Laporan",
-    description: "Petugas akan melanjutkan proses tindak lanjut sesuai dengan laporan yang diterima.",
+    description: "Petugas akan melakukan tindak lanjut laporan yang diterima",
     img: "/alur/18-petugas-puskesmas-menerima-laporan.webp",
+    audio: "/voices/18.mp3",
     },
     19: {
     id: 19,
@@ -147,6 +163,7 @@ export const FLOW_STEPS = {
     name: "Keluarga Pasien Menerima Surat Laporan Kematian",
     description: "Layanan selesai, keluarga pasien akan menerima surat laporan kematian dari petugas.",
     img: "/alur/19-keluarga-menerima-surat-laporan-kematian.webp",
+    audio: "/voices/19.mp3",
     },
     20: {
     id: 20,
@@ -154,6 +171,7 @@ export const FLOW_STEPS = {
     name: "Pasien Menuju Ruang Kesling & Surveilans",
     description: "Silahkan menuju ruang kesehatan lingkungan & surveilans di lantai 3 (dari tangga/lift ke kiri lalu ke kanan, ruangan paling pojok) untuk mendapatkan layanan.",
     img: "/alur/20-menuju-ruang-kesling.webp",
+    audio: "/voices/20.mp3",
     },
     21: {
     id: 21,
@@ -161,6 +179,7 @@ export const FLOW_STEPS = {
     name: "Pasien Mendapatkan Rujukan Internal",
     description: "Silahkan menuju poli yang dituju sesuai rujukan internal dari petugas.",
     img: "/alur/21-rujukan-internal.webp",
+    audio: "/voices/21.mp3",
     },
     22: {
     id: 22,
@@ -168,6 +187,7 @@ export const FLOW_STEPS = {
     name: "Pasien Menuju Poli Tumbang",
     description: "Silahkan menuju ruang tumbuh kembang di lantai 3 (depan tangga).",
     img: "/alur/22-menuju-poli-tumbang.webp",
+    audio: "/voices/22.mp3",
     },
     23: {
     id: 23,
@@ -175,6 +195,7 @@ export const FLOW_STEPS = {
     name: "Layanan Selesai di Poli Tumbang",
     description: "Layanan selesai, pasien dan keluarga bisa pulang.",
     img: "/alur/23-pasien-anak-pulang.webp",
+    audio: "/voices/23.mp3",
     },
     24: {
     id: 24,
@@ -182,6 +203,7 @@ export const FLOW_STEPS = {
     name: "Pasien Rujukan Poli Lain",
     description: "Kunjungan pertama, pasien mendapatkan rujukan dari poli lain, pasien dapat menuju poli Tumbang di lantai 3 (di depan tangga).",
     img: "/alur/24-pasien-rujukan-poli-lain.webp",
+    audio: "/voices/24.mp3",
     },
     25: {
     id: 25,
@@ -189,6 +211,7 @@ export const FLOW_STEPS = {
     name: "Pelaporan Kasus DBD",
     description: "Silahkan menghubungi nomor yang tertera untuk melaporkan kejadian DBD/Cikungunya.",
     img: "/alur/25-pelaporan-kasus-dbd.webp",
+    audio: "/voices/25.mp3",
     },
     26: {
     id: 26,
@@ -196,13 +219,15 @@ export const FLOW_STEPS = {
     name: "Infografis SKPK",
     description: "Silahkan melihat infografis SKPK.",
     img: "/alur/26-alur-skpk.webp",
+    audio: "/voices/26.mp3",
     },
     27: {
     id: 27,
     title: "Langkah 27",
-    name: "Infografis SKPK",
+    name: "Layanan Poli Kesling dan Surveilans",
     description: "Kunjungan pertama, pasien mendapatkan rujukan dari poli lain, pasien dapat menuju ruang Kesehatan Lingkungan di lantai 3 (ruang paling pojok.",
     img: "/alur/27-pasien-rujukan-poli-lain-kesling.webp",
+    audio: "/voices/27.mp3",
     },
     28: {
     id: 28,
@@ -210,6 +235,7 @@ export const FLOW_STEPS = {
     name: "Menuju IGD",
     description: "Silahkan menuju layanan 24 jam setelah nama Anda dipanggil (di samping loket).",
     img: "/alur/28-menuju-igd.webp",
+    audio: "/voices/28.mp3",
     },
     29: {
     id: 29,
@@ -217,6 +243,7 @@ export const FLOW_STEPS = {
     name: "Menuju Nurse Station Imunisasi Lantai 3",
     description: "Silahkan menuju nurse station imunisasi di lantai 3 (di depan tangga) dan serahkan resi pendaftaran dan buku pink",
     img: "/alur/29-menuju-nurse-station-imunisasi.webp",
+    audio: "/voices/29.mp3",
     },
     30: {
     id: 30,
@@ -224,6 +251,7 @@ export const FLOW_STEPS = {
     name: "Menimbang Bayi",
     description: "Setelah nama dipanggil, bayi ditimbang dan diukur panjang badannya oleh petugas",
     img: "/alur/30-bayi-ditimbang.webp",
+    audio: "/voices/30.mp3",
     },
     31: {
     id: 31,
