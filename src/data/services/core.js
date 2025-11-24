@@ -259,6 +259,7 @@ export const FLOW_STEPS = {
     name: "Imunisasi Bayi",
     description: "Setelah nama dipanggil, silahkan masuk ke dalam ruang imunisasi untuk mendapatkan imunisasi",
     img: "/alur/31-imunisasi-bayi.webp",
+    audio: "/voices/31.mp3",
     },
     32: {
     id: 32,
@@ -266,6 +267,7 @@ export const FLOW_STEPS = {
     name: "Imunisasi Selesai",
     description: "Layanan selesai, silahkan pulang dan kontrol kembali sesuai jadwal imunisasi berikutnya",
     img: "/alur/32-layanan-imunisasi-selesai.webp",
+    audio: "/voices/32.mp3",
     },
     33: {
     id: 33,
@@ -273,6 +275,7 @@ export const FLOW_STEPS = {
     name: "Menuju Poli CKG",
     description: "Silahkan menuju meja registrasi Poli CKG di lantai 3 (depan tangga). Persiapkan KTP Anda.",
     img: "/alur/33-menuju-poli-ckg.webp",
+    audio: "/voices/33.mp3",
     },
     34: {
     id: 34,
@@ -280,6 +283,7 @@ export const FLOW_STEPS = {
     name: "Pengambilan Nomor dan Nametag",
     description: "Silahkan menuju pos security untuk mengambil nomor antrian dan name tag pasien CKG.",
     img: "/alur/34-pos-security.webp",
+    audio: "/voices/34.mp3",
     },
     35: {
     id: 35,
@@ -287,6 +291,7 @@ export const FLOW_STEPS = {
     name: "Menuju Imunisasi Ibu Hamil",
     description: "Setelah dari poli lain/ loket. Silahkan menuju nurse station imunisasi di lantai 3, berikan buku pink dan resi pendaftaran Anda kepada petugas.",
     img: "/alur/35-menuju-imunisasi-ibu-hamil.webp",
+    audio: "/voices/35.mp3",
     },
     36: {
     id: 36,
@@ -294,6 +299,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruangan Imunisasi",
     description: "Silahkan masuk ke dalam ruangan imunisasi setelah nama Anda dipanggil.",
     img: "/alur/36-ibu-hamil-disuntik.webp",
+    audio: "/voices/36.mp3",
     },
     37: {
     id: 37,
@@ -301,6 +307,7 @@ export const FLOW_STEPS = {
     name: "Layanan Imunisasi Ibu Hamil Selesai",
     description: "Layanan telah selesai, pasien bisa pulang dan jangan lupa untuk kontrol kehamilan sesuai jadwal.",
     img: "/alur/37-layanan-imunisasi-ibu-hamil-selesai.webp",
+    audio: "/voices/37.mp3",
     },
      38: {
     id: 38,
@@ -308,6 +315,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruangan Pemeriksaan Kesehatan Haji",
     description: "Silahkan menuju ruangan pemeriksaan kesehatan haji di lantai 2 (dari tangga/ lift belok kiri), ketuk, dan berikan resi pendaftaran kepada petugas, ikuti instruksi petugas.",
     img: "/alur/38-menuju-poli-haji.webp",
+    audio: "/voices/38.mp3",
     },
     39: {
     id: 39,
@@ -315,6 +323,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Haji",
     description: "Silahkan masuk ke dalam ruangan pemeriksaan kesehatan haji, bila nama Anda telah dipanggil dan ikuti instruksi petugas.",
     img: "/alur/39-pemeriksaan-haji.webp",
+    audio: "/voices/39.mp3",
     },
     40: {
     id: 40,
@@ -322,6 +331,7 @@ export const FLOW_STEPS = {
     name: "Layanan Pemeriksaan Kesehatan Haji Selesai",
     description: "Layanan pemeriksaan kesehatan calon jamaah haji telah selesai, silahkan menuju rumah sakit rujukan untuk pemeriksaan lebih lanjut. Jika ingin kembali lagi ke Puskesmas setelah pemeriksaan di Rumah Sakit, silahkan langsung menuju ruangan haji tanpa perlu datang ke loket.",
     img: "/alur/40-layanan-haji-selesai.webp",
+    audio: "/voices/40.mp3",
     },
     41: {
     id: 41,
