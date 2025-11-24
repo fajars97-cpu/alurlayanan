@@ -855,15 +855,22 @@ function Sidebar({
 
 /* ===================== Cards ===================== */
 function ServiceCard({ s, onPick }) {
+  const name = s.nama || "";
+  // anggap nama panjang kalau lebih dari 18 karakter
+  const isLongName = name.length > 18;
+  const nameClass = isLongName
+    ? "font-semibold text-[13px] sm:text-[14px] leading-snug"
+    : "font-semibold text-sm sm:text-base";
+
   return (
     <button
-   onClick={() => onPick(s)}
-   className={`group relative overflow-hidden rounded-2xl border
-     bg-slate-100/70 dark:bg-white/5
-     hover:bg-slate-200/80 dark:hover:bg-white/10
-     active:scale-[.98] transition text-left touch-manipulation
-     ${floorBorderClass(s.lokasi)}`}
- >
+      onClick={() => onPick(s)}
+      className={`group relative overflow-hidden rounded-2xl border
+        bg-slate-100/70 dark:bg-white/5
+        hover:bg-slate-200/80 dark:hover:bg-white/10
+        active:scale-[.98] transition text-left touch-manipulation
+        ${floorBorderClass(s.lokasi)}`}
+    >
       {/* Gambar: tinggi tetap per breakpoint, gambar tidak dipotong (contain) */}
       <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="relative p-2 sm:p-3">
@@ -872,7 +879,7 @@ function ServiceCard({ s, onPick }) {
             <img
               src={resolveInfografis(s)}
               onError={onInfoError}
-              alt={s.nama}
+              alt={name}
               className="absolute inset-0 w-full h-full object-contain"
               loading="lazy"
             />
@@ -881,13 +888,20 @@ function ServiceCard({ s, onPick }) {
           </div>
         </div>
       </div>
+
       {/* Teks & ikon: bar bawah dengan latar gelap tipis */}
       <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:py-3 bg-black/40 backdrop-blur-[1px]">
         <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] leading-tight">
-         <div className="text-xl shrink-0">{s.ikon}</div>
-         <div className="font-semibold truncate">{s.nama}</div>
-       </div>
-       <div className="text-[12px] opacity-90 truncate">{s.klaster}</div>
+          <div className="text-xl shrink-0">{s.ikon}</div>
+          {/* Nama poli: tidak di-truncate, font mengecil jika terlalu panjang, boleh 2 baris */}
+          <div className={`${nameClass} whitespace-normal break-words`}>
+            {name}
+          </div>
+        </div>
+        {/* Klaster: boleh dibatasi maksimal 2 baris agar tidak terlalu tinggi */}
+        <div className="text-[11px] sm:text-[12px] opacity-90 line-clamp-2">
+          {s.klaster}
+        </div>
       </div>
     </button>
   );
