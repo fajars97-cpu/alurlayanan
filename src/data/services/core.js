@@ -499,6 +499,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruang KB-IVA",
     description: "Silahkan menuju ruang KB-IVA di lantai 2, silahkan memasuki ruangan jika nama Anda telah dipanggil.",
     img: "/alur/61-menuju-ruang-kb.webp",
+    audio: "/voices/61.mp3",
     },
     62: {
     id: 62,
@@ -506,6 +507,7 @@ export const FLOW_STEPS = {
     name: "IVA-Test + HPV DNA",
     description: "Silahkan masuk ke dalam ruangan dan ikuti prosedur IVA-Test dan HPV DNA sesuai arahan petugas.",
     img: "/alur/62-iva-test.webp",
+    audio: "/voices/62.mp3",
     },
     63: {
     id: 63,
@@ -513,6 +515,7 @@ export const FLOW_STEPS = {
     name: "Konsultasi KB",
     description: "Silahkan masuk ke dalam ruangan dan ikuti prosedur Konsultasi KB sesuai arahan petugas.",
     img: "/alur/63-konsultasi-kb.webp",
+    audio: "/voices/63.mp3",
     },
     64: {
     id: 64,
@@ -520,6 +523,7 @@ export const FLOW_STEPS = {
     name: "Implant KB",
     description: "Silahkan masuk ke dalam ruangan dan ikuti prosedur Implant KB sesuai arahan petugas.",
     img: "/alur/64-implant-kb.webp",
+    audio: "/voices/64.mp3",
     },
     65: {
     id: 65,
@@ -527,6 +531,7 @@ export const FLOW_STEPS = {
     name: "Konsultasi Gizi",
     description: "Silahkan masuk ke dalam ruangan jika nama Anda telah dipanggil dan ikuti prosedur Konsultasi Gizi sesuai arahan petugas.",
     img: "/alur/65-konsultasi-gizi.webp",
+    audio: "/voices/65.mp3",
     },
     66: {
     id: 66,
@@ -534,6 +539,7 @@ export const FLOW_STEPS = {
     name: "Menuju Meja Perawat KI Hamil",
     description: "Silahkan menuju meja perawat ruang kesehaatan ibu hamil di lantai 3 (dari tangga ke kanan) dan serahkan resi pendaftaran dan/ buku pink kepada petugas, ikuti arahan petugas.",
     img: "/alur/66-nurse-station-ibu-hamil.webp",
+    audio: "/voices/66.mp3",
     },
     67: {
     id: 67,
@@ -541,6 +547,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Ibu Hamil",
     description: "Silahkan masuk ke dalam ruangan apabila nama Anda telah dipanggil dan ikuti arahan petugas.",
     img: "/alur/67-pemeriksaan-ibu-hamil.webp",
+    audio: "/voices/67.mp3",
     },
     68: {
     id: 68,
@@ -548,6 +555,7 @@ export const FLOW_STEPS = {
     name: "Konsultasi Gizi Ibu Hamil",
     description: "Silahkan ketuk dan masuk ke dalam ruang gizi di lantai 3 (dari tangga ke kiri), serahkan rujukan internal/ buku pink lalu ikuti arahan petugas selanjutnya (urutan rujukan internal bersifat fleksibel).",
     img: "/alur/68-konsultasi-gizi-ibu-hamil.webp",
+    audio: "/voices/68.mp3",
     },
     69: {
     id: 69,
@@ -555,6 +563,7 @@ export const FLOW_STEPS = {
     name: "Pengambilan Sampel Darah Ibu Hamil",
     description: "Silahkan taruh rujukan internal pengecekan darah di laboratorium (dari tangga ke kiri), kemudian masuk ke dalam ruang pengambilan sampel apabila nomor Anda telah dipanggil dan  ikuti arahan petugas selanjutnya (urutan rujukan internal bersifat fleksibel).",
     img: "/alur/69-pengambilan-sampel-darah-ibu-hamil.webp",
+    audio: "/voices/69.mp3",
     },
     70: {
     id: 70,
@@ -562,6 +571,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Gigi Ibu Hamil",
     description: "Silahkan taruh rujukan internal pemeriksaan gigi di nurse station poli gigi lantai 2 (di depan tangga), kemudian masuk ke dalam ruang pemeriksaan gigi apabila nama Anda telah dipanggil dan  ikuti arahan petugas selanjutnya (urutan rujukan internal bersifat fleksibel).",
     img: "/alur/70-pemeriksaan-gigi-ibu-hamil.webp",
+    audio: "/voices/70.mp3",
     },
     71: {
     id: 71,
