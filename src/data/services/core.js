@@ -339,6 +339,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruang Nifas",
     description: "Silahkan menuju ruang nifas di lantai 1 (melewati ruang bersalin), ketuk, dan berikan resi pendaftaran kepada petugas, ikuti instruksi petugas.",
     img: "/alur/41-menuju-ruang-nifas.webp",
+    audio: "/voices/41.mp3",
     },
     42: {
     id: 42,
@@ -346,6 +347,7 @@ export const FLOW_STEPS = {
     name: "Melakukan Pemeriksaan Nifas",
     description: "Silahkan melakukan pemeriksaan nifas di ruang nifas di lantai 1 (melewati ruang bersalin), ikuti instruksi petugas.",
     img: "/alur/42-pemeriksaan-ibu-nifas.webp",
+    audio: "/voices/42.mp3",
     },
     43: {
     id: 43,
@@ -353,6 +355,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan Nifas Selesai",
     description: "Pemeriksaan nifas telah selesai, jangan lupa untuk kontrol nifas sesuai jadwal/ arahan petugas.",
     img: "/alur/43-pemeriksaan-nifas-selesai.webp",
+    audio: "/voices/43.mp3",
     },
     44: {
     id: 44,
@@ -360,6 +363,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruang Bersalin",
     description: "Silahkan menuju ruang bersalin di lantai 1, ketuk, dan beritahu petugas jika ibu hamil sudah mengalami konstraksi. Setelah ibu hamil diperiksa petugas dan dapat dilakukan persalinan secara normal, suami dapat mendaftarkan ibu hamil ke loket.",
     img: "/alur/44-menuju-ruang-bersalin.webp",
+    audio: "/voices/44.mp3",
     },
     45: {
     id: 45,
@@ -367,6 +371,7 @@ export const FLOW_STEPS = {
     name: "Proses Persalinan",
     description: "Silahkan ikuti arahan petugas selama proses persalinan.",
     img: "/alur/45-proses-persalinan.webp",
+    audio: "/voices/45.mp3",
     },
     46: {
     id: 46,
@@ -374,6 +379,7 @@ export const FLOW_STEPS = {
     name: "Layanan Persalinan Selesai",
     description: "Layanan persalinan telah selesai, silahkan ikuti arahan petugas untuk perawatan ibu dan bayi selanjutnya.",
     img: "/alur/46-layanan-persalinan-selesai.webp",
+    audio: "/voices/46.mp3",
     },
     47: {
     id: 47,
@@ -381,6 +387,7 @@ export const FLOW_STEPS = {
     name: "Menuju Ruang Pemeriksaaan CKG",
     description: "Silahkan menuju ruang pemeriksaan CKG di lantai 3 (dibalik nurse station), yang bertempat di ruang sanitasi, silahkan memasuki ruangan pemeriksaan jika nama Anda telah dipanggil.",
     img: "/alur/47-menuju-ruang-pemeriksaan-ckg.webp",
+    audio: "/voices/47.mp3",
     },
     48: {
     id: 48,
@@ -388,6 +395,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan CKG",
     description: "Silahkan melakukan pemeriksaan CKG di ruang pemeriksaan CKG, ikuti instruksi petugas.",
     img: "/alur/48-melakukan-pemeriksaan-ckg.webp",
+    audio: "/voices/48.mp3",
     },
     49: {
     id: 49,
@@ -395,6 +403,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan darah di Lab",
     description: "Silahkan menuju laboratorium di lantai 3 untuk pengambilan sampel darah, taruh resi pendaftaran di keranjang yang tersedia, tunggu panggilan nomor Anda.",
     img: "/alur/49-menuju-lab-ckg.webp",
+    audio: "/voices/49.mp3",
     },
     50: {
     id: 50,
@@ -402,6 +411,7 @@ export const FLOW_STEPS = {
     name: "Pemeriksaan darah di Lab",
     description: "Silahkan masuk ke dalam ruang pengambilan darah di laboratorium setelah nomor Anda dipanggil, ikuti instruksi petugas.",
     img: "/alur/50-cek-lab-ckg.webp",
+    audio: "/voices/50.mp3",
     },
     51: {
     id: 51,
