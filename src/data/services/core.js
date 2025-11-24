@@ -6,6 +6,7 @@ export const FLOW_STEPS = {
     description:
        "Silahkan mengambil nomor antrian loket di lobby lantai 1 Puskesmas. Sentuh layar loket 1, 2, atau 3 sesuai poli yang Anda tuju.",
     img: "/alur/0-mesin-nomor-antrian.webp",
+    audio: "/voices/0.mp3",
   },
   1: {
     id: 1,
@@ -23,6 +24,7 @@ export const FLOW_STEPS = {
     description:
       "Silahkan menuju kasir lantai 2 atau 3 untuk membayar biaya administrasi/layanan.",
     img: "/alur/2-menuju-kasir.webp",
+    audio: "/voices/2.mp3",
   },
   3: {
     id: 3,
