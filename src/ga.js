@@ -20,31 +20,34 @@ export const gaEvent = (name, params = {}) => {
   try { ReactGA.event(name, params); } catch {}
 };
 
-// Back-compat helper: bentuk lama (category, action, label, value, params)
-// Akan dikonversi ke event_name: "<category>_<action>"
 export const trackEvent = (category, action, label, value, params = {}) => {
   try {
-    const name = `${category}_${action}`.toLowerCase(); // contoh: "navigation_select_poli"
+    const name = `${category}_${action}`.toLowerCase(); // "navigation_select_poli"
     const payload = {};
     if (label !== undefined) payload.label = label;
     if (value !== undefined) payload.value = value;
+
+    // FIX: gunakan spread, bukan ".payload"
     ReactGA.event(name, { ...payload, ...params });
-  } catch {}
+  } catch (e) {
+    console.warn("trackEvent error", e);
+  }
 };
 
-// Catat durasi (ms) sebagai event GA4
-// - Untuk "view_service_ms" → gunakan parameter khusus "view_ms"
-// - Untuk timing lain → fallback ke parameter umum "ms"
+// Timing helper
 export const trackTiming = (name, ms, extra = {}) => {
   try {
+    // FIX: pakai spread
     const payload = { ...extra };
 
     if (name === "view_service_ms") {
-      payload.view_ms = ms;     // <-- inilah parameter yang akan dipakai custom metric View Duration
+      payload.view_ms = ms;   // dipakai untuk custom metric "View Duration"
     } else {
-      payload.ms = ms;          // aman untuk metric timing lain (mis. Search Time to Find)
+      payload.ms = ms;        // timing lain → "ms"
     }
 
     ReactGA.event(name, payload);
-  } catch {}
+  } catch (e) {
+    console.warn("trackTiming error", e);
+  }
 };

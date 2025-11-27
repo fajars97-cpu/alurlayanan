@@ -908,7 +908,7 @@ function ServiceCard({ s, onPick }) {
 }
 
 /* SubServiceCard */
-function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
+function SubServiceCard({ item, onPick, parentJadwal, poliId, facilityId, facilityName }) {
   const bpjsText = item.bpjs ? "BPJS: Tercakup" : "BPJS: Tidak Tercakup";
   const bpjsClass = item.bpjs ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
@@ -942,6 +942,8 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId }) {
         gaEvent("select_service", {
           poli_id: poliId,
           service_name: item?.nama,
+          facility_id: facilityId,
+          facility_name: facilityName,
         });
         onPick(item);
       }}
@@ -1098,6 +1100,8 @@ function RightPanel({
   searchQuery,
   scrollReq,
   onPickPoli,
+  facilityId,
+  facilityName,
 }) {
   const [sub, setSub] = useState(null);
   const [catOpen, setCatOpen] = useState("anak"); // panel kategori yang dibuka (anak/dewasa/lainnya/null)
@@ -1236,19 +1240,21 @@ useEffect(() => {
   useEffect(() => {
     if (!sub) return;
 
-  const t0 = performance.now();
+    const t0 = performance.now();
 
-  return () => {
-    const ms = Math.round(performance.now() - t0);
-    // "view_service_ms" sekarang mengirim parameter view_ms (diatur di trackTiming)
-    trackTiming("view_service_ms", ms, {
-      label: sub.nama,
-      poli_id: selected?.id,
-      poli_name: selected?.nama,
-      service_name: sub.nama,
-    });
-  };
-}, [sub, selected]);
+    return () => {
+      const ms = Math.round(performance.now() - t0);
+      // "view_service_ms" sekarang mengirim parameter view_ms (diatur di trackTiming)
+      trackTiming("view_service_ms", ms, {
+        label: sub.nama,
+        poli_id: selected?.id,
+        poli_name: selected?.nama,
+        service_name: sub.nama,
+        facility_id: facilityId,        // 👈 ini kunci: kirim facility
+        facility_name: facilityName,    // 👈 nama fasilitas yang dibaca user
+      });
+    };
+  }, [sub, selected, facilityId, facilityName]);
   const servicesGridRef = useRef(null);
 
   useEffect(() => setSub(null), [selected]);
@@ -1309,6 +1315,8 @@ useEffect(() => {
                       onPick={() => onPickSub(poli.id, index)}
                       parentJadwal={poli.jadwal}
                       poliId={poli.id}
+                      facilityId={facilityId}
+                      facilityName={facilityName}
                     />
                   ))}
                 </div>
@@ -1366,6 +1374,8 @@ useEffect(() => {
               onPick={setSub}
               parentJadwal={selected.jadwal}
               poliId={selected.id}
+              facilityId={facilityId}
+              facilityName={facilityName}
             />
           ))
         ) : (
@@ -1722,19 +1732,19 @@ export default function App() {
 };
 // === Handler pilih POLI (klik kartu poli) ===
 const onPickPoli = (s) => {
-  // event poli
   const poliName = s.nama || s.label || s.title || "(tanpa nama)";
 
-  // kirim ke Universal (lama)
+  // Legacy (Universal)
   trackEvent("Navigation", "select_poli", poliName);
 
-  // kirim ke GA4
+  // GA4 – tambahkan facility
   gaEvent("select_poli", {
     poli_id: s.id ?? "unknown_id",
     poli_name: poliName,
+    facility_id: facility,
+    facility_name: facilityName,
   });
 
-  // Time To Find (ms): sejak pencarian dikirim sampai klik poli pertama
   if (lastQueryRef.current && searchStartRef.current > 0) {
     const ms = Math.round(performance.now() - searchStartRef.current);
     gaEvent("time_to_find_ms", {
@@ -1742,12 +1752,13 @@ const onPickPoli = (s) => {
       ms,
       poli_id: s.id,
       poli_name: s.nama,
+      facility_id: facility,
+      facility_name: facilityName,
     });
     lastQueryRef.current = null;
     searchStartRef.current = 0;
   }
 
-  // ubah state pilihan
   setSelected(s);
   scrollToTopSmooth();
 };
@@ -1861,37 +1872,46 @@ useEffect(() => {
   );
 
   function handlePickSub(poliId, idx) {
-    const p = SERVICES_CURRENT.find((x) => x.id === poliId);
-    if (!p) return;
-    setQuery("");
-    setSelected(p);
-    setJump({ poliId, idx });
-    setNavOpen(false);
-    trackEvent("Navigation", "select_service", `${poliId}#${idx}`);
-    const svc = p.layanan?.[idx];
-    gaEvent("select_service", { poli_id: p.id, poli_name: p.nama, service_name: svc?.nama });
-    if (lastQueryRef.current) {
-      gaEvent("search_result_click", {
+  const p = SERVICES_CURRENT.find((x) => x.id === poliId);
+  if (!p) return;
+  const svc = p.layanan?.[idx];
+
+  setQuery("");
+  setSelected(p);
+  setJump({ poliId, idx });
+  setNavOpen(false);
+
+  trackEvent("Navigation", "select_service", `${poliId}#${idx}`);
+
+  const baseParams = {
+    poli_id: p.id,
+    poli_name: p.nama,
+    service_name: svc?.nama,
+    facility_id: facility,
+    facility_name: facilityName,
+  };
+
+  gaEvent("select_service", baseParams);
+
+  if (lastQueryRef.current) {
+    gaEvent("search_result_click", {
+      query: lastQueryRef.current,
+      ...baseParams,
+    });
+
+    if (searchStartRef.current) {
+      const ms = Math.round(performance.now() - searchStartRef.current);
+      gaEvent("search_ttfi_ms", {
         query: lastQueryRef.current,
-        poli_id: p.id,
-        poli_name: p.nama,
-        service_name: svc?.nama,
+        ...baseParams,
+        value: ms,
       });
-      if (searchStartRef.current) {
-        const ms = Math.round(performance.now() - searchStartRef.current);
-        gaEvent("search_ttfi_ms", {
-          query: lastQueryRef.current,
-          poli_id: p.id,
-          poli_name: p.nama,
-          service_name: svc?.nama,
-          value: ms,
-        });
-     }
-      // reset only the timestamp; keep lastQuery for subsequent clicks if same query is still active
-      searchStartRef.current = 0;
     }
-    scrollToTopSmooth();
+    searchStartRef.current = 0;
   }
+
+  scrollToTopSmooth();
+}
 
   useEffect(() => {
     stopFlowAudio();
@@ -1955,21 +1975,27 @@ useEffect(() => {
 
       <div className="relative">
         <select
-          value={facility}
-          onChange={(e) => {
-            const v = e.target.value;
-            setFacility(v);
-            trackEvent('Facility','change', v);
-          }}
-          className="w-full h-11 rounded-xl pl-3 pr-8 text-[14px] outline-none
-                     bg-white text-slate-900 border border-black/10
-                     dark:bg-slate-800 dark:text-white dark:border-white/10
-                     focus:ring-2 focus:ring-emerald-500 appearance-none"
-        >
-          {FACILITIES.map((f) => (
-            <option key={f.id} value={f.id}>{f.name}</option>
-          ))}
-        </select>
+  value={facility}
+  onChange={(e) => {
+    const v = e.target.value;
+    setFacility(v);
+    trackEvent('Facility','change', v);
+
+    const fac = FACILITIES.find((f) => f.id === v);
+    gaEvent("change_facility", {
+      facility_id: v,
+      facility_name: fac?.name ?? "(unknown)",
+    });
+  }}
+  className="w-full h-11 rounded-xl pl-3 pr-8 text-[14px] outline-none
+             bg-white text-slate-900 border border-black/10
+             dark:bg-slate-800 dark:text-white dark:border-white/10
+             focus:ring-2 focus:ring-emerald-500 appearance-none"
+>
+  {FACILITIES.map((f) => (
+    <option key={f.id} value={f.id}>{f.name}</option>
+  ))}
+</select>
         <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white/70">▾</span>
       </div>
     </div>
@@ -1987,22 +2013,28 @@ useEffect(() => {
       <span className="text-sm text-slate-700 dark:text-white/70">Fasilitas:</span>
       <div className="relative">
         <select
-          value={facility}
-          onChange={(e) => {
-            const v = e.target.value;
-            setFacility(v);
-            trackEvent('Facility','change', v);
-          }}
-          className="h-10 rounded-lg pl-3 pr-8 text-[14px] outline-none
-                     bg-white text-slate-900 border border-black/10
-                     dark:bg-slate-800 dark:text-white dark:border-white/10
-                     focus:ring-2 focus:ring-emerald-500 appearance-none
-                     w-[320px] max-w-[40vw]"
-        >
-          {FACILITIES.map((f) => (
-            <option key={f.id} value={f.id}>{f.name}</option>
-          ))}
-        </select>
+  value={facility}
+  onChange={(e) => {
+    const v = e.target.value;
+    setFacility(v);
+    trackEvent('Facility','change', v);
+
+    const fac = FACILITIES.find((f) => f.id === v);
+    gaEvent("change_facility", {
+      facility_id: v,
+      facility_name: fac?.name ?? "(unknown)",
+    });
+  }}
+  className="h-10 rounded-lg pl-3 pr-8 text-[14px] outline-none
+             bg-white text-slate-900 border border-black/10
+             dark:bg-slate-800 dark:text-white dark:border-white/10
+             focus:ring-2 focus:ring-emerald-500 appearance-none
+             w-[320px] max-w-[40vw]"
+>
+  {FACILITIES.map((f) => (
+    <option key={f.id} value={f.id}>{f.name}</option>
+  ))}
+</select>
         <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-500">▾</span>
       </div>
     </div>
@@ -2068,6 +2100,8 @@ useEffect(() => {
             searchQuery={query}
             scrollReq={scrollReq}
             onPickPoli={onPickPoli}
+            facilityId={facility}          
+            facilityName={facilityName}
           />
         </div>
 
