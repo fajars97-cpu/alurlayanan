@@ -30,6 +30,7 @@ export const DOCTORS_BY_POLI = {
   farmasi: "Iie Sumiasih",
   haji: "dr. Dewi Wulansari",
   "pelayanan-24": "dr. Alfred Alberta Josua Ritonga",
+  konseling_psikologi: "Herdini Primasari, M. Psi., Psikolog",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
