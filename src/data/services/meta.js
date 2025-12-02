@@ -141,7 +141,7 @@ export const EXTRA_INFO = {
 ],
 
   // KI Hamil
-  "Pemeriksaan Ibu Hamil": "Kunjungan kehamilan 1 (6-8 minggu), kunjungan kehamilan 2 (10-12 minggu), kunjungan kehamilan 3 (16 minggu), kunjungan kehamilan 4 (20 minggu), kunjungan kehamilan 5 (24 minggu), kunjungan kehamilan 6 (28 minggu), kunjungan kehamilan 7 (32 minggu), kunjungan kehamilan 8 (36 minggu), kunjungan kehamilan 9 (37-41 minggu) dilakukan di ruang KI hamil lantai 2, ikuti instruksi petugas.",
+  "Pemeriksaan Ibu Hamil": ["Kunjungan kehamilan 1 (6-8 minggu), kunjungan kehamilan 2 (10-12 minggu), kunjungan kehamilan 3 (16 minggu), kunjungan kehamilan 4 (20 minggu), kunjungan kehamilan 5 (24 minggu), kunjungan kehamilan 6 (28 minggu), kunjungan kehamilan 7 (32 minggu), kunjungan kehamilan 8 (36 minggu), kunjungan kehamilan 9 (37-41 minggu).", "Pemeriksaan USG yang tercover BPJS 2x di Pemeriksaan Trimester 1/ pertama kali datang dan Trimester 3. Di luar jadwal pemeriksaan USG berbayar Rp50.000."],
   // KI Nifas
   "Pelayanan Ibu Nifas dan Bayi sampai Usia 28 Hari": "Kontrol nifas menerima persalinan dari RS atau Puskesmas. Pendaftaran dilakukan untuk bayi dan ibu nifas. Kunjungan nifas 2 (3-7 hari setelah persalinan), kunjungan nifas 3 (7-28 hari setelah persalinan), kunjungan nifas 4 hanya untuk ibu, bayi langsung didaftarkan untuk poli imunisasi (29-42 hari setelah persalinan) dilakukan di ruang nifas lantai 1, ikuti instruksi petugas.",
   "Tindik/ Piercing": "Bayi usia dibawah 4 bulan dan diharapkan membawa anting dengan model lingkaran pendaftaran 10.000 + tindakan 45.000",
