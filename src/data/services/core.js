@@ -1259,6 +1259,34 @@ export const FLOW_STEPS = {
     description: "Silahkan menuju bagian nurse station/ meja perawat poli yang dituju, ikuti instruksi petugas",
     img: "/alur/169-menuju-nurse-station.webp",
     },
+    170: {
+    id: 170,
+    title: "Langkah 170",
+    name: "Rujukan Poli Lain",
+    description: "Bila Anda dirujuk dari poli lain, silahkan buka https://bit.ly/infolayananpkmjagakarsa lalu pilih Konseling Psikologi dan cek sesi jadwal yang tersedia. Hubungi kontak yang tertera dan sampaikan bahwa anda dirujuk dari poli lain.",
+    img: "/alur/170-rujukan-poli-lain.webp",
+    },
+    171: {
+    id: 171,
+    title: "Langkah 171",
+    name: "Cek Jadwal",
+    description: "Silahkan buka https://bit.ly/infolayananpkmjagakarsa lalu pilih Konseling Psikologi dan cek sesi jadwal yang tersedia. Silahkan datang ke Puskesmas sesuai jam dan hari yang telah dijadwalkan oleh petugas.",
+    img: "/alur/171-cek-jadwal.webp",
+    },
+    172: {
+    id: 172,
+    title: "Langkah 172",
+    name: "Menuju Ruang Konseling",
+    description: "Silahkan menuju ruang konseling di lantai 3 dan silahkan masuk ke dalam ruangan sesuai jadwal Anda.",
+    img: "/alur/172-menuju-ruang-konseling.webp",
+    },
+    173: {
+    id: 173,
+    title: "Langkah 173",
+    name: "Layanan Selesai",
+    description: "Layanan telah selesai, Anda dapat meninggalkan puskesmas",
+    img: "/alur/173-layanan-selesai.webp",
+    },
 };
 
 /* ===================== FACILITIES ===================== */
@@ -1779,10 +1807,10 @@ export const SERVICES_BY_FACILITY = {
     {
       id: "konseling_psikologi",
       nama: "Konseling Psikologi",
-      klaster: "5",
+      klaster: "Umum (Lt 3)",
       ikon: "🗣️💚",
       lokasi: "Lantai 3",
-      img: "pendaftaran-online.webp",
+      img: "poli-psikologi.webp",
       layanan: [
         {
           nama: "Konseling Psikologi",
@@ -1802,7 +1830,10 @@ export const SERVICES_BY_FACILITY = {
             },
             exceptions: {}
           },
-          alur: [167, 168, 169],
+          alur: {
+            rujukan: [170, 171, 172, 173], // rujukan poli lain
+            langsung: [0, 1, 171, 172, 173], // langsung ke konseling
+            },
         },
       ],
     },
