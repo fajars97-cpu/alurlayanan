@@ -5,6 +5,7 @@ import { initGA } from "./ga";
 import GAListener from "./gaListener";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
+import PsychologySchedule from "./components/PsychologySchedule.jsx";
 
 // Scroll ke bagian atas halaman (handle fallback kalau browser tidak support smooth)
 const scrollToTopSmooth = () => {
@@ -1559,6 +1560,13 @@ useEffect(() => {
           <FlowCard key={step.id ?? i} step={step} index={i} />
         ))}
       </div>
+
+         {/* Kalender Jadwal Konseling Psikologi – fitur khusus poli Konseling Psikologi */}
+      {selected?.id === "konseling_psikologi" && (
+        <div className="mt-4 sm:mt-6">
+          <PsychologySchedule />
+        </div>
+      )}
 
       <div className="mt-4 sm:mt-6">
   <InfoCard title="Petugas Penanggung Jawab">

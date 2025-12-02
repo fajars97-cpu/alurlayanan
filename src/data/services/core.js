@@ -1777,6 +1777,36 @@ export const SERVICES_BY_FACILITY = {
       ],
     },
     {
+      id: "konseling_psikologi",
+      nama: "Konseling Psikologi",
+      klaster: "5",
+      ikon: "🗣️💚",
+      lokasi: "Lantai 3",
+      img: "pendaftaran-online.webp",
+      layanan: [
+        {
+          nama: "Konseling Psikologi",
+          ikon: "🗣️💚",
+          tarif: 30000,
+          bpjs: true,
+          ket: "Konseling Psikologi",
+          jadwal: {
+            weekly: {
+              Senin:  "08:00-16:00",
+              Selasa: "08:00-16:00",
+              Rabu:   "08:00-16:00",
+              Kamis:  "08:00-16:00",
+              Jumat:  "08:00-16:00",
+              Sabtu:  "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {}
+          },
+          alur: [167, 168, 169],
+        },
+      ],
+    },
+    {
       id: "imunisasi",
       nama: "Imunisasi",
       klaster: "Ibu dan Anak (Lt 3)",
