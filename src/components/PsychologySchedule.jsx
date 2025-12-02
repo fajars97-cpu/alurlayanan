@@ -277,11 +277,11 @@ export default function PsychologySchedule() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">
-            Jadwal Sesi Konseling Psikologi (KIRANA)
+            Jadwal Sesi Konseling Psikologi
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-white/60 mt-1">
             Pilih tanggal (maksimal 30 hari ke depan) untuk melihat rincian
-            sesi konseling psikososial yang tersedia.
+            sesi konseling psikologi yang tersedia.
           </p>
           {apiRange && (
             <p className="text-[11px] text-slate-500 dark:text-white/40 mt-1">
@@ -299,7 +299,7 @@ export default function PsychologySchedule() {
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 dark:text-white/60">
           <div className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />{" "}
-            <span>Banyak sesi</span>
+            <span>Banyak sesi tersedia</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />{" "}
@@ -311,7 +311,7 @@ export default function PsychologySchedule() {
           </div>
           <div className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-600" />{" "}
-            <span>Libur / tidak bisa dipilih</span>
+            <span>Libur</span>
           </div>
         </div>
       </div>
