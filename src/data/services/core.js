@@ -1832,7 +1832,6 @@ export const SERVICES_BY_FACILITY = {
           },
           alur: {
             rujukan: [170, 171, 172, 173], // rujukan poli lain
-            langsung: [171, 0, 1, 172, 173], // langsung ke konseling
             },
         },
       ],
