@@ -178,7 +178,7 @@ export const EXTRA_INFO = {
 
   // CKG
   "Cek Kesehatan Gratis": [
-    "Pemeriksaan Kesehatan Gratis (CKG) adalah program pemerintah untuk mendeteksi dini faktor risiko penyakit tidak menular seperti hipertensi, diabetes, kolesterol tinggi, dan obesitas pada anak usia 0-5 tahun dan dewasa 15 tahun ke atas 1 kali setahun.",
+    "Pemeriksaan Kesehatan Gratis (CKG) adalah program pemerintah untuk mendeteksi dini faktor risiko penyakit tidak menular seperti hipertensi, diabetes, kolesterol tinggi, dan obesitas pada anak usia 0-6 tahun dan dewasa 18 tahun ke atas 1 kali setahun, serta cek kesehatan sekolah (6-18 tahun) yang diadakan di masing-masing sekolah.",
     "Pemeriksaan ini meliputi pengukuran tekanan darah, gula darah, kolesterol (sesuai faktor risiko), pemriksaan indeks massa tubuh (IMT),dan pemeriksaan lain sesuai faktor risiko dan paket pemeriksaan sesuai usia, yang disertai konseling kesehatan untuk mengelola faktor risiko penyakit yang ditemukan",
     "Pasien disarankan untuk melakukan puasa 8-12 jam (tidak boleh makan dan minum kecuali minum air putih) dari pukul 10 malam dan datang pagi ke Puskesmas untuk CKG agar tidak melewatai batas puasa",
     "Hasil pemeriksaan penunjang lainnya (gigi, KB-IVA, mata, laboratorium) dikonsultasikan lagi ke petugas CKG untuk dilakukan penginputan dan hasil pemeriksaan dikirimkan melalui pesan Whatsapp dan aplikasi satusehat mobile",
