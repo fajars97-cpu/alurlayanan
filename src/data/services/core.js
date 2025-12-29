@@ -1804,38 +1804,38 @@ export const SERVICES_BY_FACILITY = {
         },
       ],
     },
-    {
-      id: "konseling_psikologi",
-      nama: "Konseling Psikologi",
-      klaster: "Umum (Lt 3)",
-      ikon: "🗣️💚",
-      lokasi: "Lantai 3",
-      img: "poli-psikologi.webp",
-      layanan: [
-        {
-          nama: "Konseling Psikologi",
-          ikon: "🗣️💚",
-          tarif: 30000,
-          bpjs: true,
-          ket: "Konseling Psikologi",
-          jadwal: {
-            weekly: {
-              Senin:  "08:00-16:00",
-              Selasa: "08:00-16:00",
-              Rabu:   "08:00-16:00",
-              Kamis:  "08:00-16:00",
-              Jumat:  "08:00-16:00",
-              Sabtu:  "Tutup",
-              Minggu: "Tutup",
-            },
-            exceptions: {}
-          },
-          alur: {
-            rujukan: [170, 171, 172, 173], // rujukan poli lain
-            },
-        },
-      ],
-    },
+    //{
+      //id: "konseling_psikologi",
+      //nama: "Konseling Psikologi",
+      //klaster: "Umum (Lt 3)",
+      //ikon: "🗣️💚",
+      //lokasi: "Lantai 3",
+      //img: "poli-psikologi.webp",
+      //layanan: [
+        //{
+          //nama: "Konseling Psikologi",
+          //ikon: "🗣️💚",
+          //tarif: 30000,
+          //bpjs: true,
+          //ket: "Konseling Psikologi",
+          //jadwal: {
+            //weekly: {
+              //Senin:  "08:00-16:00",
+              //Selasa: "08:00-16:00",
+              //Rabu:   "08:00-16:00",
+              //Kamis:  "08:00-16:00",
+              //Jumat:  "08:00-16:00",
+              //Sabtu:  "Tutup",
+              //Minggu: "Tutup",
+            //},
+            //exceptions: {}
+          //},
+          //alur: {
+            //rujukan: [170, 171, 172, 173], // rujukan poli lain
+           // },
+        //},
+      //],
+    //},
     {
       id: "imunisasi",
       nama: "Imunisasi",

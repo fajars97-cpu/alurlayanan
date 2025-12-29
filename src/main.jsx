@@ -4,7 +4,7 @@ import App from "./App.jsx";
 import "./index.css";
 import { HashRouter } from "react-router-dom";
 import { initGA } from "./ga.js";
-import GAListener from "./GAListener.jsx";
+import GAListener from "./gaListener.jsx";
 
 class ErrorBoundary extends React.Component {
   constructor(p){ super(p); this.state = { hasError:false, err:null }; }
