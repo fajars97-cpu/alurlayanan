@@ -6,6 +6,14 @@ import GAListener from "./gaListener";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 import PsychologySchedule from "./components/PsychologySchedule.jsx";
+// === Global schedule override (Ramadan, libur massal, dll)
+import {
+  RAMADAN_MODE,
+  RAMADAN_DEFAULT,
+  GLOBAL_CLOSED_DATES,
+  ALWAYS_OPEN_POLI_IDS,
+  formatDateKey,
+} from "./config/scheduleOverride";
 
 // Scroll ke bagian atas halaman (handle fallback kalau browser tidak support smooth)
 const scrollToTopSmooth = () => {
@@ -195,7 +203,7 @@ function stopFlowAudio() {
  * Overnight "22:00-06:00" ditangani otomatis.
  */
 const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-const RULE_DEFAULT = {
+const RULE_DEFAULT_NORMAL = {
   Senin: "08:00-16:00",
   Selasa: "08:00-16:00",
   Rabu: "08:00-16:00",
@@ -204,6 +212,7 @@ const RULE_DEFAULT = {
   Sabtu: "Tutup",
   Minggu: "Tutup",
 };
+const RULE_DEFAULT = RAMADAN_MODE ? RAMADAN_DEFAULT : RULE_DEFAULT_NORMAL;
 const toMin = (s) => {
   const [h, m] = String(s).trim().split(":").map((n) => parseInt(n, 10) || 0);
   return h * 60 + m;
@@ -304,14 +313,16 @@ function getOpenStatus(service, ref = new Date()) {
     isFullDay = curFrom <= 0 && curTo >= 1440;
   }
 
-  // === NEW: Istirahat Senin–Jumat pukul 12:00–13:00 (kecuali 24 jam)
+  // === Istirahat Senin–Kamis 12:00–13:00, Jumat 11:30–13:00 (kecuali 24 jam)
   const dayName = DAY_NAMES_ID[ref.getDay()];
   const isWeekday = ["Senin","Selasa","Rabu","Kamis","Jumat"].includes(dayName);
-  const rest = isWeekday && now >= 720 && now < 780; // 12:00–13:00
+  const restStart = dayName === "Jumat" ? 690 : 720; // Jumat 11:30, lainnya 12:00
+  const restEnd = 780; // 13:00
+  const rest = isWeekday && now >= restStart && now < restEnd;
   if (rest) {
     open = false;
-    // saat istirahat, perubahan terdekat adalah pukul 13:00
-    if (nextChange == null || 780 < nextChange) nextChange = 780;
+    // saat istirahat, perubahan terdekat adalah akhir istirahat (13:00)
+    if (nextChange == null || restEnd < nextChange) nextChange = restEnd;
   }
 
   const minutesUntilChange = nextChange != null ? nextChange - now : null;
@@ -345,6 +356,14 @@ export function isOpenNow(s, ref = new Date()) {
 
 // === Union status untuk sebuah poli (menggabungkan jadwal poli + semua layanan)
 function getOpenStatusForPoli(poli, ref = new Date()) {
+   // Override libur massal: semua poli tutup kecuali layanan 24 jam tertentu
+  if (RAMADAN_MODE) {
+    const key = formatDateKey(ref);
+    if (GLOBAL_CLOSED_DATES.has(key) && !ALWAYS_OPEN_POLI_IDS.has(poli?.id)) {
+      return { open: false, rest: false, soon: null, minutesUntilChange: null };
+    }
+  }
+
   const schedules = [];
   if (poli?.jadwal) schedules.push(poli.jadwal);
   (poli?.layanan || []).forEach((L) => {
@@ -394,13 +413,15 @@ function getOpenStatusForPoli(poli, ref = new Date()) {
     isFullDay = curFrom <= 0 && curTo >= 1440;
   }
 
-  // Istirahat 12:00–13:00 (Sen–Jum), kecuali 24 jam
+  // Istirahat Senin–Kamis 12:00–13:00, Jumat 11:30–13:00 (kecuali 24 jam)
   const dayName = DAY_NAMES_ID[ref.getDay()];
   const isWeekday = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"].includes(dayName);
-  const rest = !isFullDay && isWeekday && now >= 720 && now < 780;
+  const restStart = dayName === "Jumat" ? 690 : 720; // Jumat 11:30
+  const restEnd = 780; // 13:00
+  const rest = !isFullDay && isWeekday && now >= restStart && now < restEnd;
   if (rest) {
     open = false;
-    if (nextChange == null || 780 < nextChange) nextChange = 780;
+    if (nextChange == null || restEnd < nextChange) nextChange = restEnd;
   }
 
   const minutesUntilChange = nextChange != null ? nextChange - now : null;
