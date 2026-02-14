@@ -18,7 +18,7 @@ export const RAMADAN_DEFAULT = {
 export const GLOBAL_CLOSED_DATES = new Set(["2026-02-16", "2026-02-17"]);
 
 // Poli yang tetap buka 24 jam (ID sudah cocok dengan core.js kamu)
-export const ALWAYS_OPEN_POLI_IDS = new Set(["igd", "farmasi", "pelayanan-24"]);
+export const ALWAYS_OPEN_POLI_IDS = new Set(["igd", "farmasi", "pelayanan-24", "pendaftaran_online", "RB"]);
 
 export function formatDateKey(date) {
   const y = date.getFullYear();
