@@ -30,7 +30,7 @@ export const DOCTORS_BY_POLI = {
   farmasi: "Iie Sumiasih",
   haji: "dr. Dewi Wulansari",
   "pelayanan-24": "dr. Alfred Alberta Josua Ritonga",
-  konseling_psikologi: "Herdini Primasari, M. Psi., Psikolog",
+  konseling_psikologi: "NADIRA KHAIRUNNISA",
 };
 
 /* ===================== Info Tambahan (contoh) ===================== */
@@ -142,7 +142,12 @@ export const EXTRA_INFO = {
 ],
 
   // Konseling Psikologi
-  //"Konseling Psikologi": ["Hanya melalui janji temu, silahkan melihat jadwal dan sesi yang masih tersedia, lalu konfirmasi ke nomor WA:087777256442.","Melayani pasien anak sekolah SD 1 sampai dewasa lansia, melayani permasalahan:","1. Masalah terkait gaya hidup", "2. Orang dengan potensi bahaya kesehatan terkait dengan keadaan sosial ekonomi dan psikosial","3. Insomnia non organik","4. Gangguan penyesuaian","5. Gangguan cemas menyeluruh","6. Gangguan sikap menentang/membangkang"],//
+  "Konseling Psikologi": [
+    "Layanan konseling psikologi klinis oleh NADIRA KHAIRUNNISA.",
+    "Jadwal Senin-Kamis 08.00-12.00 dan 13.00-16.00.",
+    "Jadwal Jumat 08.00-11.30 dan 13.00-16.30.",
+    "Layanan buka Senin-Jumat dan tutup Sabtu-Minggu.",
+  ],
   // KI Hamil
   "Pemeriksaan Ibu Hamil": ["Kunjungan kehamilan 1 (6-8 minggu), kunjungan kehamilan 2 (10-12 minggu), kunjungan kehamilan 3 (16 minggu), kunjungan kehamilan 4 (20 minggu), kunjungan kehamilan 5 (24 minggu), kunjungan kehamilan 6 (28 minggu), kunjungan kehamilan 7 (32 minggu), kunjungan kehamilan 8 (36 minggu), kunjungan kehamilan 9 (37-41 minggu).", "Pemeriksaan USG yang tercover BPJS 2x di Pemeriksaan Trimester 1/ pertama kali datang dan Trimester 3. Di luar jadwal pemeriksaan USG berbayar Rp50.000."],
   // KI Nifas

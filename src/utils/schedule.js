@@ -64,14 +64,15 @@ function normalizeRanges(value) {
 
 function normalizeSchedule(scheduleLike) {
   if (!scheduleLike || typeof scheduleLike !== "object" || Array.isArray(scheduleLike)) {
-    return { tz: "Asia/Jakarta", weekly: { ...RULE_DEFAULT }, exceptions: {} };
+    return { tz: "Asia/Jakarta", weekly: { ...RULE_DEFAULT }, exceptions: {}, breaks: {} };
   }
 
-  if (scheduleLike.weekly || scheduleLike.exceptions) {
+  if (scheduleLike.weekly || scheduleLike.exceptions || scheduleLike.breaks) {
     return {
       tz: scheduleLike.tz || "Asia/Jakarta",
       weekly: { ...RULE_DEFAULT, ...(scheduleLike.weekly || {}) },
       exceptions: { ...(scheduleLike.exceptions || {}) },
+      breaks: normalizeBreakSchedule(scheduleLike.breaks),
     };
   }
 
@@ -79,7 +80,23 @@ function normalizeSchedule(scheduleLike) {
     tz: "Asia/Jakarta",
     weekly: { ...RULE_DEFAULT, ...scheduleLike },
     exceptions: {},
+    breaks: {},
   };
+}
+
+function normalizeBreakSchedule(breaksLike) {
+  if (!breaksLike || typeof breaksLike !== "object" || Array.isArray(breaksLike)) {
+    return { weekly: {}, exceptions: {} };
+  }
+
+  if (breaksLike.weekly || breaksLike.exceptions) {
+    return {
+      weekly: { ...(breaksLike.weekly || {}) },
+      exceptions: { ...(breaksLike.exceptions || {}) },
+    };
+  }
+
+  return { weekly: { ...breaksLike }, exceptions: {} };
 }
 
 function rangesForDate(schedule, date) {
@@ -88,6 +105,14 @@ function rangesForDate(schedule, date) {
 
   if (exceptions[key] != null) return normalizeRanges(exceptions[key]);
   return normalizeRanges(weekly[dayNameID(date)]);
+}
+
+function breakRangesForDate(schedule, date) {
+  const { breaks } = normalizeSchedule(schedule);
+  const key = `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+
+  if (breaks?.exceptions?.[key] != null) return normalizeRanges(breaks.exceptions[key]);
+  return normalizeRanges(breaks?.weekly?.[dayNameID(date)]);
 }
 
 function rangesForToday(schedule, ref = new Date()) {
@@ -101,6 +126,23 @@ function rangesForToday(schedule, ref = new Date()) {
   });
 
   rangesForDate(schedule, today).forEach(({ from, to }) => {
+    out.push(to >= from ? { from, to } : { from, to: 1440 });
+  });
+
+  return out;
+}
+
+function breakRangesForToday(schedule, ref = new Date()) {
+  const today = new Date(ref);
+  const yesterday = new Date(ref);
+  yesterday.setDate(ref.getDate() - 1);
+
+  const out = [];
+  breakRangesForDate(schedule, yesterday).forEach(({ from, to }) => {
+    if (to < from) out.push({ from: 0, to });
+  });
+
+  breakRangesForDate(schedule, today).forEach(({ from, to }) => {
     out.push(to >= from ? { from, to } : { from, to: 1440 });
   });
 
@@ -132,7 +174,7 @@ function getRestWindow(ref) {
   };
 }
 
-function scanRanges(ranges, ref, nextDayRanges = []) {
+function scanRanges(ranges, ref, nextDayRanges = [], restRanges = []) {
   const now = ref.getHours() * 60 + ref.getMinutes();
   const sorted = [...ranges].sort((a, b) => a.from - b.from);
   let open = false;
@@ -153,12 +195,21 @@ function scanRanges(ranges, ref, nextDayRanges = []) {
   }
 
   const isFullDay = fullDayFromRanges(sorted);
-  const restWindow = getRestWindow(ref);
-  const rest = !isFullDay && restWindow && now >= restWindow.start && now < restWindow.end;
+  const defaultRestWindow = getRestWindow(ref);
+  const restWindows = [
+    ...(defaultRestWindow ? [defaultRestWindow] : []),
+    ...restRanges.map(({ from, to }) => ({ start: from, end: to })),
+  ];
+  const activeRestWindow = restWindows.find(
+    (window) => now >= window.start && now < window.end
+  );
+  const rest = !isFullDay && Boolean(activeRestWindow);
 
   if (rest) {
     open = false;
-    if (nextChange == null || restWindow.end < nextChange) nextChange = restWindow.end;
+    if (nextChange == null || activeRestWindow.end < nextChange) {
+      nextChange = activeRestWindow.end;
+    }
   }
 
   const minutesUntilChange = nextChange != null ? nextChange - now : null;
@@ -181,16 +232,28 @@ export function getOpenStatus(service, ref = new Date()) {
   const tomorrow = new Date(ref);
   tomorrow.setDate(ref.getDate() + 1);
 
-  return scanRanges(rangesForToday(schedule, ref), ref, rangesForToday(schedule, tomorrow));
+  return scanRanges(
+    rangesForToday(schedule, ref),
+    ref,
+    rangesForToday(schedule, tomorrow),
+    breakRangesForToday(schedule, ref)
+  );
 }
 
 export function getEffectiveJadwal(service) {
-  const { weekly } = normalizeSchedule(service?.jadwal || {});
+  const schedule = service?.jadwal || {};
+  const { weekly, breaks } = normalizeSchedule(schedule);
   return DAY_NAMES_ID.reduce((output, dayName) => {
     const ranges = normalizeRanges(weekly[dayName]);
-    output[dayName] = ranges.length
+    const dayBreaks = normalizeRanges(breaks?.weekly?.[dayName]);
+    const scheduleText = ranges.length
       ? ranges.map((range) => `${fmtMin(range.from)}-${fmtMin(range.to)}`).join(", ")
       : "Tutup";
+    const breakText = dayBreaks.length
+      ? ` (Istirahat ${dayBreaks.map((range) => `${fmtMin(range.from)}-${fmtMin(range.to)}`).join(", ")})`
+      : "";
+
+    output[dayName] = ranges.length ? `${scheduleText}${breakText}` : scheduleText;
     return output;
   }, {});
 }
@@ -217,8 +280,9 @@ export function getOpenStatusForPoli(poli, ref = new Date()) {
   const tomorrow = new Date(ref);
   tomorrow.setDate(ref.getDate() + 1);
   const nextDayRanges = schedules.flatMap((schedule) => rangesForToday(schedule, tomorrow));
+  const restRanges = schedules.flatMap((schedule) => breakRangesForToday(schedule, ref));
 
-  return scanRanges(ranges, ref, nextDayRanges);
+  return scanRanges(ranges, ref, nextDayRanges, restRanges);
 }
 
 export function schedulesForPoli(poli) {
@@ -233,10 +297,14 @@ export function schedulesForPoli(poli) {
 }
 
 export function weeklyKey(schedule) {
-  const { weekly } = normalizeSchedule(schedule);
+  const { weekly, breaks } = normalizeSchedule(schedule);
   return JSON.stringify(
     DAY_NAMES_ID.reduce((output, dayName) => {
       output[dayName] = normalizeRanges(weekly[dayName]).map((range) => [range.from, range.to]);
+      output[`${dayName}:breaks`] = normalizeRanges(breaks?.weekly?.[dayName]).map((range) => [
+        range.from,
+        range.to,
+      ]);
       return output;
     }, {})
   );

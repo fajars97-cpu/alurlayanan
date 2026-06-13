@@ -3,7 +3,6 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import { trackEvent, trackTiming, gaEvent } from "./ga.js";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
-import PsychologySchedule from "./components/PsychologySchedule.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
 import { mapEmbedSrc, reviewLink } from "./utils/facilityMaps";
 import {
@@ -1659,13 +1658,6 @@ useEffect(() => {
             description="Tonton edukasi singkat dari Puskesmas Jagakarsa sebelum melakukan pemeriksaan urine lengkap."
             cta="Buka video edukasi pemeriksaan urine di Instagram"
           />
-        </div>
-      )}
-
-         {/* Kalender Jadwal Konseling Psikologi – fitur khusus poli Konseling Psikologi */}
-      {selected?.id === "konseling_psikologi" && (
-        <div className="mt-4 sm:mt-6">
-          <PsychologySchedule />
         </div>
       )}
 

@@ -1256,21 +1256,21 @@ export const FLOW_STEPS = {
     id: 170,
     title: "Langkah 170",
     name: "Rujukan Poli Lain",
-    description: "Bila Anda dirujuk dari poli lain, silahkan buka https://bit.ly/infolayananpkmjagakarsa lalu pilih Konseling Psikologi dan cek sesi jadwal yang tersedia. Hubungi kontak yang tertera dan sampaikan bahwa anda dirujuk dari poli lain.",
+    description: "Bila Anda dirujuk dari poli lain, silahkan menuju layanan Konseling Psikologi sesuai jam buka layanan. Sampaikan kepada petugas bahwa Anda dirujuk dari poli lain.",
     img: "/alur/170-rujukan-poli-lain.webp",
     },
     171: {
     id: 171,
     title: "Langkah 171",
-    name: "Cek Jadwal",
-    description: "Silahkan buka https://bit.ly/infolayananpkmjagakarsa lalu pilih Konseling Psikologi dan cek sesi jadwal yang tersedia. Silahkan datang ke Puskesmas sesuai jam dan hari yang telah dijadwalkan oleh petugas.",
+    name: "Cek Jadwal Layanan",
+    description: "Silahkan datang pada jam layanan Konseling Psikologi: Senin-Kamis 08.00-12.00 dan 13.00-16.00, Jumat 08.00-11.30 dan 13.00-16.30.",
     img: "/alur/171-cek-jadwal.webp",
     },
     172: {
     id: 172,
     title: "Langkah 172",
     name: "Menuju Ruang Konseling",
-    description: "Silahkan menuju ruang konseling di lantai 3 dan silahkan masuk ke dalam ruangan sesuai jadwal Anda.",
+    description: "Silahkan menuju ruang konseling di lantai 3 dan ikuti arahan petugas.",
     img: "/alur/172-menuju-ruang-konseling.webp",
     },
     173: {
@@ -1294,6 +1294,28 @@ export const FACILITIES = [
   { id: "pustu-lentengagung2",      name: "Puskesmas Pembantu Lenteng Agung 2" },
   { id: "pustu-cipedak",      name: "Puskesmas Pembantu Cipedak (Coming Soon)" },
 ];
+
+const LAB_EXTENDED_SERVICE_SCHEDULE = {
+  weekly: {
+    Senin: "08:00-20:00",
+    Selasa: "08:00-20:00",
+    Rabu: "08:00-20:00",
+    Kamis: "08:00-20:00",
+    Jumat: "08:00-20:00",
+    Sabtu: "Tutup",
+    Minggu: "Tutup",
+  },
+  breaks: {
+    weekly: {
+      Senin: "18:00-19:00",
+      Selasa: "18:00-19:00",
+      Rabu: "18:00-19:00",
+      Kamis: "18:00-19:00",
+      Jumat: "18:00-19:00",
+    },
+  },
+  exceptions: {},
+};
 
 /* ===================== SERVICES_BY_FACILITY ===================== */
 /* Salin semua poli/layanan kamu ke sini. Aku sertakan beberapa utama,
@@ -1797,6 +1819,39 @@ export const SERVICES_BY_FACILITY = {
         },
       ],
     },
+    {
+      id: "konseling_psikologi",
+      nama: "Konseling Psikologi",
+      klaster: "Umum (Lt 3)",
+      ikon: "PSI",
+      lokasi: "Lantai 3",
+      img: "poli-psikologi.webp",
+      layanan: [
+        {
+          nama: "Konseling Psikologi",
+          ikon: "PSI",
+          tarif: 30000,
+          bpjs: true,
+          ket: "Konseling psikologi klinis oleh NADIRA KHAIRUNNISA.",
+          penanggungJawab: "NADIRA KHAIRUNNISA",
+          jadwal: {
+            weekly: {
+              Senin: "08:00-12:00, 13:00-16:00",
+              Selasa: "08:00-12:00, 13:00-16:00",
+              Rabu: "08:00-12:00, 13:00-16:00",
+              Kamis: "08:00-12:00, 13:00-16:00",
+              Jumat: "08:00-11:30, 13:00-16:30",
+              Sabtu: "Tutup",
+              Minggu: "Tutup",
+            },
+            exceptions: {},
+          },
+          alur: {
+            rujukan: [170, 171, 172, 173],
+          },
+        },
+      ],
+    },
     //{
       //id: "konseling_psikologi",
       //nama: "Konseling Psikologi",
@@ -2210,7 +2265,8 @@ export const SERVICES_BY_FACILITY = {
           ikon: "🩸",
           tarif: 30000,
           bpjs: true,
-          ket: "Tes Darah Lengkap",
+          ket: "Tes Darah Lengkap. Pengambilan sampel terakhir pukul 18.00.",
+          jadwal: LAB_EXTENDED_SERVICE_SCHEDULE,
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
                  Rujukan_Pustu: [106, 99, 104, 107],
           },
@@ -2507,7 +2563,8 @@ export const SERVICES_BY_FACILITY = {
           ikon: "🧬",
           tarif: 30000,
           bpjs: true,
-          ket: "Serologi",
+          ket: "Serologi. Pengambilan sampel terakhir pukul 18.00.",
+          jadwal: LAB_EXTENDED_SERVICE_SCHEDULE,
           alur: {Rujukan_Internal: [105, 98, 99, 104, 107],
                  Rujukan_Pustu: [106, 99, 104, 107],
           },
