@@ -17,7 +17,11 @@ export const trackPage = (path) => {
 
 // GA4: helper event bernama (native)
 export const gaEvent = (name, params = {}) => {
-  try { ReactGA.event(name, params); } catch {}
+  try {
+    ReactGA.event(name, params);
+  } catch {
+    // Analytics must never block the UI.
+  }
 };
 
 export const trackEvent = (category, action, label, value, params = {}) => {

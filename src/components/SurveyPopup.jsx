@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent, trackTiming } from "../ga.js";
 
 export default function SurveyPopup({
@@ -26,13 +26,13 @@ export default function SurveyPopup({
   }, [delayMs, storageKey]);
 
   // Tutup & set cooldown
-  function closeWithCooldown() {
+  const closeWithCooldown = useCallback(() => {
     const until = Date.now() + cooldownDays * 24 * 60 * 60 * 1000;
     localStorage.setItem(storageKey, String(until));
     setOpen(false);
     const ms = Math.round(performance.now() - openedAtRef.current || 0);
     if (ms > 0) trackTiming("survey_popup_open_ms", ms);
-  }
+  }, [cooldownDays, storageKey]);
 
   // Tutup dengan ESC
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function SurveyPopup({
     }
     if (open) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [closeWithCooldown, open]);
 
   if (!open) return null;
 

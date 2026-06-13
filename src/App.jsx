@@ -1,19 +1,22 @@
 // src/App.jsx
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { trackEvent, trackTiming, gaEvent } from "./ga.js";
-import { initGA } from "./ga";
-import GAListener from "./gaListener";
 import { motion, AnimatePresence } from "framer-motion";
 import SurveyPopup from "./components/SurveyPopup.jsx";
 import PsychologySchedule from "./components/PsychologySchedule.jsx";
-// === Global schedule override (Ramadan, libur massal, dll)
+import ThemeToggle from "./components/ThemeToggle.jsx";
+import { mapEmbedSrc, reviewLink } from "./utils/facilityMaps";
 import {
-  RAMADAN_MODE,
-  RAMADAN_DEFAULT,
-  GLOBAL_CLOSED_DATES,
-  ALWAYS_OPEN_POLI_IDS,
-  formatDateKey,
-} from "./config/scheduleOverride";
+  DAY_NAMES_ID,
+  getEffectiveJadwal,
+  getOpenStatus,
+  getOpenStatusForPoli,
+  schedulesForPoli,
+  todayText,
+  weeklyKey,
+} from "./utils/schedule";
+
+const MotionDiv = motion.div;
 
 // Scroll ke bagian atas halaman (handle fallback kalau browser tidak support smooth)
 const scrollToTopSmooth = () => {
@@ -34,71 +37,6 @@ import {
   FLOW_STEPS,
 } from "./data/services";
 
-const FACILITY_MAPS = {
-  "pkm-jagakarsa": {
-    q: "PUSKESMAS KECAMATAN JAGAKARASA, Jakarta Selatan",
-    placeId: "ChIJS7JbYn_uaS4R6E4MCNb0w30",
-    supportsDirectReview: true,
-  },
-  "pustu-tanjungbarat": {
-    q: "Puskesmas Tanjung Barat, Jakarta Selatan",
-    placeId: "ChIJLT_m2IjtaS4RB0sHFY8j0KI",
-    supportsDirectReview: true,
-  },
-  "pustu-srengsengsawah": {
-    q: "Puskesmas Pembantu Srengseng Sawah, Jakarta Selatan",
-    placeId: "ChIJaSqhiRzvaS4RQo8FMv98JRQ",
-    supportsDirectReview: true,
-  },
-  "pustu-ciganjur": {
-    q: "Puskesmas Pembantu Ciganjur, Jakarta Selatan",
-    placeId: "ChIJU_yjbGPuaS4RpBSozGg8cdk",
-    supportsDirectReview: true,
-  },
-  "pustu-lentengagung1": {
-     q: "Puskesmas Kelurahan Lenteng Agung 1, Jakarta Selatan",
-    placeId: "ChIJG7hq5cPtaS4R7r4cJtZMPFA",
-    supportsDirectReview: true,
-  },
-  "pustu-lentengagung2": {
-    q: "Puskesmas Kelurahan Lenteng Agung 2, Jakarta Selatan",
-    placeId: "ChIJu0YkBaHtaS4RPlGNuJKnMMc",
-    supportsDirectReview: true,
-  },
-  "pustu-jagakarsa1": {
-    q: "Puskesmas Kelurahan Jagakarsa, Jakarta Selatan",
-    placeId: "ChIJa7s6RtjtaS4RZ_bLfIC-iRI",
-    supportsDirectReview: true, 
-  },
-  "pustu-jagakarsa2": {
-    q: "Puskesmas Kelurahan Jagakarsa II, Jakarta Selatan",
-    placeId: "ChIJZc1NWgXyaS4REQfStgT5oHQ",
-    supportsDirectReview: true,
-  },
-};
-
-
-function mapEmbedSrc(facilityId) {
-  const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS["pkm-jagakarsa"];
-  return `https://www.google.com/maps?q=${encodeURIComponent(item.q)}&output=embed`;
-}
-
-function reviewLink(facilityId) {
-  const item = FACILITY_MAPS[facilityId] || FACILITY_MAPS["pkm-jagakarsa"];
-  const q   = encodeURIComponent((item.q || "").trim());
-  const pid = (item.placeId || "").trim();
-
-  // Jika fasilitas mendukung direct review → popup langsung
-  if (item.supportsDirectReview && pid)
-    return `https://search.google.com/local/writereview?placeid=${pid}&hl=id`;
-
-  // Jika tidak, buka panel tempat (stabil)
-  if (pid)
-    return `https://www.google.com/maps/place/?q=place_id:${pid}`;
-
-  return `https://www.google.com/maps/search/?api=1&query=${q}`;
-}
-
 // === Floor helpers ===
  function getFloorNumber(lokasi) {
    if (!lokasi) return null;
@@ -107,16 +45,31 @@ function reviewLink(facilityId) {
  }
  function floorBorderClass(lokasi) {
    const n = getFloorNumber(lokasi);
-   if (n === 1) return "border-violet-400/60 hover:border-violet-300/80";
-   if (n === 2) return "border-sky-400/60 hover:border-sky-300/80";
-   if (n === 3) return "border-emerald-400/60 hover:border-emerald-300/80";
-   return "border-white/10 hover:border-white/20";
+   if (n === 1) return "border-slate-200 hover:border-emerald-200 dark:border-white/10 dark:hover:border-emerald-400/30";
+   if (n === 2) return "border-slate-200 hover:border-sky-200 dark:border-white/10 dark:hover:border-sky-400/30";
+   if (n === 3) return "border-slate-200 hover:border-teal-200 dark:border-white/10 dark:hover:border-teal-400/30";
+   return "border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20";
  }
 
 /* ===================== Path helpers ===================== */
 const BASE = import.meta.env.BASE_URL ?? "/";
 const asset = (p) => `${BASE}${String(p).replace(/^\/+/, "")}`;
 const DIR_INFO = `${BASE}infografis`;
+const PUSKESMAS_LOGO_SRC = asset("icons/logo-puskesmas.jpg");
+
+function PuskesmasLogo({ className = "size-9" }) {
+  return (
+    <div
+      className={`grid shrink-0 place-items-center rounded-lg border border-black/10 bg-white p-1 shadow-sm dark:border-white/10 ${className}`}
+    >
+      <img
+        src={PUSKESMAS_LOGO_SRC}
+        alt="Logo Puskesmas"
+        className="h-full w-full rounded-md object-contain"
+      />
+    </div>
+  );
+}
 
 /* ===================== Infografis helpers ===================== */
 const resolveInfografis = (service) => {
@@ -131,6 +84,43 @@ const onInfoError = (e) => {
   e.currentTarget.onerror = null;
   e.currentTarget.src = INFO_FALLBACK;
 };
+
+const SPUTUM_COLLECTION_REEL_URL =
+  "https://www.instagram.com/reel/DZcHDxHquo1/?utm_source=ig_embed&utm_campaign=loading";
+const FASTING_LAB_REEL_URL =
+  "https://www.instagram.com/reel/DZcIDwBKijA/?utm_source=ig_embed&utm_campaign=loading";
+const COMPLETE_URINE_TEST_REEL_URL =
+  "https://www.instagram.com/reel/DZcHXS7qS-0/?utm_source=ig_embed&utm_campaign=loading";
+
+function ensureInstagramEmbedScript(onReady) {
+  if (typeof window === "undefined") return;
+
+  const processEmbed = () => {
+    try {
+      window.instgrm?.Embeds?.process?.();
+    } catch {
+      // Instagram embeds are optional; keep the fallback link visible.
+    }
+    onReady?.();
+  };
+
+  if (window.instgrm?.Embeds?.process) {
+    processEmbed();
+    return;
+  }
+
+  const existing = document.querySelector('script[src="https://www.instagram.com/embed.js"]');
+  if (existing) {
+    existing.addEventListener("load", processEmbed, { once: true });
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = "https://www.instagram.com/embed.js";
+  script.onload = processEmbed;
+  document.body.appendChild(script);
+}
 
 /* ===================== Alur Layanan helpers ===================== */
 const resolveFlowImg = (img) => {
@@ -192,308 +182,7 @@ function stopFlowAudio() {
   try {
     a.pause();
     a.currentTime = 0;
-  } catch {}
-}
-
-/* ===================== Jadwal helpers (scalable) ===================== */
-/**
- * Format dukungan:
- * - Lama: s.jadwal = { Senin: "08:00–16:00", ... }
- * - Baru: s.jadwal = { tz?, weekly: { Senin: ["08:00-12:00","13:00-16:00"], ... }, exceptions: { "YYYY-MM-DD": "Tutup" | ["09:00-12:00"] } }
- * Overnight "22:00-06:00" ditangani otomatis.
- */
-const DAY_NAMES_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-const RULE_DEFAULT_NORMAL = {
-  Senin: "08:00-16:00",
-  Selasa: "08:00-16:00",
-  Rabu: "08:00-16:00",
-  Kamis: "08:00-16:00",
-  Jumat: "08:00-16:30",
-  Sabtu: "Tutup",
-  Minggu: "Tutup",
-};
-const RULE_DEFAULT = RAMADAN_MODE ? RAMADAN_DEFAULT : RULE_DEFAULT_NORMAL;
-const toMin = (s) => {
-  const [h, m] = String(s).trim().split(":").map((n) => parseInt(n, 10) || 0);
-  return h * 60 + m;
-};
-const pad2 = (n) => (n < 10 ? "0" + n : "" + n);
-const fmtMin = (m) => `${pad2(Math.floor(m / 60))}:${pad2(m % 60)}`;
-
-function normalizeRanges(value) {
-  if (value == null) return [];
-  const t = String(value).trim().replace(/–|—/g, "-");
-  if (!t || /tutup/i.test(t)) return [];
-  const parts = Array.isArray(value) ? value : t.split(",").map((r) => r.trim());
-  return parts
-    .map((r) => {
-      const [a, b] = String(r).split("-").map((x) => x.trim());
-      if (!a || !b) return null;
-      return { from: toMin(a), to: toMin(b) };
-    })
-    .filter(Boolean);
-}
-function normalizeSchedule(jadwalLike) {
-  if (!jadwalLike || typeof jadwalLike !== "object" || Array.isArray(jadwalLike)) {
-    return { tz: "Asia/Jakarta", weekly: { ...RULE_DEFAULT }, exceptions: {} };
-  }
-  if (jadwalLike.weekly || jadwalLike.exceptions) {
-    return {
-      tz: jadwalLike.tz || "Asia/Jakarta",
-      weekly: { ...RULE_DEFAULT, ...(jadwalLike.weekly || {}) },
-      exceptions: { ...(jadwalLike.exceptions || {}) },
-    };
-  }
-  const weekly = { ...RULE_DEFAULT, ...jadwalLike };
-  return { tz: "Asia/Jakarta", weekly, exceptions: {} };
-}
-const dayNameID = (date) => DAY_NAMES_ID[date.getDay()];
-function rangesForDate(schedule, date) {
-  const { weekly, exceptions } = normalizeSchedule(schedule);
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const key = `${y}-${pad2(m)}-${pad2(d)}`;
-  if (exceptions[key] != null) return normalizeRanges(exceptions[key]);
-  return normalizeRanges(weekly[dayNameID(date)]);
-}
-function rangesForToday(schedule, ref = new Date()) {
-  const today = new Date(ref);
-  const yesterday = new Date(ref);
-  yesterday.setDate(ref.getDate() - 1);
-  const todayRanges = rangesForDate(schedule, today);
-  const yRanges = rangesForDate(schedule, yesterday);
-  const out = [];
-  yRanges.forEach(({ from, to }) => {
-    if (to < from) out.push({ from: 0, to });
-  });
-  todayRanges.forEach(({ from, to }) => {
-    if (to >= from) out.push({ from, to });
-    else out.push({ from, to: 1440 });
-  });
-  return out;
-}
-function getOpenStatus(service, ref = new Date()) {
-  const schedule = service?.jadwal || {};
-  const ranges = rangesForToday(schedule, ref);
-  const now = ref.getHours() * 60 + ref.getMinutes();
-  let open = false;
-  let nextChange = null;
-  // --- sort & scan
-  const sorted = [...ranges].sort((a,b) => a.from - b.from);
-  for (const r of sorted) {
-    if (now >= r.from && now <= r.to) {
-      open = true;
-      if (nextChange == null || r.to < nextChange) nextChange = r.to;
-    } else if (now < r.from) {
-      if (nextChange == null || r.from < nextChange) nextChange = r.from;
-    }
-  }
-  if (nextChange == null) {
-    const tmr = new Date(ref);
-    tmr.setDate(ref.getDate() + 1);
-    const tRanges = rangesForToday(schedule, tmr);
-    if (tRanges.length) nextChange = tRanges[0].from + 1440;
-  }
-   // === NEW: deteksi 24 jam penuh (union menutup 0..1440 tanpa jeda)
-  let isFullDay = false;
-  if (sorted.length) {
-    let curFrom = Math.max(0, sorted[0].from);
-    let curTo = Math.min(1440, sorted[0].to);
-    for (let i = 1; i < sorted.length; i++) {
-      const r = sorted[i];
-      if (r.from <= curTo) {
-        // gabungkan overlap / nempel
-        curTo = Math.max(curTo, r.to);
-      } else {
-        // ada jeda → bukan 24 jam penuh
-        break;
-      }
-    }
-    isFullDay = curFrom <= 0 && curTo >= 1440;
-  }
-
-  // === Istirahat Senin–Kamis 12:00–13:00, Jumat 11:30–13:00 (kecuali 24 jam)
-  const dayName = DAY_NAMES_ID[ref.getDay()];
-  const isWeekday = ["Senin","Selasa","Rabu","Kamis","Jumat"].includes(dayName);
-  const restStart = dayName === "Jumat" ? 690 : 720; // Jumat 11:30, lainnya 12:00
-  const restEnd = 780; // 13:00
-  const rest = isWeekday && now >= restStart && now < restEnd;
-  if (rest) {
-    open = false;
-    // saat istirahat, perubahan terdekat adalah akhir istirahat (13:00)
-    if (nextChange == null || restEnd < nextChange) nextChange = restEnd;
-  }
-
-  const minutesUntilChange = nextChange != null ? nextChange - now : null;
-
-  // === NEW: penanda segera buka/tutup (±30 menit)
-  let soon = null;
-  if (!isFullDay && !rest && minutesUntilChange != null && minutesUntilChange >= 0) {
-    if (!open && minutesUntilChange <= 30) soon = "segera-buka";
-    if ( open && minutesUntilChange <= 30) soon = "segera-tutup";
-  }
-
-  if (isFullDay) {
-    return { open: true, rest: false, soon: null, minutesUntilChange: null };
-  }
-  return { open, rest, soon, minutesUntilChange };
-}
-export function getEffectiveJadwal(s) {
-  const { weekly } = normalizeSchedule(s?.jadwal || {});
-  const out = {};
-  for (const d of DAY_NAMES_ID) {
-    const arr = normalizeRanges(weekly[d]);
-    out[d] = arr.length
-      ? arr.map((r) => `${fmtMin(r.from)}–${fmtMin(r.to)}`).join(", ")
-      : "Tutup";
-  }
-  return out;
-}
-export function isOpenNow(s, ref = new Date()) {
-  return getOpenStatus(s, ref).open;
-}
-
-// === Union status untuk sebuah poli (menggabungkan jadwal poli + semua layanan)
-function getOpenStatusForPoli(poli, ref = new Date()) {
-   // Override libur massal: semua poli tutup kecuali layanan 24 jam tertentu
-  if (RAMADAN_MODE) {
-    const key = formatDateKey(ref);
-    if (GLOBAL_CLOSED_DATES.has(key) && !ALWAYS_OPEN_POLI_IDS.has(poli?.id)) {
-      return { open: false, rest: false, soon: null, minutesUntilChange: null };
-    }
-  }
-
-  const schedules = [];
-  if (poli?.jadwal) schedules.push(poli.jadwal);
-  (poli?.layanan || []).forEach((L) => {
-    if (L?.jadwal) schedules.push(L.jadwal);
-  });
-
-  // kalau tidak ada apa-apa, pakai default rule yang sudah kamu definisikan
-  if (schedules.length === 0) return getOpenStatus({ jadwal: {} }, ref);
-
-  // gabungkan semua rentang "hari ini" + overnight
-  const ranges = schedules.flatMap((j) => rangesForToday(j, ref));
-  if (ranges.length === 0) return getOpenStatus({ jadwal: {} }, ref);
-
-  // --- logika sama seperti getOpenStatus(), tapi langsung dari 'ranges'
-  const now = ref.getHours() * 60 + ref.getMinutes();
-  let open = false;
-  let nextChange = null;
-
-  const sorted = [...ranges].sort((a, b) => a.from - b.from);
-
-  for (const r of sorted) {
-    if (now >= r.from && now <= r.to) {
-      open = true;
-      if (nextChange == null || r.to < nextChange) nextChange = r.to;
-    } else if (now < r.from) {
-      if (nextChange == null || r.from < nextChange) nextChange = r.from;
-    }
-  }
-
-  if (nextChange == null) {
-    const tmr = new Date(ref);
-    tmr.setDate(ref.getDate() + 1);
-    const tRanges = schedules.flatMap((j) => rangesForToday(j, tmr));
-    if (tRanges.length) nextChange = tRanges.sort((a,b)=>a.from-b.from)[0].from + 1440;
-  }
-
-  // deteksi 24 jam penuh (union menutup 0..1440)
-  let isFullDay = false;
-  if (sorted.length) {
-    let curFrom = Math.max(0, sorted[0].from);
-    let curTo = Math.min(1440, sorted[0].to);
-    for (let i = 1; i < sorted.length; i++) {
-      const r = sorted[i];
-      if (r.from <= curTo) curTo = Math.max(curTo, r.to);
-      else break; // ada jeda → bukan 24h penuh
-    }
-    isFullDay = curFrom <= 0 && curTo >= 1440;
-  }
-
-  // Istirahat Senin–Kamis 12:00–13:00, Jumat 11:30–13:00 (kecuali 24 jam)
-  const dayName = DAY_NAMES_ID[ref.getDay()];
-  const isWeekday = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"].includes(dayName);
-  const restStart = dayName === "Jumat" ? 690 : 720; // Jumat 11:30
-  const restEnd = 780; // 13:00
-  const rest = !isFullDay && isWeekday && now >= restStart && now < restEnd;
-  if (rest) {
-    open = false;
-    if (nextChange == null || restEnd < nextChange) nextChange = restEnd;
-  }
-
-  const minutesUntilChange = nextChange != null ? nextChange - now : null;
-  let soon = null;
-  if (!isFullDay && !rest && minutesUntilChange != null && minutesUntilChange >= 0) {
-    if (!open && minutesUntilChange <= 30) soon = "segera-buka";
-    if ( open && minutesUntilChange <= 30) soon = "segera-tutup";
-  }
-
-  if (isFullDay) return { open: true, rest: false, soon: null, minutesUntilChange: null };
-  return { open, rest, soon, minutesUntilChange };
-}
-
-/* ===== Jadwal aggregator untuk Sidebar (beragam per layanan) ===== */
-function schedulesForPoli(poli) {
-  const list = [];
-  if (poli?.jadwal) list.push({ label: "Poli", jadwal: poli.jadwal });
-
-  (poli?.layanan || []).forEach((L) => {
-    if (L.jadwal) list.push({ label: L.nama, jadwal: L.jadwal });
-  });
-  return list;
-}
-function weeklyKey(jadwal) {
-  const { weekly } = normalizeSchedule(jadwal);
-  return JSON.stringify(
-    DAY_NAMES_ID.reduce((acc, d) => {
-      acc[d] = (normalizeRanges(weekly[d]) || []).map((r) => [r.from, r.to]);
-      return acc;
-    }, {})
-  );
-}
-function poliOpenAny(poli) {
-  if (isOpenNow({ jadwal: poli?.jadwal })) return true;
-  return (poli?.layanan || []).some((L) => isOpenNow({ jadwal: L.jadwal }));
-}
-
-/* ====== Jadwal helpers untuk kartu layanan ====== */
-const TODAY = () => DAY_NAMES_ID[new Date().getDay()];
-function summarizeWeekly(jadwalLike) {
-  // Ringkas HANYA hari yang buka (lewati "Tutup")
-  const eff = getEffectiveJadwal({ jadwal: jadwalLike });
-  const short = (d) => d.slice(0, 3);
-  // Buat daftar hanya hari buka dalam urutan Minggu..Sabtu
-  const openEntries = DAY_NAMES_ID
-    .map((d) => [d, eff[d]])
-    .filter(([, val]) => val && !/^\s*Tutup\s*$/i.test(val));
-  if (openEntries.length === 0) return "Tidak melayani rutin";
-
-  // Kelompokkan hari berurutan yang jamnya sama
-  const groups = [];
-  let cur = null;
-  openEntries.forEach(([d, val]) => {
-    if (!cur || cur.val !== val) {
-      cur && groups.push(cur);
-      cur = { from: d, to: d, val };
-    } else {
-      // lanjutkan range
-      cur.to = d;
-    }
-  });
-  cur && groups.push(cur);
-
-  return groups
-    .map((g) =>
-      g.from === g.to ? `${short(g.from)} ${g.val}` : `${short(g.from)}–${short(g.to)} ${g.val}`
-    )
-    .join("; ");
-}
-function todayText(jadwalLike) {
-  const eff = getEffectiveJadwal({ jadwal: jadwalLike });
-  return eff[TODAY()];
+  } catch { /* noop */ }
 }
 
 /* ===================== UI kecil ===================== */
@@ -564,6 +253,62 @@ const StatusPill = ({ open, rest, soon }) => {
   );
 };
 
+function StatTile({ label, value, tone = "slate" }) {
+  const tones = {
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-300",
+    rose: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/20 dark:bg-rose-500/10 dark:text-rose-300",
+    sky: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-400/20 dark:bg-sky-500/10 dark:text-sky-300",
+    slate: "border-slate-200 bg-slate-50 text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-white/70",
+  };
+
+  return (
+    <div className={`rounded-lg border px-3 py-2 ${tones[tone]}`}>
+      <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">{label}</div>
+      <div className="mt-0.5 text-lg font-semibold text-slate-950 dark:text-white">{value}</div>
+    </div>
+  );
+}
+
+function ServicesOverview({ facilityName, services, searchQuery, subMatchesCount }) {
+  const summary = useMemo(() => {
+    return services.reduce(
+      (acc, service) => {
+        const status = getOpenStatusForPoli(service);
+        if (status.open) acc.open += 1;
+        else if (status.rest) acc.rest += 1;
+        else acc.closed += 1;
+        return acc;
+      },
+      { open: 0, rest: 0, closed: 0 }
+    );
+  }, [services]);
+
+  const hasSearch = Boolean(searchQuery?.trim());
+
+  return (
+    <section className="mb-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50 dark:border-white/10 dark:bg-slate-950/65 dark:shadow-none">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <div className="text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-300">
+            Direktori jadwal layanan
+          </div>
+          <h1 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white">
+            {hasSearch ? "Hasil pencarian layanan" : "Pilih poli layanan"}
+          </h1>
+          <p className="mt-1 text-sm text-slate-600 dark:text-white/60">
+            {facilityName} - {hasSearch ? `${subMatchesCount} hasil layanan ditemukan.` : "Status dan jadwal hari ini ditampilkan di setiap kartu."}
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:min-w-[22rem]">
+          <StatTile label="Buka" value={summary.open} tone="emerald" />
+          <StatTile label="Istirahat" value={summary.rest} tone="sky" />
+          <StatTile label="Tutup" value={summary.closed} tone="rose" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Sign Puasa
 const PuasaPill = () => (
   <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-tight bg-amber-500/10 border border-amber-400/30 text-amber-700 dark:text-amber-300">
@@ -583,69 +328,28 @@ function StickyBack({ onClick, label = "Kembali" }) {
         aria-label="Kembali"
         className="pointer-events-auto inline-flex items-center gap-2
                    px-3.5 py-1.5 rounded-full text-[14px] font-medium
-                   bg-slate-900/95 text-white border border-white/20
-                   shadow-lg backdrop-blur-sm
-                   hover:bg-slate-900 active:scale-95"
+                   bg-white/90 text-slate-700 border border-slate-200
+                   shadow-sm shadow-slate-200/60 backdrop-blur-sm
+                   hover:bg-white hover:text-slate-950 hover:border-slate-300
+                   dark:bg-white/5 dark:text-white dark:border-white/15
+                   dark:shadow-none dark:hover:bg-white/10 dark:hover:border-white/25
+                   active:scale-95"
       >
-        <span className="-rotate-180">➜</span> {label}
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" className="shrink-0">
+          <path
+            d="M19 12H5m0 0 5-5m-5 5 5 5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        {label}
       </button>
     </div>
   );
 }
-
-/* ===================== Drawer (NEW) ===================== */
-function Drawer({ open, onClose, children }) {
-  // Lock scroll saat drawer terbuka
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, [open]);
-
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
-          {/* Overlay penuh: tap untuk menutup */}
-          <motion.div
-            key="overlay"
-            className="fixed inset-0 z-[9997] bg-black/50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-          {/* Panel drawer dengan swipe-left close */}
-          <motion.aside
-            key="drawer"
-            className="fixed inset-y-0 left-0 z-[9998] w-[86%] max-w-[22rem]
-                       bg-white/80 dark:bg-slate-950/80 backdrop-blur
-                       border-r border-black/10 dark:border-white/10
-                       overflow-y-auto"
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "tween", duration: 0.22 }}
-            drag="x"
-            dragConstraints={{ left: -80, right: 0 }}
-            dragElastic={0.04}
-            onDragEnd={(_, info) => {
-              const swipedFar = info.offset.x <= -80;
-              const swipedFast = info.velocity.x < -500;
-              if (swipedFar || swipedFast) onClose();
-            }}
-          >
-            {/* handle geser yang lebar di sisi kanan */}
-            <div className="absolute right-0 top-0 h-full w-4 cursor-ew-resize touch-pan-x" />
-            {children}
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
-
 
 /* ===================== Sidebar ===================== */
 function Sidebar({
@@ -669,8 +373,8 @@ function Sidebar({
     <aside
       className="
         w-full md:w-80 shrink-0
-      bg-white/70 dark:bg-slate-950/70 backdrop-blur
-        border-r border-black/5 dark:border-white/10
+      bg-white/90 dark:bg-slate-950/90 backdrop-blur
+        border-r border-slate-200 dark:border-white/10
         flex flex-col
         /* === Tinggi: mobile full-screen (dvh), desktop sisakan tinggi header === */
         min-h-[100dvh] h-[100dvh]
@@ -684,21 +388,20 @@ function Sidebar({
         rounded-none
       "
     >
-      <div className="p-4 flex items-center gap-2 border-b border-black/5 dark:border-white/10">
-        <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center">🏥</div>
-        <div className="font-semibold truncate text-slate-900 dark:text-white">Jadwal Layanan</div>
-      </div>
-
-      <div className="px-4 pt-3 text-xs text-slate-700 dark:text-white/70">
-        Fasilitas: <span className="text-slate-900 font-medium dark:text-white">{facilityName}</span>
+      <div className="p-4 flex items-center gap-3 border-b border-slate-200 dark:border-white/10">
+        <PuskesmasLogo className="size-9" />
+        <div className="min-w-0">
+          <div className="font-semibold truncate text-slate-900 dark:text-white">Jadwal Layanan</div>
+          <div className="text-xs text-slate-500 dark:text-white/45 truncate">{facilityName}</div>
+        </div>
       </div>
 
       <div className="p-4 space-y-3">
-        <label className="text-xs uppercase text-slate-600 dark:text-white/50">
+        <label className="text-xs font-semibold uppercase text-slate-500 dark:text-white/45">
   Pencarian
 </label>
 
-<div className="relative rounded-2xl border border-white/10 bg-slate-900/30 p-4 sm:p-5 overflow-visible">
+<div className="relative overflow-visible">
   <input
     ref={searchRef}
     type="text" // ganti dari "search" → hilangkan tombol clear bawaan browser
@@ -716,9 +419,10 @@ function Sidebar({
     }}
     enterKeyHint="search"
     placeholder="Cari 'umum', 'imunisasi', 'cabut gigi' …"
-    className="w-full h-12 rounded-2xl bg-white/40 dark:bg-white/5
-              border border-emerald-500/20 focus:border-emerald-500/60
-              outline-none pr-16 pl-4 text-sm sm:text-[15px]"
+    className="w-full h-11 rounded-lg bg-white/80 dark:bg-white/5
+                      border border-slate-200 dark:border-white/10 focus:border-emerald-500/60
+              outline-none pr-10 pl-4 text-sm sm:text-[15px]
+              placeholder:text-slate-400 dark:placeholder:text-white/35"
   />
 
   {query && (
@@ -730,10 +434,11 @@ function Sidebar({
       requestAnimationFrame(() => searchRef.current?.focus());
     }}
     aria-label="Hapus kata pencarian"
-    className="absolute right-6 top-1/2 -translate-y-1/2
+    className="absolute right-2.5 top-1/2 -translate-y-1/2
                h-6 w-6 rounded-full
-               bg-emerald-500/18 text-emerald-300
-               hover:bg-emerald-500/30 hover:text-emerald-50
+               bg-slate-200 text-slate-600
+               hover:bg-slate-300 hover:text-slate-900
+               dark:bg-white/10 dark:text-white/60 dark:hover:bg-white/15 dark:hover:text-white
                active:scale-95 transition-all
                flex items-center justify-center"
   >
@@ -765,12 +470,14 @@ function Sidebar({
           flex-1
         "
       >
-        <div className="text-xs uppercase text-slate-600 dark:text-white/50 mb-2">Daftar Poli</div>
+        <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase text-slate-500 dark:text-white/45">
+          <span>Daftar Poli</span>
+          <span className="rounded-full bg-slate-200 px-2 py-0.5 text-slate-600 dark:bg-white/8 dark:text-white/50">{services.length}</span>
+        </div>
 
         {services.map((s) => {
           const active = expandedId === s.id;
           const hl = highlightIds.includes(s.id);
-          const open = poliOpenAny(s);
           // gunakan status poli untuk label (memunculkan Istirahat/Segera *)
           const { open: openPill, rest, soon } = getOpenStatusForPoli(s);
 
@@ -790,16 +497,16 @@ function Sidebar({
             <div key={s.id} className="space-y-2">
               <button
                 onClick={() => toggle(s)}
-                className={`group w-full text-left px-4 py-3.5 rounded-xl border transition
+                className={`group w-full text-left px-3.5 py-3 rounded-lg border transition
                 ${selected?.id === s.id
-                ? "bg-emerald-500/15 border-emerald-500/70 ring-2 ring-emerald-400/40"
+                ? "bg-emerald-500/12 border-emerald-500/70 ring-2 ring-emerald-400/30"
                 : hl
                 ? "bg-emerald-400/10 border-emerald-400/50"
-                : "bg-slate-100/70 border-black/10 dark:bg-white/5 dark:border-white/10"}
-                hover:bg-slate-200/80 dark:hover:bg-white/8`}
+                : "bg-white/75 border-slate-200 dark:bg-white/5 dark:border-white/10"}
+                hover:bg-white dark:hover:bg-white/8`}
                 >
                 <div className="flex items-center gap-3">
-                  <div className="text-lg">{s.ikon}</div>
+                  <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-slate-50 text-base dark:bg-white/8">{s.ikon}</div>
                   <div className="min-w-0 flex-1">
                     <div className="font-medium truncate text-slate-900 dark:text-white">{s.nama}</div>
                     <div className="text-xs text-slate-600 dark:text-white/60 truncate">{s.klaster}</div>
@@ -809,8 +516,8 @@ function Sidebar({
               </button>
 
               {active && (
-                <div className="mx-2 mb-2 rounded-xl border border-black/10 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 p-3 text-sm">
-                  <div className="text-slate-700 dark:text-white/60 mb-2">Jadwal</div>
+                <div className="mx-2 mb-2 rounded-lg border border-slate-200 bg-white/80 p-3 text-sm dark:border-white/10 dark:bg-white/5">
+                  <div className="mb-2 text-xs font-semibold uppercase text-slate-500 dark:text-white/45">Jadwal</div>
 
                   {/* 1) Tidak ada jadwal khusus sama sekali → tampilkan default */}
                   {uniqueSchedules.length === 0 && (
@@ -878,6 +585,9 @@ function Sidebar({
 /* ===================== Cards ===================== */
 function ServiceCard({ s, onPick }) {
   const name = s.nama || "";
+  const status = getOpenStatusForPoli(s);
+  const serviceCount = (s.layanan || []).length;
+  const todaySchedule = s.jadwal ? todayText(s.jadwal) : "Cek jadwal tiap layanan";
   // anggap nama panjang kalau lebih dari 18 karakter
   const isLongName = name.length > 18;
   const nameClass = isLongName
@@ -887,14 +597,17 @@ function ServiceCard({ s, onPick }) {
   return (
     <button
       onClick={() => onPick(s)}
-      className={`group relative overflow-hidden rounded-2xl border
-        bg-slate-100/70 dark:bg-white/5
-        hover:bg-slate-200/80 dark:hover:bg-white/10
-        active:scale-[.98] transition text-left touch-manipulation
+      className={`group relative overflow-hidden rounded-lg border
+        bg-white shadow-sm shadow-slate-200/60 dark:bg-white/5 dark:shadow-none
+        hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:shadow-slate-200/80 dark:hover:bg-white/8
+        active:scale-[.99] transition text-left touch-manipulation
         ${floorBorderClass(s.lokasi)}`}
     >
+      <div className="absolute left-3 top-3 z-10">
+        <StatusPill open={status.open} rest={status.rest} soon={status.soon} />
+      </div>
       {/* Gambar: tinggi tetap per breakpoint, gambar tidak dipotong (contain) */}
-      <div className="w-full bg-slate-200/70 dark:bg-slate-900/40 transition-colors duration-300">
+      <div className="w-full bg-slate-50 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="relative p-2 sm:p-3">
           {/* container tinggi tetap agar desktop tidak mengecil, mobile tidak terpotong */}
           <div className="relative h-40 sm:h-48 md:h-56 lg:h-60 xl:h-64">
@@ -906,13 +619,13 @@ function ServiceCard({ s, onPick }) {
               loading="lazy"
             />
             {/* Gradient bawah saja (±40% tinggi) agar teks kontras tanpa menutup gambar */}
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 sm:h-16 md:h-14 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 sm:h-16 md:h-14 bg-gradient-to-t from-black/45 via-black/12 to-transparent" />
           </div>
         </div>
       </div>
 
       {/* Teks & ikon: bar bawah dengan latar gelap tipis */}
-      <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:py-3 bg-black/40 backdrop-blur-[1px]">
+      <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:py-3 bg-black/32 backdrop-blur-[1px]">
         <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] leading-tight">
           <div className="text-xl shrink-0">{s.ikon}</div>
           {/* Nama poli: tidak di-truncate, font mengecil jika terlalu panjang, boleh 2 baris */}
@@ -923,6 +636,12 @@ function ServiceCard({ s, onPick }) {
         {/* Klaster: boleh dibatasi maksimal 2 baris agar tidak terlalu tinggi */}
         <div className="text-[11px] sm:text-[12px] opacity-90 line-clamp-2">
           {s.klaster}
+        </div>
+        <div className="mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 border-t border-white/15 pt-2 text-[11px] text-white/85">
+          <span className="text-white/55">Hari ini</span>
+          <span className="truncate">{todaySchedule}</span>
+          <span className="text-white/55">Layanan</span>
+          <span>{serviceCount}</span>
         </div>
       </div>
     </button>
@@ -941,7 +660,7 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId, facilityId, facili
   const renderCompactSchedule = (jadwal) => {
     if (!jadwal?.weekly && !Object.keys(jadwal || {}).length) return null;
     const eff = getEffectiveJadwal({ jadwal });
-    const openDays = Object.entries(eff).filter(([_, jam]) => jam && !/tutup/i.test(jam));
+    const openDays = Object.entries(eff).filter(([, jam]) => jam && !/tutup/i.test(jam));
     if (!openDays.length) return null;
     return (
       <div className="mt-1 space-y-0.5 text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">
@@ -969,12 +688,12 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId, facilityId, facili
         });
         onPick(item);
       }}
-      className="relative w-full text-left rounded-2xl border
-      border-black/10 dark:border-white/10
-      bg-slate-100/70 dark:bg-white/5
-      hover:bg-slate-200/80 dark:hover:bg-white/8
-      ring-0 hover:ring-1 hover:ring-black/10 dark:hover:ring-white/15
-      transition-all shadow-sm hover:shadow active:scale-[.99]
+      className="relative w-full text-left rounded-lg border
+      border-slate-200 dark:border-white/10
+      bg-white dark:bg-white/5
+      hover:bg-white dark:hover:bg-white/8
+      ring-0 hover:ring-1 hover:ring-slate-200 dark:hover:ring-white/15
+      transition-all shadow-sm shadow-slate-200/50 hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-200/70 dark:shadow-none active:scale-[.99]
       focus:outline-none focus:ring-2 focus:ring-emerald-500 overflow-visible"
     >
       <div className="p-4 sm:p-5 space-y-3">
@@ -1051,7 +770,7 @@ function FlowCard({ step, index }) {
         player.pause();
         player.currentTime = 0;
         player.play();
-      } catch {}
+      } catch { /* noop */ }
       trackEvent("Flow","restart_audio", key);
       return;
     }
@@ -1110,6 +829,96 @@ function InfoCard({ title, children }) {
   );
 }
 
+function InstagramEmbedCard({ permalink, title, description, cta = "Buka video edukasi di Instagram" }) {
+  const [scriptReady, setScriptReady] = useState(false);
+
+  useEffect(() => {
+    ensureInstagramEmbedScript(() => setScriptReady(true));
+  }, [permalink]);
+
+  useEffect(() => {
+    if (scriptReady) {
+      try {
+        window.instgrm?.Embeds?.process?.();
+      } catch {
+        // Keep the fallback link visible if Instagram cannot process embeds.
+      }
+    }
+  }, [scriptReady]);
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-200/50 dark:border-white/10 dark:bg-white/5 dark:shadow-none sm:p-4">
+      <div className="mb-3">
+        <div className="text-sm uppercase tracking-wide text-slate-600 dark:text-white/60">
+          Edukasi Video
+        </div>
+        <h3 className="mt-1 text-base font-semibold text-slate-950 dark:text-white">
+          {title}
+        </h3>
+        {description && (
+          <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/60">
+            {description}
+          </p>
+        )}
+      </div>
+
+      <div className="flex justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-white/10 dark:bg-slate-950/40 sm:p-2">
+        <blockquote
+          className="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink={permalink}
+          data-instgrm-version="14"
+          style={{
+            background: "#fff",
+            border: 0,
+            borderRadius: 8,
+            boxShadow: "none",
+            margin: 0,
+            maxWidth: 540,
+            minWidth: 0,
+            padding: 0,
+            width: "100%",
+          }}
+        >
+          <div style={{ padding: 16 }}>
+            <a
+              href={permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-lg border border-slate-200 bg-white p-4 text-center text-sm font-semibold text-sky-700 hover:bg-slate-50"
+            >
+              {cta}
+            </a>
+          </div>
+        </blockquote>
+      </div>
+    </section>
+  );
+}
+
+function shouldShowSputumEducation(selected, sub) {
+  const haystack = `${selected?.id || ""} ${selected?.nama || ""} ${sub?.nama || ""} ${sub?.ket || ""}`.toLowerCase();
+
+  return (
+    selected?.id === "pm" ||
+    haystack.includes("tb") ||
+    haystack.includes("dahak") ||
+    haystack.includes("sputum") ||
+    haystack.includes("bta")
+  );
+}
+
+function shouldShowFastingLabEducation(selected, sub) {
+  return selected?.id === "laboratorium" && Boolean(sub?.puasa);
+}
+
+function shouldShowCompleteUrineEducation(selected, sub) {
+  if (selected?.id !== "laboratorium") return false;
+
+  const serviceName = `${sub?.nama || ""} ${sub?.ket || ""}`.toLowerCase();
+  return serviceName.includes("urine lengkap") || serviceName.includes("urin lengkap");
+}
+
 /* ===================== Right Panel ===================== */
 function RightPanel({
   selected,
@@ -1146,8 +955,6 @@ const backStateRef = useRef({
   listenersAttached: false,
 });
 
-const getLevel = () => (sub ? 2 : selected ? 1 : 0);
-
 const seedEntryAndTrap = () => {
   if (typeof window === "undefined") return;
   const S = backStateRef.current;
@@ -1158,7 +965,7 @@ const seedEntryAndTrap = () => {
     }
     history.pushState({ __TRAP: true, t: Date.now() }, "");
     S.seeded = true;
-  } catch {}
+  } catch { /* noop */ }
 };
 
 useEffect(() => {
@@ -1171,7 +978,7 @@ useEffect(() => {
     try {
       // Pasang lagi 1 TRAP sinkron di awal handler agar back cepat tetap tertahan
       history.pushState({ __TRAP: true, t: Date.now() }, "");
-    } catch {}
+    } catch { /* noop */ }
   };
 
   const handleBack = () => {
@@ -1181,18 +988,18 @@ useEffect(() => {
     // Kunci: pasang lagi TRAP sinkron di awal
     reTrapSync();
 
-    const level = getLevel();
+    const level = sub ? 2 : selected ? 1 : 0;
 
     // 1) SUBSERVICE → kembali ke POLI
     if (level === 2) {
-      try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch {}
+      try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch { /* noop */ }
       setSub(null);
       S.lock = false;
       return;
     }
     // 2) POLI → kembali ke BERANDA
     if (level === 1) {
-      try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch {}
+      try { if (typeof stopFlowAudio === "function") stopFlowAudio(); } catch { /* noop */ }
       setSelected(null);
       S.lock = false;
       return;
@@ -1209,7 +1016,7 @@ useEffect(() => {
         S.listenersAttached = false;
       }
       // Loncat melewati TRAP & ENTRY → benar-benar keluar dari situs
-      try { history.go(-2); } catch { try { history.back(); } catch {} }
+      try { history.go(-2); } catch { try { history.back(); } catch { /* noop */ } }
       S.lock = false;
       return;
     }
@@ -1224,7 +1031,7 @@ useEffect(() => {
   const onPop = () => handleBack();
   const onHash = () => handleBack();
 
-  const onPageShow = (e) => {
+  const onPageShow = () => {
     // Termasuk navigasi back-forward cache (bfcache)
     // Setiap halaman jadi aktif → seed ulang ENTRY+TRAP
     seedEntryAndTrap();
@@ -1256,7 +1063,7 @@ useEffect(() => {
     S.listenersAttached = false;
   };
 // tergantung posisi (agar mundur level bekerja)
-}, [selected, sub]);
+}, [selected, setSelected, sub]);
 
   // === Dwell-time: lama lihat detail layanan (kirim saat ganti/keluar)
   useEffect(() => {
@@ -1294,11 +1101,11 @@ useEffect(() => {
     return A;
   }, [sub]);
 
-  const scenarioKeys = Object.keys(scenarios);
+  const scenarioKeys = useMemo(() => Object.keys(scenarios), [scenarios]);
   const [scenarioKey, setScenarioKey] = useState(null);
   useEffect(() => {
     setScenarioKey(scenarioKeys[0] ?? null);
-  }, [sub, JSON.stringify(scenarioKeys)]);
+  }, [scenarioKeys]);
 
   const flowSteps = useMemo(() => {
     return (scenarios[scenarioKey] || []).map((id) => FLOW_STEPS[id]).filter(Boolean);
@@ -1312,14 +1119,20 @@ useEffect(() => {
     if (selected.id !== scrollReq.poliId) return;
     try {
       servicesGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    } catch {}
+    } catch { /* noop */ }
   }, [scrollReq, selected, sub]);
 
   if (!selected || showSearchResults) {
     return (
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
+        <ServicesOverview
+          facilityName={facilityName}
+          services={filtered}
+          searchQuery={searchQuery}
+          subMatchesCount={subMatches?.length ?? 0}
+        />
         <AnimatePresence mode="wait">
-          <motion.div
+          <MotionDiv
             key="grid-poli-or-search"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -1328,7 +1141,6 @@ useEffect(() => {
           >
             {showSearchResults ? (
               <section className="mb-6">
-                <div className="mb-2 text-slate-700 dark:text-white/70">Hasil Pelayanan</div>
                 <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
                     <SubServiceCard
@@ -1345,7 +1157,6 @@ useEffect(() => {
               </section>
             ) : (
               <>
-                <div className="mb-3 text-slate-700 dark:text-white/70">Pilih poli untuk melihat jenis layanannya.</div>
                 <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filtered.map((s) => (
                     <ServiceCard key={s.id} s={s} onPick={onPickPoli} />
@@ -1353,7 +1164,7 @@ useEffect(() => {
                 </div>
               </>
             )}
-          </motion.div>
+          </MotionDiv>
         </AnimatePresence>
       </div>
     );
@@ -1468,7 +1279,7 @@ useEffect(() => {
       {/* Body: animasi sederhana agar terasa dropdown */}
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <MotionDiv
             id={`${id}-panel`}
             key={`${id}-content`}
             initial={{ opacity: 0, y: -6 }}
@@ -1480,7 +1291,7 @@ useEffect(() => {
             <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {children}
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </div>
@@ -1581,6 +1392,39 @@ useEffect(() => {
           <FlowCard key={step.id ?? i} step={step} index={i} />
         ))}
       </div>
+
+      {shouldShowSputumEducation(selected, sub) && (
+        <div className="mt-4 sm:mt-6">
+          <InstagramEmbedCard
+            permalink={SPUTUM_COLLECTION_REEL_URL}
+            title="Cara Mengeluarkan Dahak untuk Pemeriksaan"
+            description="Tonton edukasi singkat dari Puskesmas Jagakarsa sebelum pengambilan atau pengumpulan sampel dahak."
+            cta="Buka video edukasi dahak di Instagram"
+          />
+        </div>
+      )}
+
+      {shouldShowFastingLabEducation(selected, sub) && (
+        <div className="mt-4 sm:mt-6">
+          <InstagramEmbedCard
+            permalink={FASTING_LAB_REEL_URL}
+            title="Persiapan Puasa Sebelum Pemeriksaan Laboratorium"
+            description="Tonton edukasi singkat dari Puskesmas Jagakarsa untuk layanan laboratorium yang mewajibkan puasa."
+            cta="Buka video edukasi puasa di Instagram"
+          />
+        </div>
+      )}
+
+      {shouldShowCompleteUrineEducation(selected, sub) && (
+        <div className="mt-4 sm:mt-6">
+          <InstagramEmbedCard
+            permalink={COMPLETE_URINE_TEST_REEL_URL}
+            title="Persiapan Pemeriksaan Urine Lengkap"
+            description="Tonton edukasi singkat dari Puskesmas Jagakarsa sebelum melakukan pemeriksaan urine lengkap."
+            cta="Buka video edukasi pemeriksaan urine di Instagram"
+          />
+        </div>
+      )}
 
          {/* Kalender Jadwal Konseling Psikologi – fitur khusus poli Konseling Psikologi */}
       {selected?.id === "konseling_psikologi" && (
@@ -1715,34 +1559,6 @@ useEffect(() => {
   );
 }
 
-/* ===================== Hook kecil untuk deteksi tema (animated) ===================== */
-function useThemeKey() {
-  const get = () =>
-    (typeof document !== "undefined" && document.documentElement.classList.contains("dark"))
-      ? "dark"
-      : "light";
-  const [key, setKey] = useState(get());
-
-  useEffect(() => {
-    // Amati perubahan class pada <html>
-    const obs = new MutationObserver(() => setKey(get()));
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-
-    // Storage (kalau tab lain mengganti tema)
-    const onStorage = (e) => {
-      if (e.key === "theme") setKey(get());
-    };
-    window.addEventListener("storage", onStorage);
-
-    return () => {
-      obs.disconnect();
-      window.removeEventListener("storage", onStorage);
-    };
-  }, []);
-
-  return key;
-}
-
 /* ===================== App Root ===================== */
 export default function App() {
   const [query, setQuery] = useState("");
@@ -1792,11 +1608,11 @@ const onPickPoli = (s) => {
   scrollToTopSmooth();
 };
 
-  const SERVICES_CURRENT = SERVICES_BY_FACILITY[facility] || [];
+  const SERVICES_CURRENT = useMemo(
+    () => SERVICES_BY_FACILITY[facility] || [],
+    [facility]
+  );
   const facilityName = FACILITIES.find((f) => f.id === facility)?.name || "-";
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const openDrawer = () => setDrawerOpen(true);
-  const closeDrawer = () => setDrawerOpen(false);
   const swipeRef = useRef({ x0: 0, x: 0, t0: 0 });
   function onDrawerTouchStart(e) {
     const x = e.touches?.[0]?.clientX ?? 0;
@@ -1821,7 +1637,7 @@ const onPickPoli = (s) => {
       try {
         const h = (headerRef.current && headerRef.current.offsetHeight) || 56; // fallback
         document.documentElement?.style?.setProperty?.("--topbar-h", `${h}px`);
-      } catch {}
+      } catch { /* noop */ }
     };
     if (document.readyState === "loading") {
       window.addEventListener("DOMContentLoaded", apply, { once: true });
@@ -1834,25 +1650,22 @@ const onPickPoli = (s) => {
         ro = new ResizeObserver(apply);
         if (headerRef.current) ro.observe(headerRef.current);
       }
-    } catch {}
+    } catch { /* noop */ }
     window.addEventListener("resize", apply);
     window.addEventListener("orientationchange", apply);
     return () => {
-      try { ro && ro.disconnect && ro.disconnect(); } catch {}
+      try { ro && ro.disconnect && ro.disconnect(); } catch { /* noop */ }
       window.removeEventListener("resize", apply);
       window.removeEventListener("orientationchange", apply);
     };
   }, []);
 
-  // === Inisialisasi Google Analytics (sekali saat mount) ===
-  useEffect(() => {
-    try { initGA(); } catch {}
-  }, []);
-
   // Register service worker (offline cache ringan)
 useEffect(() => {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+    navigator.serviceWorker.register(asset("sw.js")).catch(() => {
+      // Offline cache is optional.
+    });
   }
 }, []);
 
@@ -1958,13 +1771,11 @@ useEffect(() => {
 
   return (
     <>
-    <GAListener />
     <div className="
           min-h-screen
           text-slate-900 dark:text-white
-          bg-gradient-to-b
-          from-white via-slate-50 to-slate-100
-          dark:from-slate-900 dark:via-slate-950 dark:to-black
+          bg-slate-50
+          dark:bg-slate-950
           transition-colors duration-300
         "
       >
@@ -1972,10 +1783,9 @@ useEffect(() => {
   ref={headerRef}
   className="
     sticky top-0 z-30 backdrop-blur
-    bg-transparent text-inherit
-    md:bg-transparent
-    dark:md:bg-transparent
-    border-b border-black/5 dark:border-white/10
+    bg-white/90 text-inherit shadow-sm shadow-slate-200/50
+    dark:bg-slate-950/90
+    border-b border-black/10 dark:border-white/10
     transition-colors duration-300
   "
 >
@@ -1983,7 +1793,7 @@ useEffect(() => {
   <div className="md:hidden max-w-7xl mx-auto px-3 sm:px-4 py-2 space-y-2">
     {/* Baris 1: Ikon + Judul full */}
     <div className="flex items-center gap-2">
-      <div className="size-8 rounded-xl bg-emerald-600 grid place-items-center shrink-0">🏥</div>
+      <PuskesmasLogo className="size-9" />
       <div className="leading-tight">
         <div className="text-[11px] font-medium opacity-90">INFORMASI LAYANAN</div>
         <div className="text-[14px] font-semibold">PUSKESMAS JAGAKARSA</div>
@@ -1991,9 +1801,9 @@ useEffect(() => {
     </div>
 
     {/* Baris 2: Burger + Select (w-full) */}
-    <div className="grid grid-cols-[auto_1fr] items-center gap-2">
+    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2">
       <button
-        className="inline-grid place-items-center size-11 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/15"
+        className="inline-grid place-items-center size-11 rounded-lg border border-black/10 bg-white text-slate-800 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
         aria-label="Buka menu"
         onClick={() => { setNavOpen(true); trackEvent('Drawer','open'); }}
       >
@@ -2027,15 +1837,21 @@ useEffect(() => {
 </select>
         <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white/70">▾</span>
       </div>
+      <ThemeToggle className="px-2.5" />
     </div>
   </div>
 
   {/* === DESKTOP: 1 baris (ikon + judul + Fasilitas + select) === */}
   <div className="hidden md:flex max-w-7xl mx-auto px-6 py-3 items-center gap-4">
-    <div className="size-9 rounded-xl bg-emerald-600 grid place-items-center shrink-0">🏥</div>
+    <PuskesmasLogo className="size-10" />
 
-    <div className="text-lg font-semibold whitespace-nowrap">
-      Informasi Layanan Puskesmas Jagakarsa
+    <div>
+      <div className="text-base font-semibold whitespace-nowrap text-slate-950 dark:text-white">
+        Informasi Layanan Puskesmas Jagakarsa
+      </div>
+      <div className="text-xs text-slate-500 dark:text-white/45">
+        Direktori jadwal, alur, dan informasi poli
+      </div>
     </div>
 
     <div className="ml-auto flex items-center gap-3">
@@ -2066,6 +1882,7 @@ useEffect(() => {
 </select>
         <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-500">▾</span>
       </div>
+      <ThemeToggle />
     </div>
   </div>
 </header>
@@ -2088,7 +1905,7 @@ useEffect(() => {
             aria-modal="true"
             onTouchStart={onDrawerTouchStart}
             onTouchMove={onDrawerTouchMove}
-            onTouchEnd={(e) => { onDrawerTouchEnd(e); trackEvent("Drawer","close","swipe"); }}
+            onTouchEnd={() => { onDrawerTouchEnd(); trackEvent("Drawer","close","swipe"); }}
           >
             {/* NEW: area handle di tepi kanan agar mudah diseret/geser */}
             <div
@@ -2174,6 +1991,27 @@ useEffect(() => {
       </a>
       <div className="text-xs text-slate-500 dark:text-white/50">
         © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
+      </div>
+      <div className="text-[11px] leading-snug text-slate-500 dark:text-white/40">
+        Logo Puskesmas:{" "}
+        <a
+          href="https://id.wikipedia.org/wiki/Berkas:Lambang_Puskesmas.jpg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white/70"
+        >
+          Heriwibowo2015
+        </a>
+        ,{" "}
+        <a
+          href="https://creativecommons.org/licenses/by-sa/4.0/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white/70"
+        >
+          CC BY-SA 4.0
+        </a>
+        .
       </div>
     </div>
   </div>

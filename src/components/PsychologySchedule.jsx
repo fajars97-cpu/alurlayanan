@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { gaEvent } from "../ga.js"; // opsional, bisa dihapus kalau tidak ingin GA
 
+const MotionDiv = motion.div;
+
 // TODO: ganti dengan URL Apps Script kamu
 const API_URL =
   "https://script.google.com/macros/s/AKfycbyF7jT9rPHMnGvvX8WIBZOfHNhBrE0K0Lod-XY9DsteiiMnQm0duJJfCkPbKGLyuIhv/exec";
@@ -259,7 +261,9 @@ export default function PsychologySchedule() {
         date: iso,
         available: dayData?.summary?.tersedia ?? 0,
       });
-    } catch {}
+    } catch {
+      // GA is optional; schedule selection should still work.
+    }
   }
 
   function closeModal() {
@@ -412,14 +416,14 @@ export default function PsychologySchedule() {
       {/* Popup detail sesi */}
       <AnimatePresence>
         {selectedDate && selectedDay && (
-          <motion.div
+          <MotionDiv
             className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}
           >
-            <motion.div
+            <MotionDiv
               className="w-full max-w-md mx-4 rounded-2xl bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 shadow-xl p-4 sm:p-5 space-y-3"
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -491,8 +495,8 @@ export default function PsychologySchedule() {
                 WhatsApp resmi Puskesmas Jagakarsa. Mohon cantumkan nama, NIK,
                 dan keluhan singkat.
               </div>
-            </motion.div>
-          </motion.div>
+            </MotionDiv>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </section>

@@ -1245,13 +1245,6 @@ export const FLOW_STEPS = {
     description: "Setelah mendaftar, silahkan menuju bagian security untuk mencetak resi pendaftaran",
     img: "/alur/168-cetak-resi-online.webp",
     },
-    168: {
-    id: 168,
-    title: "Langkah 168",
-    name: "Cetak Resi Pendaftaran Online",
-    description: "Setelah mendaftar, silahkan menuju bagian security untuk mencetak resi pendaftaran",
-    img: "/alur/168-cetak-resi-online.webp",
-    },
     169: {
     id: 169,
     title: "Langkah 169",
