@@ -253,7 +253,21 @@ const StatusPill = ({ open, rest, soon }) => {
   );
 };
 
-function StatTile({ label, value, tone = "slate" }) {
+const STATUS_FILTERS = {
+  all: "Semua",
+  open: "Buka",
+  rest: "Istirahat",
+  closed: "Tutup",
+};
+
+function getPoliStatusKey(service) {
+  const status = getOpenStatusForPoli(service);
+  if (status.open) return "open";
+  if (status.rest) return "rest";
+  return "closed";
+}
+
+function StatTile({ label, value, tone = "slate", active = false, onClick }) {
   const tones = {
     emerald: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-300",
     rose: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/20 dark:bg-rose-500/10 dark:text-rose-300",
@@ -262,20 +276,35 @@ function StatTile({ label, value, tone = "slate" }) {
   };
 
   return (
-    <div className={`rounded-lg border px-3 py-2 ${tones[tone]}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-lg border px-3 py-2 text-left transition
+        hover:-translate-y-0.5 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/60
+        ${tones[tone]}
+        ${active ? "ring-2 ring-emerald-500/45 shadow-sm shadow-emerald-900/10" : ""}`}
+    >
       <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">{label}</div>
       <div className="mt-0.5 text-lg font-semibold text-slate-950 dark:text-white">{value}</div>
-    </div>
+    </button>
   );
 }
 
-function ServicesOverview({ facilityName, services, searchQuery, subMatchesCount }) {
+function ServicesOverview({
+  facilityName,
+  services,
+  searchQuery,
+  subMatchesCount,
+  statusFilter,
+  onStatusFilterChange,
+}) {
   const summary = useMemo(() => {
     return services.reduce(
       (acc, service) => {
-        const status = getOpenStatusForPoli(service);
-        if (status.open) acc.open += 1;
-        else if (status.rest) acc.rest += 1;
+        const statusKey = getPoliStatusKey(service);
+        if (statusKey === "open") acc.open += 1;
+        else if (statusKey === "rest") acc.rest += 1;
         else acc.closed += 1;
         return acc;
       },
@@ -284,6 +313,10 @@ function ServicesOverview({ facilityName, services, searchQuery, subMatchesCount
   }, [services]);
 
   const hasSearch = Boolean(searchQuery?.trim());
+  const activeLabel = STATUS_FILTERS[statusFilter] ?? STATUS_FILTERS.all;
+  const toggleStatus = (nextStatus) => {
+    onStatusFilterChange?.(statusFilter === nextStatus ? "all" : nextStatus);
+  };
 
   return (
     <section className="mb-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50 dark:border-white/10 dark:bg-slate-950/65 dark:shadow-none">
@@ -297,12 +330,31 @@ function ServicesOverview({ facilityName, services, searchQuery, subMatchesCount
           </h1>
           <p className="mt-1 text-sm text-slate-600 dark:text-white/60">
             {facilityName} - {hasSearch ? `${subMatchesCount} hasil layanan ditemukan.` : "Status dan jadwal hari ini ditampilkan di setiap kartu."}
+            {statusFilter !== "all" ? ` Filter aktif: ${activeLabel}.` : ""}
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:min-w-[22rem]">
-          <StatTile label="Buka" value={summary.open} tone="emerald" />
-          <StatTile label="Istirahat" value={summary.rest} tone="sky" />
-          <StatTile label="Tutup" value={summary.closed} tone="rose" />
+          <StatTile
+            label="Buka"
+            value={summary.open}
+            tone="emerald"
+            active={statusFilter === "open"}
+            onClick={() => toggleStatus("open")}
+          />
+          <StatTile
+            label="Istirahat"
+            value={summary.rest}
+            tone="sky"
+            active={statusFilter === "rest"}
+            onClick={() => toggleStatus("rest")}
+          />
+          <StatTile
+            label="Tutup"
+            value={summary.closed}
+            tone="rose"
+            active={statusFilter === "closed"}
+            onClick={() => toggleStatus("closed")}
+          />
         </div>
       </div>
     </section>
@@ -924,11 +976,14 @@ function RightPanel({
   selected,
   setSelected,
   filtered,
+  overviewServices,
   subMatches,
   onPickSub,
   jump,
   setJump,
   searchQuery,
+  statusFilter,
+  setStatusFilter,
   scrollReq,
   onPickPoli,
   facilityId,
@@ -1127,9 +1182,11 @@ useEffect(() => {
       <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
         <ServicesOverview
           facilityName={facilityName}
-          services={filtered}
+          services={overviewServices}
           searchQuery={searchQuery}
           subMatchesCount={subMatches?.length ?? 0}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
         />
         <AnimatePresence mode="wait">
           <MotionDiv
@@ -1157,11 +1214,17 @@ useEffect(() => {
               </section>
             ) : (
               <>
-                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {filtered.map((s) => (
-                    <ServiceCard key={s.id} s={s} onPick={onPickPoli} />
-                  ))}
-                </div>
+                {filtered.length > 0 ? (
+                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {filtered.map((s) => (
+                      <ServiceCard key={s.id} s={s} onPick={onPickPoli} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-600 dark:border-white/15 dark:bg-white/5 dark:text-white/60">
+                    Tidak ada layanan dengan filter ini.
+                  </div>
+                )}
               </>
             )}
           </MotionDiv>
@@ -1565,6 +1628,7 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [facility, setFacility] = useState("pkm-jagakarsa");
   const [navOpen, setNavOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [scrollReq, setScrollReq] = useState(null); // { poliId, ts }
   const [jump, setJump] = useState(null);
   const lastQueryRef = useRef(null);
@@ -1676,7 +1740,7 @@ useEffect(() => {
     }
   }, [query]);
 
-  const filtered = useMemo(() => {
+  const filteredByQuery = useMemo(() => {
    const q = query.trim().toLowerCase();
    const list = SERVICES_CURRENT.filter(
      (s) => !q || s.nama.toLowerCase().includes(q) || s.klaster.toLowerCase().includes(q)
@@ -1690,18 +1754,24 @@ useEffect(() => {
    });
  }, [query, SERVICES_CURRENT]);
 
+  const filtered = useMemo(() => {
+    if (statusFilter === "all") return filteredByQuery;
+    return filteredByQuery.filter((service) => getPoliStatusKey(service) === statusFilter);
+  }, [filteredByQuery, statusFilter]);
+
   const subResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     const rows = [];
-    SERVICES_CURRENT.forEach((p) =>
+    filteredByQuery.forEach((p) => {
+      if (statusFilter !== "all" && getPoliStatusKey(p) !== statusFilter) return;
       (p.layanan || []).forEach((item, idx) => {
         const hay = `${(item.nama || "").toLowerCase()} ${(item.ket || "").toLowerCase()}`;
         if (hay.includes(q)) rows.push({ poli: p, item, index: idx });
-      })
-    );
+      });
+    });
     return rows;
-  }, [query, SERVICES_CURRENT]);
+  }, [query, filteredByQuery, statusFilter]);
 
   const matchPoliIds = useMemo(
     () => Array.from(new Set(subResults.map((r) => r.poli.id))),
@@ -1709,8 +1779,12 @@ useEffect(() => {
   );
   const sidebarList = useMemo(
     () =>
-      filtered.length === 0 && query && subResults.length > 0 ? SERVICES_CURRENT : filtered,
-    [filtered, query, subResults, SERVICES_CURRENT]
+      filtered.length === 0 && query && subResults.length > 0
+        ? SERVICES_CURRENT.filter((service) =>
+            statusFilter === "all" ? true : getPoliStatusKey(service) === statusFilter
+          )
+        : filtered,
+    [filtered, query, subResults, SERVICES_CURRENT, statusFilter]
   );
 
   function handlePickSub(poliId, idx) {
@@ -1939,11 +2013,14 @@ useEffect(() => {
             selected={selected}
             setSelected={setSelected}
             filtered={filtered}
+            overviewServices={filteredByQuery}
             subMatches={subResults}
             onPickSub={handlePickSub}
             jump={jump}
             setJump={setJump}
             searchQuery={query}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
             scrollReq={scrollReq}
             onPickPoli={onPickPoli}
             facilityId={facility}          
