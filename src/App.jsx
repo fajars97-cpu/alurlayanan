@@ -253,6 +253,60 @@ const StatusPill = ({ open, rest, soon }) => {
   );
 };
 
+function formatClockFromMinutes(minutesFromNow) {
+  if (minutesFromNow == null || !Number.isFinite(minutesFromNow)) return null;
+
+  const target = new Date();
+  target.setMinutes(target.getMinutes() + minutesFromNow);
+  return target.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function describeServiceStatus(status, fallbackSchedule = null) {
+  const time = formatClockFromMinutes(status?.minutesUntilChange);
+  const nextDay = (status?.minutesUntilChange ?? 0) >= 24 * 60;
+  const dayPrefix = nextDay ? "besok " : "";
+
+  if (status?.rest) {
+    return time ? `Istirahat, buka lagi ${dayPrefix}${time}` : "Sedang istirahat";
+  }
+
+  if (status?.open) {
+    if (status?.minutesUntilChange == null) return "Buka 24 jam";
+    return time ? `Buka sampai ${dayPrefix}${time}` : "Sedang buka";
+  }
+
+  if (time) return `Tutup, buka ${dayPrefix}${time}`;
+  return fallbackSchedule ? `Tutup hari ini (${fallbackSchedule})` : "Tutup hari ini";
+}
+
+const QUICK_ACCESS_DEFS = [
+  { id: "igd", label: "IGD" },
+  { id: "pendaftaran_online", label: "Pendaftaran Online" },
+  { id: "laboratorium", label: "Laboratorium" },
+  { id: "farmasi", label: "Farmasi" },
+  { id: "poli-gigi", label: "Poli Gigi", aliases: ["gigi"] },
+  { id: "ruang-bersalin", label: "Ruang Bersalin", aliases: ["bersalin"] },
+];
+
+function findQuickAccessServices(services) {
+  return QUICK_ACCESS_DEFS.map((item) => {
+    const service = services.find((candidate) => {
+      const haystack = `${candidate.id || ""} ${candidate.nama || ""}`.toLowerCase();
+      return (
+        haystack.includes(item.id.replace(/_/g, "-")) ||
+        haystack.includes(item.id) ||
+        item.aliases?.some((alias) => haystack.includes(alias))
+      );
+    });
+
+    return service ? { ...item, service } : null;
+  }).filter(Boolean);
+}
+
 const STATUS_FILTERS = {
   all: "Semua",
   open: "Buka",
@@ -332,6 +386,15 @@ function ServicesOverview({
             {facilityName} - {hasSearch ? `${subMatchesCount} hasil layanan ditemukan.` : "Status dan jadwal hari ini ditampilkan di setiap kartu."}
             {statusFilter !== "all" ? ` Filter aktif: ${activeLabel}.` : ""}
           </p>
+          {statusFilter !== "all" && (
+            <button
+              type="button"
+              onClick={() => onStatusFilterChange?.("all")}
+              className="mt-2 inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              Tampilkan semua
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-2 sm:min-w-[22rem]">
           <StatTile
@@ -356,6 +419,47 @@ function ServicesOverview({
             onClick={() => toggleStatus("closed")}
           />
         </div>
+      </div>
+    </section>
+  );
+}
+
+function QuickAccessBar({ services, onPick }) {
+  const quickServices = useMemo(() => findQuickAccessServices(services), [services]);
+  if (!quickServices.length) return null;
+
+  return (
+    <section className="mb-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-xs font-semibold uppercase text-slate-500 dark:text-white/45">
+          Akses cepat
+        </div>
+      </div>
+      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+        {quickServices.map(({ id, label, service }) => {
+          const status = getOpenStatusForPoli(service);
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onPick(service)}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm shadow-slate-200/50 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50/70 dark:border-white/10 dark:bg-white/5 dark:text-white dark:shadow-none dark:hover:border-emerald-400/30 dark:hover:bg-emerald-500/10"
+            >
+              <span className="text-base">{service.ikon}</span>
+              <span>{label}</span>
+              <span
+                className={`size-2 rounded-full ${
+                  status.open
+                    ? "bg-emerald-500"
+                    : status.rest
+                      ? "bg-sky-500"
+                      : "bg-rose-500"
+                }`}
+                aria-hidden="true"
+              />
+            </button>
+          );
+        })}
       </div>
     </section>
   );
@@ -640,6 +744,7 @@ function ServiceCard({ s, onPick }) {
   const status = getOpenStatusForPoli(s);
   const serviceCount = (s.layanan || []).length;
   const todaySchedule = s.jadwal ? todayText(s.jadwal) : "Cek jadwal tiap layanan";
+  const statusDetail = describeServiceStatus(status, todaySchedule);
   // anggap nama panjang kalau lebih dari 18 karakter
   const isLongName = name.length > 18;
   const nameClass = isLongName
@@ -692,6 +797,8 @@ function ServiceCard({ s, onPick }) {
         <div className="mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 border-t border-white/15 pt-2 text-[11px] text-white/85">
           <span className="text-white/55">Hari ini</span>
           <span className="truncate">{todaySchedule}</span>
+          <span className="text-white/55">Status</span>
+          <span className="truncate">{statusDetail}</span>
           <span className="text-white/55">Layanan</span>
           <span>{serviceCount}</span>
         </div>
@@ -707,8 +814,10 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId, facilityId, facili
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
 
   const jadwalLayanan = item.jadwal || null;
-  const { open, rest, soon } = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
+  const serviceStatus = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
+  const { open, rest, soon } = serviceStatus;
   const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
+  const statusDetail = describeServiceStatus(serviceStatus, today || "jadwal default poli");
   const renderCompactSchedule = (jadwal) => {
     if (!jadwal?.weekly && !Object.keys(jadwal || {}).length) return null;
     const eff = getEffectiveJadwal({ jadwal });
@@ -753,7 +862,12 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId, facilityId, facili
           <span className={bpjsClass}>{bpjsText}</span>
           <StatusPill open={open} rest={rest} soon={soon} />
         </div>
-        <div className="text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">{tarifText}</div>
+        <div className="grid gap-1 text-[12px] sm:text-[13px] text-slate-700 dark:text-white/70">
+          <div>{tarifText}</div>
+          <div>
+            <span className="text-slate-500 dark:text-white/50">Status:</span> {statusDetail}
+          </div>
+        </div>
         <div className="h-px bg-black/10 dark:bg-white/10" />
         <div className="flex items-start gap-3">
           <div className="mt-0.5 text-xl sm:text-2xl shrink-0">{item.ikon ?? "🧩"}</div>
@@ -1188,6 +1302,9 @@ useEffect(() => {
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
         />
+        {!searchQuery?.trim() && (
+          <QuickAccessBar services={overviewServices} onPick={onPickPoli} />
+        )}
         <AnimatePresence mode="wait">
           <MotionDiv
             key="grid-poli-or-search"
@@ -1372,6 +1489,8 @@ useEffect(() => {
               onPick={setSub}
               parentJadwal={selected.jadwal}
               poliId={selected.id}
+              facilityId={facilityId}
+              facilityName={facilityName}
             />
           ))}
         </Panel>
@@ -1386,6 +1505,8 @@ useEffect(() => {
               onPick={setSub}
               parentJadwal={selected.jadwal}
               poliId={selected.id}
+              facilityId={facilityId}
+              facilityName={facilityName}
             />
           ))}
         </Panel>
@@ -1400,6 +1521,8 @@ useEffect(() => {
               onPick={setSub}
               parentJadwal={selected.jadwal}
               poliId={selected.id}
+              facilityId={facilityId}
+              facilityName={facilityName}
             />
           ))}
         </Panel>
@@ -1410,6 +1533,12 @@ useEffect(() => {
       </div>
     );
   }
+
+  const detailStatus = getOpenStatus({ jadwal: sub.jadwal || selected.jadwal });
+  const detailScheduleToday = todayText(sub.jadwal || selected.jadwal || {});
+  const detailStatusText = describeServiceStatus(detailStatus, detailScheduleToday);
+  const detailBpjsText = sub.bpjs ? "BPJS tercakup" : "BPJS tidak tercakup";
+  const detailLocation = selected.lokasi || selected.klaster || "-";
 
   return (
     <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6 space-y-4">
@@ -1426,6 +1555,49 @@ useEffect(() => {
       <div className="text-slate-700 dark:text-white/70">
         Alur layanan untuk: <span className="font-medium">{sub.nama}</span>
       </div>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50 dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusPill
+                open={detailStatus.open}
+                rest={detailStatus.rest}
+                soon={detailStatus.soon}
+              />
+              {sub?.puasa && <PuasaPill />}
+            </div>
+            <div className="mt-2 text-base font-semibold text-slate-950 dark:text-white">
+              {detailStatusText}
+            </div>
+            {sub.ket && (
+              <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/60">
+                {sub.ket}
+              </p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-[20rem]">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+              <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">Tarif</div>
+              <div className="mt-1 font-semibold text-slate-950 dark:text-white">{formatTarifID(sub.tarif)}</div>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+              <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">BPJS</div>
+              <div className={`mt-1 font-semibold ${sub.bpjs ? "text-emerald-700 dark:text-emerald-300" : "text-rose-700 dark:text-rose-300"}`}>
+                {detailBpjsText}
+              </div>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+              <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">Lokasi</div>
+              <div className="mt-1 font-semibold text-slate-950 dark:text-white">{detailLocation}</div>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+              <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">Hari ini</div>
+              <div className="mt-1 font-semibold text-slate-950 dark:text-white">{detailScheduleToday}</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {Object.keys(scenarios).length > 1 && (
         <div className="flex flex-wrap gap-2 -mt-1">
@@ -2068,27 +2240,6 @@ useEffect(() => {
       </a>
       <div className="text-xs text-slate-500 dark:text-white/50">
         © {new Date().getFullYear()} Puskesmas Jagakarsa — Mockup UI.
-      </div>
-      <div className="text-[11px] leading-snug text-slate-500 dark:text-white/40">
-        Logo Puskesmas:{" "}
-        <a
-          href="https://id.wikipedia.org/wiki/Berkas:Lambang_Puskesmas.jpg"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white/70"
-        >
-          Heriwibowo2015
-        </a>
-        ,{" "}
-        <a
-          href="https://creativecommons.org/licenses/by-sa/4.0/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-white/70"
-        >
-          CC BY-SA 4.0
-        </a>
-        .
       </div>
     </div>
   </div>
