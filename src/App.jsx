@@ -741,7 +741,6 @@ function Sidebar({
 function ServiceCard({ s, onPick }) {
   const name = s.nama || "";
   const status = getOpenStatusForPoli(s);
-  const serviceCount = (s.layanan || []).length;
   const todaySchedule = s.jadwal ? todayText(s.jadwal) : "Cek jadwal tiap layanan";
   const statusDetail = describeServiceStatus(status, todaySchedule);
   // anggap nama panjang kalau lebih dari 18 karakter
@@ -753,7 +752,7 @@ function ServiceCard({ s, onPick }) {
   return (
     <button
       onClick={() => onPick(s)}
-      className={`group relative grid min-h-44 grid-cols-[minmax(0,1fr)_7.5rem] overflow-hidden rounded-lg border
+      className={`group relative grid min-h-36 grid-cols-[minmax(0,1fr)_7rem] overflow-hidden rounded-lg border
         bg-white shadow-sm shadow-slate-200/60 dark:bg-white/5 dark:shadow-none
         hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:shadow-slate-200/80 dark:hover:bg-white/8
         active:scale-[.99] transition text-left touch-manipulation
@@ -764,10 +763,10 @@ function ServiceCard({ s, onPick }) {
         <StatusPill open={status.open} rest={status.rest} soon={status.soon} />
       </div>
       {/* Gambar: tinggi tetap per breakpoint, gambar tidak dipotong (contain) */}
-      <div className="col-start-2 row-start-1 h-full w-full bg-slate-50 dark:bg-slate-900/40 transition-colors duration-300 sm:col-auto sm:row-auto">
+      <div className="col-start-2 row-start-1 h-full w-full border-l border-slate-100 bg-slate-50 dark:border-white/10 dark:bg-slate-900/40 transition-colors duration-300 sm:col-auto sm:row-auto sm:border-l-0">
         <div className="relative h-full p-2 sm:h-auto sm:p-3">
           {/* container tinggi tetap agar desktop tidak mengecil, mobile tidak terpotong */}
-          <div className="relative h-full min-h-44 sm:h-48 sm:min-h-0 md:h-56 lg:h-60 xl:h-64">
+          <div className="relative h-full min-h-36 sm:h-48 sm:min-h-0 md:h-56 lg:h-60 xl:h-64">
             <img
               src={resolveInfografis(s)}
               onError={onInfoError}
@@ -776,14 +775,14 @@ function ServiceCard({ s, onPick }) {
               loading="lazy"
             />
             {/* Gradient bawah saja (±40% tinggi) agar teks kontras tanpa menutup gambar */}
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 sm:h-16 md:h-14 bg-gradient-to-t from-black/45 via-black/12 to-transparent" />
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 hidden h-16 bg-gradient-to-t from-black/45 via-black/12 to-transparent sm:block md:h-14" />
           </div>
         </div>
       </div>
 
       {/* Teks & ikon: bar bawah dengan latar gelap tipis */}
-      <div className="relative z-[1] col-start-1 row-start-1 flex h-full min-w-0 flex-col justify-end px-3 py-3 bg-gradient-to-r from-black/48 via-black/38 to-black/12 backdrop-blur-[1px] sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:block sm:h-auto sm:bg-black/32 sm:px-3 sm:py-3">
-        <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] leading-tight">
+      <div className="relative z-[1] col-start-1 row-start-1 flex h-full min-w-0 flex-col justify-end px-3 py-3 pt-11 text-slate-900 dark:text-white sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:block sm:h-auto sm:bg-black/32 sm:px-3 sm:py-3 sm:text-white sm:backdrop-blur-[1px]">
+        <div className="flex items-center gap-2 leading-tight sm:drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
           <div className="text-xl shrink-0">{s.ikon}</div>
           {/* Nama poli: tidak di-truncate, font mengecil jika terlalu panjang, boleh 2 baris */}
           <div className={`${nameClass} whitespace-normal break-words`}>
@@ -791,16 +790,14 @@ function ServiceCard({ s, onPick }) {
           </div>
         </div>
         {/* Klaster: boleh dibatasi maksimal 2 baris agar tidak terlalu tinggi */}
-        <div className="text-[11px] sm:text-[12px] opacity-90 line-clamp-2">
+        <div className="mt-1 line-clamp-2 text-[12px] text-slate-600 dark:text-white/70 sm:text-[12px] sm:text-white sm:opacity-90">
           {s.klaster}
         </div>
-        <div className="mt-2 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5 border-t border-white/15 pt-2 text-[11px] text-white/85">
-          <span className="text-white/55">Hari ini</span>
+        <div className="mt-3 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-1 border-t border-slate-200 pt-2 text-[11px] text-slate-700 dark:border-white/10 dark:text-white/70 sm:mt-2 sm:border-white/15 sm:text-white/85">
+          <span className="text-slate-500 dark:text-white/45 sm:text-white/55">Hari ini</span>
           <span className="truncate">{todaySchedule}</span>
-          <span className="text-white/55">Status</span>
+          <span className="text-slate-500 dark:text-white/45 sm:text-white/55">Status</span>
           <span className="truncate">{statusDetail}</span>
-          <span className="text-white/55">Layanan</span>
-          <span>{serviceCount}</span>
         </div>
       </div>
     </button>
