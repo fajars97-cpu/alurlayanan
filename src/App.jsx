@@ -373,7 +373,7 @@ function ServicesOverview({
   };
 
   return (
-    <section className="mb-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50 dark:border-white/10 dark:bg-slate-950/65 dark:shadow-none">
+    <section className="mb-4 w-full overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50 dark:border-white/10 dark:bg-slate-950/65 dark:shadow-none">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-300">
@@ -382,7 +382,7 @@ function ServicesOverview({
           <h1 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white">
             {hasSearch ? "Hasil pencarian layanan" : "Pilih poli layanan"}
           </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-white/60">
+          <p className="mt-1 max-w-full text-sm leading-relaxed text-slate-600 dark:text-white/60">
             {facilityName} - {hasSearch ? `${subMatchesCount} hasil layanan ditemukan.` : "Status dan jadwal hari ini ditampilkan di setiap kartu."}
             {statusFilter !== "all" ? ` Filter aktif: ${activeLabel}.` : ""}
           </p>
@@ -396,7 +396,7 @@ function ServicesOverview({
             </button>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-2 sm:min-w-[22rem]">
+        <div className="grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-3 lg:w-auto lg:min-w-[22rem]">
           <StatTile
             label="Buka"
             value={summary.open}
@@ -429,13 +429,13 @@ function QuickAccessBar({ services, onPick }) {
   if (!quickServices.length) return null;
 
   return (
-    <section className="mb-4">
+    <section className="mb-4 w-full overflow-hidden">
       <div className="flex items-center justify-between gap-3">
         <div className="text-xs font-semibold uppercase text-slate-500 dark:text-white/45">
           Akses cepat
         </div>
       </div>
-      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+      <div className="mt-2 flex max-w-full snap-x gap-2 overflow-x-auto overscroll-x-contain pb-2 [-webkit-overflow-scrolling:touch]">
         {quickServices.map(({ id, label, service }) => {
           const status = getOpenStatusForPoli(service);
           return (
@@ -443,10 +443,10 @@ function QuickAccessBar({ services, onPick }) {
               key={id}
               type="button"
               onClick={() => onPick(service)}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm shadow-slate-200/50 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50/70 dark:border-white/10 dark:bg-white/5 dark:text-white dark:shadow-none dark:hover:border-emerald-400/30 dark:hover:bg-emerald-500/10"
+              className="inline-flex max-w-[78vw] shrink-0 snap-start items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm shadow-slate-200/50 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50/70 dark:border-white/10 dark:bg-white/5 dark:text-white dark:shadow-none dark:hover:border-emerald-400/30 dark:hover:bg-emerald-500/10"
             >
               <span className="text-base">{service.ikon}</span>
-              <span>{label}</span>
+              <span className="truncate">{label}</span>
               <span
                 className={`size-2 rounded-full ${
                   status.open
@@ -754,20 +754,21 @@ function ServiceCard({ s, onPick }) {
   return (
     <button
       onClick={() => onPick(s)}
-      className={`group relative overflow-hidden rounded-lg border
+      className={`group relative grid min-h-44 grid-cols-[minmax(0,1fr)_7.5rem] overflow-hidden rounded-lg border
         bg-white shadow-sm shadow-slate-200/60 dark:bg-white/5 dark:shadow-none
         hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:shadow-slate-200/80 dark:hover:bg-white/8
         active:scale-[.99] transition text-left touch-manipulation
+        sm:block sm:min-h-0
         ${floorBorderClass(s.lokasi)}`}
     >
       <div className="absolute left-3 top-3 z-10">
         <StatusPill open={status.open} rest={status.rest} soon={status.soon} />
       </div>
       {/* Gambar: tinggi tetap per breakpoint, gambar tidak dipotong (contain) */}
-      <div className="w-full bg-slate-50 dark:bg-slate-900/40 transition-colors duration-300">
-        <div className="relative p-2 sm:p-3">
+      <div className="col-start-2 row-start-1 h-full w-full bg-slate-50 dark:bg-slate-900/40 transition-colors duration-300 sm:col-auto sm:row-auto">
+        <div className="relative h-full p-2 sm:h-auto sm:p-3">
           {/* container tinggi tetap agar desktop tidak mengecil, mobile tidak terpotong */}
-          <div className="relative h-40 sm:h-48 md:h-56 lg:h-60 xl:h-64">
+          <div className="relative h-full min-h-44 sm:h-48 sm:min-h-0 md:h-56 lg:h-60 xl:h-64">
             <img
               src={resolveInfografis(s)}
               onError={onInfoError}
@@ -782,7 +783,7 @@ function ServiceCard({ s, onPick }) {
       </div>
 
       {/* Teks & ikon: bar bawah dengan latar gelap tipis */}
-      <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:py-3 bg-black/32 backdrop-blur-[1px]">
+      <div className="relative z-[1] col-start-1 row-start-1 flex h-full min-w-0 flex-col justify-end px-3 py-3 bg-gradient-to-r from-black/48 via-black/38 to-black/12 backdrop-blur-[1px] sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:block sm:h-auto sm:bg-black/32 sm:px-3 sm:py-3">
         <div className="flex items-center gap-2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] leading-tight">
           <div className="text-xl shrink-0">{s.ikon}</div>
           {/* Nama poli: tidak di-truncate, font mengecil jika terlalu panjang, boleh 2 baris */}
@@ -794,7 +795,7 @@ function ServiceCard({ s, onPick }) {
         <div className="text-[11px] sm:text-[12px] opacity-90 line-clamp-2">
           {s.klaster}
         </div>
-        <div className="mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 border-t border-white/15 pt-2 text-[11px] text-white/85">
+        <div className="mt-2 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5 border-t border-white/15 pt-2 text-[11px] text-white/85">
           <span className="text-white/55">Hari ini</span>
           <span className="truncate">{todaySchedule}</span>
           <span className="text-white/55">Status</span>
@@ -1293,7 +1294,7 @@ useEffect(() => {
 
   if (!selected || showSearchResults) {
     return (
-      <div className="min-h-[calc(100svh-64px)] p-3 sm:p-4 md:p-6">
+      <div className="min-h-[calc(100svh-64px)] min-w-0 overflow-x-hidden p-3 sm:p-4 md:p-6">
         <ServicesOverview
           facilityName={facilityName}
           services={overviewServices}
@@ -1315,7 +1316,7 @@ useEffect(() => {
           >
             {showSearchResults ? (
               <section className="mb-6">
-                <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
                   {subMatches.map(({ poli, item, index }) => (
                     <SubServiceCard
                       key={poli.id + "#" + index}
@@ -1332,7 +1333,7 @@ useEffect(() => {
             ) : (
               <>
                 {filtered.length > 0 ? (
-                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                     {filtered.map((s) => (
                       <ServiceCard key={s.id} s={s} onPick={onPickPoli} />
                     ))}
@@ -1377,7 +1378,7 @@ useEffect(() => {
     return (
       <div
         ref={servicesGridRef}
-        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
       >
         {items.length > 0 ? (
           items.map((it, i) => (
@@ -1468,7 +1469,7 @@ useEffect(() => {
             transition={{ duration: 0.18 }}
             className="p-4 pt-3"
           >
-            <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {children}
             </div>
           </MotionDiv>
@@ -1576,7 +1577,7 @@ useEffect(() => {
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-[20rem]">
+          <div className="grid w-full grid-cols-1 gap-2 text-sm min-[380px]:grid-cols-2 sm:w-auto sm:min-w-[20rem]">
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
               <div className="text-[11px] uppercase text-slate-500 dark:text-white/45">Tarif</div>
               <div className="mt-1 font-semibold text-slate-950 dark:text-white">{formatTarifID(sub.tarif)}</div>
@@ -1622,7 +1623,7 @@ useEffect(() => {
         </div>
       )}
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {flowSteps.map((step, i) => (
           <FlowCard key={step.id ?? i} step={step} index={i} />
         ))}
@@ -2038,16 +2039,16 @@ useEffect(() => {
   {/* === MOBILE: 2 baris === */}
   <div className="md:hidden max-w-7xl mx-auto px-3 sm:px-4 py-2 space-y-2">
     {/* Baris 1: Ikon + Judul full */}
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2">
       <PuskesmasLogo className="size-9" />
-      <div className="leading-tight">
+      <div className="min-w-0 leading-tight">
         <div className="text-[11px] font-medium opacity-90">INFORMASI LAYANAN</div>
-        <div className="text-[14px] font-semibold">PUSKESMAS JAGAKARSA</div>
+        <div className="break-words text-[14px] font-semibold leading-tight">PUSKESMAS JAGAKARSA</div>
       </div>
     </div>
 
     {/* Baris 2: Burger + Select (w-full) */}
-    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2">
+    <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
       <button
         className="inline-grid place-items-center size-11 rounded-lg border border-black/10 bg-white text-slate-800 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
         aria-label="Buka menu"
@@ -2058,7 +2059,7 @@ useEffect(() => {
         </svg>
       </button>
 
-      <div className="relative">
+      <div className="relative min-w-0">
         <select
   value={facility}
   onChange={(e) => {
@@ -2133,7 +2134,7 @@ useEffect(() => {
   </div>
 </header>
 
-        <div className="max-w-7xl mx-auto px-0 md:px-4 grid md:grid-cols-[24rem_1fr]">
+        <div className="mx-auto grid max-w-7xl min-w-0 overflow-x-hidden px-0 md:grid-cols-[24rem_minmax(0,1fr)] md:px-4">
           {navOpen && (
             <button
               aria-label="Tutup menu"
@@ -2143,7 +2144,7 @@ useEffect(() => {
           )}
 
           <div
-            className={`fixed z-50 inset-y-0 left-0 w-80 md:w-auto md:static md:z-auto
+            className={`fixed z-50 inset-y-0 left-0 w-[min(20rem,88vw)] md:w-auto md:static md:z-auto
               transition-transform md:transition-none
               ${navOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full md:translate-x-0 pointer-events-none md:pointer-events-auto"}
               h-[100svh] overflow-y-auto overscroll-contain`}
@@ -2206,12 +2207,12 @@ useEffect(() => {
           cooldownDays={7}
         />
 
-        <footer className="mt-8 border-t border-white/10">
-  <div className="max-w-7xl mx-auto px-4 py-6 grid gap-6
+        <footer className="mt-8 overflow-hidden border-t border-white/10">
+  <div className="mx-auto grid max-w-7xl min-w-0 gap-6 px-3 py-6 sm:px-4
                           md:grid-cols-[minmax(0,1fr)_18rem]
                           lg:grid-cols-[minmax(0,720px)_20rem] items-start">
-    <div className="w-full rounded-xl overflow-hidden ring-1 ring-black/10 dark:ring-white/10
-                            aspect-[16/10] md:aspect-auto md:h-72 lg:h-80 xl:h-96">
+    <div className="w-full min-w-0 rounded-xl overflow-hidden ring-1 ring-black/10 dark:ring-white/10
+                            aspect-[4/3] sm:aspect-[16/10] md:aspect-auto md:h-72 lg:h-80 xl:h-96">
       <iframe
         title="Lokasi fasilitas"
         loading="lazy"
@@ -2221,7 +2222,7 @@ useEffect(() => {
       />
     </div>
 
-    <div className="text-sm text-slate-700 dark:text-white/70 space-y-3">
+    <div className="min-w-0 text-sm text-slate-700 dark:text-white/70 space-y-3">
       <div className="font-semibold text-slate-900 dark:text-white">
         Lokasi: {facilityName}
       </div>

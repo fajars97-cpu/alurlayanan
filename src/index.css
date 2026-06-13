@@ -6,6 +6,18 @@
 :root { color-scheme: light; }
 .dark { color-scheme: dark; }
 
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+* {
+  min-width: 0;
+}
+
 /* styling select (opsional, seperti sebelumnya) */
 select, select option {
   background-color: #ffffff;
