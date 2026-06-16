@@ -1,6 +1,7 @@
 import {
   ALWAYS_OPEN_POLI_IDS,
   GLOBAL_CLOSED_DATES,
+  HOLIDAY_DATES,
   RAMADAN_DEFAULT,
   RAMADAN_MODE,
   formatDateKey,
@@ -28,6 +29,12 @@ const RULE_DEFAULT_NORMAL = {
 
 const RULE_DEFAULT = RAMADAN_MODE ? RAMADAN_DEFAULT : RULE_DEFAULT_NORMAL;
 const WEEKDAY_NAMES = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
+const CLOSED_STATUS = {
+  open: false,
+  rest: false,
+  soon: null,
+  minutesUntilChange: null,
+};
 
 const toMin = (value) => {
   const [hours, minutes] = String(value)
@@ -41,6 +48,43 @@ const pad2 = (value) => (value < 10 ? `0${value}` : `${value}`);
 const fmtMin = (value) => `${pad2(Math.floor(value / 60))}:${pad2(value % 60)}`;
 const dayNameID = (date) => DAY_NAMES_ID[date.getDay()];
 const DASH_RE = /\u2013|\u2014|\u00e2\u20ac\u201c|\u00e2\u20ac\u201d/g;
+
+export function holidayNameForDate(ref = new Date()) {
+  return HOLIDAY_DATES[formatDateKey(ref)] ?? null;
+}
+
+function isGlobalHolidayWeekday(ref = new Date()) {
+  const dayName = dayNameID(ref);
+  const key = formatDateKey(ref);
+  return WEEKDAY_NAMES.includes(dayName) && GLOBAL_CLOSED_DATES.has(key);
+}
+
+function shouldApplyGlobalHolidayClosure(poliId, ref = new Date()) {
+  return isGlobalHolidayWeekday(ref) && !ALWAYS_OPEN_POLI_IDS.has(poliId);
+}
+
+function shouldForceOpenOnHoliday(poliId, ref = new Date()) {
+  return isGlobalHolidayWeekday(ref) && ALWAYS_OPEN_POLI_IDS.has(poliId);
+}
+
+function holidayClosedStatus(ref = new Date()) {
+  return {
+    ...CLOSED_STATUS,
+    holiday: true,
+    holidayName: holidayNameForDate(ref),
+  };
+}
+
+function holidayOpenStatus(ref = new Date()) {
+  return {
+    open: true,
+    rest: false,
+    soon: null,
+    minutesUntilChange: null,
+    holidayOpen: true,
+    holidayName: holidayNameForDate(ref),
+  };
+}
 
 function normalizeRanges(value) {
   if (value == null) return [];
@@ -227,7 +271,14 @@ function scanRanges(ranges, ref, nextDayRanges = [], restRanges = []) {
   return { open, rest: Boolean(rest), soon, minutesUntilChange };
 }
 
-export function getOpenStatus(service, ref = new Date()) {
+export function getOpenStatus(service, ref = new Date(), options = {}) {
+  if (shouldApplyGlobalHolidayClosure(options.poliId, ref)) {
+    return holidayClosedStatus(ref);
+  }
+  if (shouldForceOpenOnHoliday(options.poliId, ref)) {
+    return holidayOpenStatus(ref);
+  }
+
   const schedule = service?.jadwal || {};
   const tomorrow = new Date(ref);
   tomorrow.setDate(ref.getDate() + 1);
@@ -259,11 +310,11 @@ export function getEffectiveJadwal(service) {
 }
 
 export function getOpenStatusForPoli(poli, ref = new Date()) {
-  if (RAMADAN_MODE) {
-    const key = formatDateKey(ref);
-    if (GLOBAL_CLOSED_DATES.has(key) && !ALWAYS_OPEN_POLI_IDS.has(poli?.id)) {
-      return { open: false, rest: false, soon: null, minutesUntilChange: null };
-    }
+  if (shouldApplyGlobalHolidayClosure(poli?.id, ref)) {
+    return holidayClosedStatus(ref);
+  }
+  if (shouldForceOpenOnHoliday(poli?.id, ref)) {
+    return holidayOpenStatus(ref);
   }
 
   const schedules = [];
@@ -310,7 +361,16 @@ export function weeklyKey(schedule) {
   );
 }
 
-export function todayText(scheduleLike) {
-  const today = DAY_NAMES_ID[new Date().getDay()];
+export function todayText(scheduleLike, options = {}) {
+  const ref = options.ref || new Date();
+  if (shouldApplyGlobalHolidayClosure(options.poliId, ref)) {
+    const holidayName = holidayNameForDate(ref);
+    return holidayName ? `Tutup (${holidayName})` : "Tutup";
+  }
+  if (shouldForceOpenOnHoliday(options.poliId, ref)) {
+    return "00:00-24:00";
+  }
+
+  const today = DAY_NAMES_ID[ref.getDay()];
   return getEffectiveJadwal({ jadwal: scheduleLike })[today];
 }

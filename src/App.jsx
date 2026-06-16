@@ -265,6 +265,10 @@ function formatClockFromMinutes(minutesFromNow) {
 }
 
 function describeServiceStatus(status, fallbackSchedule = null) {
+  if (status?.holiday) {
+    return status.holidayName ? `Tutup (${status.holidayName})` : "Tutup hari libur";
+  }
+
   const time = formatClockFromMinutes(status?.minutesUntilChange);
   const nextDay = (status?.minutesUntilChange ?? 0) >= 24 * 60;
   const dayPrefix = nextDay ? "besok " : "";
@@ -741,7 +745,11 @@ function Sidebar({
 function ServiceCard({ s, onPick }) {
   const name = s.nama || "";
   const status = getOpenStatusForPoli(s);
-  const todaySchedule = s.jadwal ? todayText(s.jadwal) : "Cek jadwal tiap layanan";
+  const todaySchedule = status.holiday
+    ? todayText({}, { poliId: s.id })
+    : s.jadwal
+      ? todayText(s.jadwal, { poliId: s.id })
+      : "Cek jadwal tiap layanan";
   const statusDetail = describeServiceStatus(status, todaySchedule);
   // anggap nama panjang kalau lebih dari 18 karakter
   const isLongName = name.length > 18;
@@ -811,9 +819,17 @@ function SubServiceCard({ item, onPick, parentJadwal, poliId, facilityId, facili
   const tarifText = `Tarif Umum: ${formatTarifID(item.tarif)}`;
 
   const jadwalLayanan = item.jadwal || null;
-  const serviceStatus = getOpenStatus({ jadwal: jadwalLayanan || parentJadwal });
+  const serviceStatus = getOpenStatus(
+    { jadwal: jadwalLayanan || parentJadwal },
+    new Date(),
+    { poliId }
+  );
   const { open, rest, soon } = serviceStatus;
-  const today = jadwalLayanan ? todayText(jadwalLayanan) : null;
+  const today = jadwalLayanan
+    ? todayText(jadwalLayanan, { poliId })
+    : serviceStatus.holiday
+      ? todayText({}, { poliId })
+      : null;
   const statusDetail = describeServiceStatus(serviceStatus, today || "jadwal default poli");
   const renderCompactSchedule = (jadwal) => {
     if (!jadwal?.weekly && !Object.keys(jadwal || {}).length) return null;
@@ -1531,8 +1547,14 @@ useEffect(() => {
     );
   }
 
-  const detailStatus = getOpenStatus({ jadwal: sub.jadwal || selected.jadwal });
-  const detailScheduleToday = todayText(sub.jadwal || selected.jadwal || {});
+  const detailStatus = getOpenStatus(
+    { jadwal: sub.jadwal || selected.jadwal },
+    new Date(),
+    { poliId: selected.id }
+  );
+  const detailScheduleToday = todayText(sub.jadwal || selected.jadwal || {}, {
+    poliId: selected.id,
+  });
   const detailStatusText = describeServiceStatus(detailStatus, detailScheduleToday);
   const detailBpjsText = sub.bpjs ? "BPJS tercakup" : "BPJS tidak tercakup";
   const detailLocation = selected.lokasi || selected.klaster || "-";
